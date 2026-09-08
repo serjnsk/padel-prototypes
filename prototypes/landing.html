@@ -1,0 +1,63 @@
+<title>PADEL.СЕЛЕКТ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,700;0,800;1,700;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0c1719;--stripe:#101f22;--panel:#0a0e13;--line:#1c2a2d;--line-strong:#25363a;
+  --ink:#ffffff;--muted:#8a9ea0;--dim:#5e7174;
+  --lime:#8ae81f;--lime-ink:#0b1b06;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit}
+.land{display:grid;grid-template-columns:1fr 500px;min-height:100vh}
+.hero{position:relative;overflow:hidden;background:repeating-linear-gradient(180deg,var(--bg) 0 42px,var(--stripe) 42px 84px);padding:0 56px;display:flex;flex-direction:column;justify-content:center}
+.wm{position:absolute;left:8px;top:-40px;font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(200px,26vw,360px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.13);text-stroke:2px rgba(255,255,255,.13);user-select:none;pointer-events:none;white-space:nowrap}
+.copy{position:relative;max-width:1000px;margin-top:-6vh}
+.eyebrow{display:inline-block;border:1px solid var(--line-strong);border-radius:4px;padding:8px 14px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#cfd9da;margin-bottom:28px}
+h1{font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(44px,5vw,72px);line-height:1;letter-spacing:-.01em;text-transform:uppercase;margin:0 0 28px;max-width:960px}
+.lead{font-size:19px;line-height:1.55;color:#b6c4c6;max-width:640px;margin:0 0 34px}
+.tags{display:flex;gap:12px;flex-wrap:wrap}
+.tag{border:1px solid var(--line-strong);background:rgba(255,255,255,.03);border-radius:4px;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#dfe7e8}
+.panel{background:var(--panel);border-left:1px solid var(--line);padding:56px 44px;display:flex;flex-direction:column;justify-content:center}
+.logo{font-family:var(--display);font-weight:800;font-style:italic;font-size:15px;letter-spacing:.04em;margin-bottom:32px}
+.logo em{font-style:italic;color:var(--lime)}
+h2{font-family:var(--display);font-weight:900;font-style:italic;font-size:34px;letter-spacing:-.01em;text-transform:uppercase;margin:0 0 26px}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.fld{position:relative;margin-bottom:22px}
+.fld input{width:100%;background:#0f151b;border:1px solid var(--line-strong);border-radius:6px;padding:15px 16px;color:var(--ink);font:inherit;font-size:15px}
+.fld input::placeholder{color:var(--dim)}
+.fld input:focus{outline:2px solid var(--lime);outline-offset:1px}
+.fld svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--muted)}
+.submit{display:block;width:100%;background:var(--lime);color:var(--lime-ink);border:0;border-radius:6px;padding:16px;font-family:var(--display);font-weight:800;font-style:italic;font-size:15px;letter-spacing:.1em;text-transform:uppercase;text-align:center;text-decoration:none;cursor:pointer;margin:6px 0 22px}
+.submit:hover{filter:brightness(1.06)}
+.note{border:1px solid var(--line-strong);border-radius:6px;padding:14px 18px;font-size:14px;line-height:1.5;color:#c5d0d2}
+@media (max-width:1000px){
+  .land{grid-template-columns:1fr}
+  .hero{padding:72px 24px 48px;min-height:70vh}
+  .copy{margin-top:0}
+  .panel{border-left:0;border-top:1px solid var(--line);padding:40px 24px}
+}
+</style>
+
+<div class="land">
+  <section class="hero">
+    <div class="wm" aria-hidden="true">ПАДЕЛ</div>
+    <div class="copy">
+      <span class="eyebrow">Для организаторов турниров</span>
+      <h1>Проведение и&nbsp;судейство<br>турниров по&nbsp;паделу</h1>
+      <p class="lead">Организация и проведение официальных турниров по регламенту ФПР. Расписание игр, ведение турнира, судейство на вышке, живые таблицы для зрителей и ТВ-режим для табло — всё в одном сервисе под ключ.</p>
+      <div class="tags"><span class="tag">Удобный конструктор турниров</span><span class="tag">Live таблицы для зрителей</span><span class="tag">Режим «Судейство на вышке»</span><span class="tag">Кастомизация дизайна турнира</span><span class="tag">ТВ режим</span></div>
+    </div>
+  </section>
+  <aside class="panel">
+    <div class="logo">PADEL.<em>СЕЛЕКТ</em></div>
+    <h2>Вход</h2>
+    <label for="email">E-mail</label>
+    <div class="fld"><input id="email" type="email" placeholder="name@club.ru" autocomplete="username"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="11" r="3"/><path d="M7 17c1.2-1.6 3-2.4 5-2.4s3.8.8 5 2.4"/></svg></div>
+    <label for="pass">Пароль</label>
+    <div class="fld"><input id="pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <a class="submit" href="tournaments-list.html">Войти</a>
+    <div class="note">Доступ выдаёт администратор сервиса. Самостоятельная регистрация отключена: за аккаунтом обратитесь к организатору.</div>
+  </aside>
+</div>

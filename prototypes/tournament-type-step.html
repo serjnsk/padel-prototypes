@@ -1,0 +1,690 @@
+<title>Конструктор турнира</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f8;--surface:#ffffff;--surface-2:#f3f4f6;--border:#e5e7eb;--border-strong:#d1d5db;
+  --ink:#111827;--muted:#6b7280;--faint:#9ca3af;
+  --accent:#84cc16;--accent-ink:#111827;--accent-soft:#ecfccb;--accent-line:#65a30d;
+  --black:#111111;--black-ink:#ffffff;
+  --path:#111827;
+  --warn:#92400e;--warn-bg:#fef3c7;--err:#b91c1c;--err-bg:#fee2e2;--hint:#1e40af;--hint-bg:#dbeafe;
+  --r:8px;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 20px;position:sticky;top:0;z-index:5}
+.logo{font-weight:800;letter-spacing:.06em;font-size:15px}
+.logo em{font-style:normal;color:var(--accent-line)}
+.pillchip{background:var(--surface-2);color:var(--muted);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600}
+.topbar .user{margin-left:auto;display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-weight:600;font-size:13px}
+.topbar .user i{width:24px;height:24px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:800}
+.topbar .out{color:var(--ink);font-weight:500;font-size:13px;background:none;border:0}
+.shell{display:grid;grid-template-columns:184px 1fr;min-height:calc(100vh - 50px)}
+.sidenav{background:var(--surface);border-right:1px solid var(--border);padding:14px 8px;display:flex;flex-direction:column;gap:4px;font-weight:500;font-size:15px}
+.sidenav a{color:var(--ink);text-decoration:none;padding:9px 10px;border-radius:8px}
+.sidenav a:hover{background:var(--surface-2)}
+.sidenav a.cur{font-weight:700;background:var(--surface-2)}
+.wiz{padding:22px 24px 40px;min-width:0}
+.crumbs{color:var(--muted);font-size:13px;margin-bottom:6px}
+h1{font-size:22px;margin:0 0 16px;font-weight:700;letter-spacing:-.01em}
+.steps{display:flex;gap:8px;list-style:none;margin:0 0 20px;padding:0;flex-wrap:wrap}
+.steps li{display:flex;align-items:center;gap:10px;padding:0 16px 0 10px;height:36px;border-radius:8px;color:var(--muted);font-weight:600;font-size:14px;background:var(--surface);border:1px solid var(--border)}
+.steps li b{width:20px;height:20px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--muted)}
+.steps li.cur{background:var(--black);color:var(--black-ink);border-color:var(--black)}
+.steps li.cur b{background:var(--accent);color:var(--accent-ink)}
+.lead{color:var(--muted);margin:0 0 18px;max-width:80ch;font-size:13px}
+h2{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 10px}
+.base{display:flex;flex-wrap:wrap;gap:14px 16px;align-items:flex-end;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:18px}
+.base .field:first-child{margin-right:24px}
+.base .alerts{flex-basis:100%}
+.base .eq{color:var(--muted);padding-bottom:11px;font-variant-numeric:tabular-nums}
+.num.sel{width:140px;height:40px;padding:0 10px;font-weight:600}
+.base .num{width:120px;height:40px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;color:var(--ink);font-weight:600}
+.num{width:90px;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-variant-numeric:tabular-nums;font-weight:500}
+.num:disabled{color:var(--muted)}
+.num.bad{border-color:var(--err);background:var(--err-bg)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted)}
+.stages{display:grid;grid-template-columns:1fr 56px 1fr 56px 1fr;gap:0;align-items:stretch;margin-bottom:22px}
+.arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.arrow svg{width:32px;height:16px}
+.arrow.off{opacity:.35}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;transition:opacity .2s,border-color .2s}
+.card:not(.off){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card.off{opacity:.6}
+.card.off .body{pointer-events:none;filter:grayscale(.6)}
+.card .head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.card .head .kind{font-size:11px;color:var(--muted);font-weight:600}
+.card .head .name{border:0;background:transparent;font-weight:700;font-size:15px;padding:2px 4px;margin-left:-4px;border-radius:6px;width:100%;min-width:0}
+.card .head .name:hover{background:var(--surface-2)}
+.card .head .name:focus{background:var(--surface-2);outline:1px solid var(--accent)}
+.toggle{position:relative;width:40px;height:22px;flex:none;border-radius:999px;background:var(--border-strong);border:0;transition:background .15s}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{left:21px}
+.toggle:disabled{opacity:.4;cursor:not-allowed}
+.headtitle{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.card .body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;flex:1}
+.prow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.prow label{color:var(--ink);font-weight:600;font-size:13px}
+.prow .val{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.prow .num{width:72px;padding:7px 10px}
+.card select{padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-weight:500}
+.card .foot{display:flex;gap:16px;padding:10px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500;font-variant-numeric:tabular-nums}
+.card .foot b{color:var(--ink);font-size:14px;font-weight:700}
+.card .foot .tag{margin-left:auto;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:2px 9px;font-weight:700;font-size:11px}
+.check{display:flex;align-items:center;gap:8px;font-weight:500;font-size:13px}
+.check input{accent-color:var(--accent-line);width:16px;height:16px;margin:0}
+.card .alerts{margin-top:auto}
+.anim{background:var(--surface-2);border-radius:6px;border:1px solid var(--border);aspect-ratio:1.5;display:block;overflow:hidden}
+.anim svg{width:100%;height:100%;display:block}
+.typeview{display:flex;flex-direction:column;gap:8px}
+.typeview .tt{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.typeview .tt b{font-size:15px}
+.typeview .tt .code{font-family:var(--mono);font-size:11px;color:var(--accent-line);margin-left:4px}
+.typeview p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45}
+.typeview .change{flex:none;border:1px solid var(--border-strong);color:var(--ink);background:var(--surface);border-radius:6px;padding:5px 11px;font-weight:600;font-size:12px}
+.typeview .change:hover{background:var(--surface-2)}
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:6px;font-size:12.5px;flex-wrap:wrap}
+.alert .id{font-family:var(--mono);font-size:11px;opacity:.7}
+.alert.warn{background:var(--warn-bg);color:var(--warn)}
+.alert.err{background:var(--err-bg);color:var(--err)}
+.alert.hint{background:var(--hint-bg);color:var(--hint)}
+.alert .fix{margin-left:auto;display:flex;gap:6px}
+.alert .fix button{border:1px solid currentColor;background:transparent;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:600;color:inherit}
+.nav{display:flex;align-items:center;gap:12px;margin-top:4px}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px}
+a.btn{color:var(--ink);text-decoration:none;display:inline-block}
+.btn.primary,a.btn.primary{background:var(--black);color:var(--black-ink);border-color:var(--black)}
+.btn.primary:disabled,.btn.primary.dis{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn.ghost{border-color:transparent;color:var(--ink);font-weight:600}
+.nav .sp{flex:1;color:var(--err);font-size:13px;font-weight:500}
+.modal{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.open{display:flex}
+.sheet{background:var(--surface);border-radius:12px;border:1px solid var(--border);max-width:1180px;width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;overflow:hidden}
+.sheet .sh{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.sheet .sh h3{margin:0;font-size:16px}
+.sheet .sh .x{margin-left:auto;border:0;background:transparent;font-size:20px;line-height:1;color:var(--muted);padding:4px 8px;border-radius:6px}
+.sheet .sh .x:hover{background:var(--surface-2)}
+.sheet .sb{padding:18px;overflow:auto}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tcard{border:1px solid var(--border);border-radius:8px;padding:14px;text-align:left;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0;position:relative}
+.tcard:hover{border-color:var(--border-strong)}
+.tcard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tcard.on::after{content:"выбран";position:absolute;top:12px;right:12px;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700}
+.tcard.dis{opacity:.5;cursor:not-allowed}
+.tcard .code{font-family:var(--mono);font-size:11px;color:var(--accent-line)}
+.tcard b{font-size:15px;line-height:1.25;padding-right:64px}
+.tcard p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.tcard .why{font-size:11px;color:var(--err)}
+#preview .sheet{max-width:none;width:calc(100vw - 40px);height:calc(100vh - 40px)}
+#preview .sb{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.prev{display:grid;grid-template-columns:1fr 240px;gap:20px;min-height:0;flex:1;height:100%}
+.prev .side{overflow:auto}
+.prev .canvas{border:1px solid var(--border);border-radius:8px;background:var(--surface);overflow:hidden;padding:10px;min-height:0;display:flex}
+.prev .canvas svg{display:block;width:100%;height:100%}
+.xm{stroke:var(--err);stroke-width:2.5;stroke-linecap:round}
+.prev .side{display:flex;flex-direction:column;gap:12px}
+.prev .side h4{margin:0;font-size:12px;font-weight:700}
+.places{display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums;font-size:13px}
+.places div{display:flex;justify-content:space-between;padding:5px 8px;border-radius:6px;background:var(--surface-2)}
+.places div.ex{background:var(--accent-soft);font-weight:600}
+.places div.hit{outline:2px solid var(--black)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.pctl{display:flex;flex-direction:column;gap:6px}
+.pctl label{font-size:12px;font-weight:600}
+.pctl select{padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2)}
+.n{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.2}
+.n.bye{stroke-dasharray:2 2;fill:transparent}
+.n.in{fill:var(--accent-soft);stroke:var(--accent-line)}
+.ln{fill:none;stroke:var(--border-strong);stroke-width:1.1}
+.ln.dash{stroke-dasharray:3 3;stroke:var(--accent-line)}
+.pth{fill:none;stroke:var(--path);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.pn{fill:var(--accent);stroke:var(--path);stroke-width:1.5}
+.lab{font-size:10px;fill:var(--muted);font-family:var(--sans);font-weight:600}
+.lab.big{font-size:11px;fill:var(--ink)}
+.cap{font-size:11px;fill:var(--ink);font-family:var(--sans);font-weight:600}
+.box{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.2;rx:5}
+.pl{font-size:10px;fill:var(--ink);font-family:var(--mono)}
+.anim .pth{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 4s linear infinite}
+@keyframes draw{0%{stroke-dashoffset:var(--len)}70%{stroke-dashoffset:0}100%{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.anim .pth{animation:none;stroke-dashoffset:0}}
+@media (max-width:1100px){
+  .shell{grid-template-columns:1fr}
+  .sidenav{display:none}
+  .types{grid-template-columns:1fr}
+  .stages{grid-template-columns:1fr}
+  .arrow{flex-direction:row;padding:6px 0}
+  .arrow svg{transform:rotate(90deg)}
+  .base{grid-template-columns:1fr}
+  .prev{grid-template-columns:1fr}
+}
+</style>
+
+<div class="topbar">
+  <span class="logo">PADEL.<em>СЕЛЕКТ</em></span>
+  <span class="pillchip">кабинет организатора</span>
+  <span class="user"><i>АМ</i>Алексей Мироносицкий · организатор</span>
+  <button class="out">Выйти</button>
+</div>
+<div class="shell">
+<nav class="sidenav"><a class="cur" href="tournaments-list.html">Турниры</a><a href="championships-list.html">Чемпионаты / Лиги</a><a href="#">Игроки</a></nav>
+<div class="wiz">
+  <div class="crumbs">Турниры / Новый турнир</div>
+  <h1>Создание турнира</h1>
+  <ol class="steps">
+    <li class="done"><b>1</b>Основные настройки</li>
+    <li class="cur"><b>2</b>Тип турнира</li>
+    <li><b>3</b>Настройки матчей</li>
+    <li><b>4</b>Участники</li>
+  </ol>
+  <div class="base" id="base"></div>
+
+  <h2>Этапы</h2>
+  <div class="stages" id="stages"></div>
+
+  <div class="nav">
+    <a class="btn" href="tournament-basic-step.html" style="text-decoration:none">← Назад</a>
+    <span class="sp" id="navnote"></span>
+    <button class="btn ghost" data-act="preview">Предпросмотр</button>
+    <a class="btn primary" id="next" href="tournament-matches-step.html">Далее →</a>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="picker"><div class="sheet">
+  <div class="sh"><h3>Тип финального этапа</h3><span class="note">Системы регламента, п. 1.4.2–1.4.7</span><button class="x" data-close="picker" aria-label="Закрыть">×</button></div>
+  <div class="sb"><div class="types" id="types"></div></div>
+</div></div>
+
+<div class="modal" id="preview"><div class="sheet">
+  <div class="sh"><h3>Предпросмотр: путь участника</h3><span class="note" id="pvformula"></span><button class="x" data-close="preview" aria-label="Закрыть">×</button></div>
+  <div class="sb"><div class="prev">
+    <div class="canvas" id="pvcanvas"></div>
+    <div class="side" id="pvside"></div>
+  </div></div>
+</div></div>
+
+<script>
+/* ---------- state ---------- */
+const S = {
+  N:16, Q:4, WC:0,
+  qual:{on:false, name:'Квалификация'},
+  groups:{on:true, G:4, k:2, name:'Групповой этап'},
+  fin:{on:true, type:'O', third:true, dt:'r1', thirdOT:true, thirdDT:false, grand:false, name:'Финальный этап'},
+  pv:{gplace:1, loss:1}
+};
+const TYPES = {
+  O:{code:'О', name:'Олимпийская', short:'На выбывание', desc:'Одно поражение — участник выбывает. Определяются 1-е и 2-е места, с матчем за 3-е — 1–4. Остальные места общие по туру вылета.'},
+  ODT:{code:'О и ДТ', name:'Олимпийская с дополнительным турниром', short:'На выбывание + утешительный', desc:'Проигравший в основной сетке продолжает в утешительной, которая тоже играется на выбывание и имеет своего победителя.'},
+  UO:{code:'УО', name:'Олимпийская усовершенствованная', short:'За все места', desc:'После поражения участник не выбывает, а играет за более низкое место. Каждый проводит одинаковое число матчей, все места точные.'},
+  UO2:{code:'УО-2', name:'До двух поражений', short:'Двойное выбывание', desc:'Проигравший в верхней сетке переходит в нижнюю и выбывает после второго поражения. Финал верхней даёт 1–2 места, победитель нижней — 3-е.'},
+  FG:{code:'К', name:'Финальная группа', short:'Круговая на финальном этапе', desc:'Вышедшие из групп играют каждый с каждым в одной таблице. Все места финальной группы точные.'}
+};
+const pow2up = n => { let m=2; while(m<n) m*=2; return m; };
+const log2 = n => Math.round(Math.log2(n));
+const plural = (n,a,b,c) => { const m=n%100, d=n%10; if(m>=11&&m<=19) return c; if(d===1) return a; if(d>=2&&d<=4) return b; return c; };
+const rng = (a,b) => a===b ? String(a) : a+'–'+b;
+
+/* ---------- model ---------- */
+function groupSizes(n){
+  if(n<2) return [n];
+  const G=Math.max(1,Math.min(S.groups.G,Math.floor(n/2)));
+  const base=Math.floor(n/G), extra=n%G, sizes=[];
+  for(let i=0;i<G;i++) sizes.push(base+(i<extra?1:0));
+  return sizes;
+}
+function rrCalc(s){ return { matches:s*(s-1)/2, rounds: s<2?0:(s%2?s:s-1), min:s-1, max:s-1 }; }
+
+/* bracket calc for t participants; returns matches, rounds, min, max, byes, M, places[] {from,to,exact,label?} */
+function bracketCalc(t, f){
+  const type=f.type;
+  if(t<=1) return {matches:0,rounds:0,min:0,max:0,byes:0,M:1,places:[{from:1,to:1,exact:true}]};
+  if(type==='FG'){ const c=rrCalc(t); return {...c, byes:0, M:t, places:[{from:1,to:t,exact:true}]}; }
+  const M=pow2up(t), R=log2(M), byes=M-t;
+  const places=[];
+  const olympicPlaces=(third)=>{
+    const p=[{from:1,to:1,exact:true},{from:2,to:2,exact:true}];
+    let start=3, r=2; // r = round-from-end index of losers (2 = SF losers)
+    if(third && t>=4){ p.push({from:3,to:3,exact:true},{from:4,to:4,exact:true}); start=5; r=3; }
+    for(;r<=R;r++){ const cnt=Math.pow(2,r-1); const to=Math.min(t,start+cnt-1); if(start<=t) p.push({from:start,to,exact:false}); start+=cnt; }
+    return p;
+  };
+  if(type==='O'){
+    const third = f.third && t>=4 ? 1:0;
+    return {matches:t-1+third, rounds:R, min:1, max:R, byes, M, places:olympicPlaces(f.third)};
+  }
+  if(type==='ODT'){
+    const third = f.thirdOT && t>=4 ? 1:0;
+    const L1 = t - M/2;
+    let E, dtR;
+    if(f.dt==='r1'){ E=L1; dtR = E>=2 ? log2(pow2up(E)) : 0; }
+    else if(f.dt==='r12'){ E=L1 + (R>=2 ? M/4 : 0); dtR = Math.max(1, L1>=2?log2(pow2up(L1)):0) + (R>=2?1:0); }
+    else { E=t-1; dtR = R; }
+    const dtMatches = Math.max(0,E-1) + (f.thirdDT && E>=4 ? 1:0);
+    const rounds = Math.max(R, 1+dtR);
+    const p = olympicPlaces(f.thirdOT);
+    if(E>=1) p.push({from:1,to:Math.max(1,E),exact:false,label:'ДТ'});
+    return {matches:t-1+third+dtMatches, rounds, min:E>=2?2:1, max:Math.max(R,1+dtR), byes, M, places:p, E, dtMatches, L1};
+  }
+  if(type==='UO'){
+    return {matches:(M/2)*R - byes, rounds:R, min:byes?R-1:R, max:R, byes, M, places:[{from:1,to:t,exact:true}]};
+  }
+  if(type==='UO2'){
+    const g = f.grand?1:0;
+    if(t===2) return {matches:1+0, rounds:1, min:1, max:1, byes:0, M:2, places:[{from:1,to:1,exact:true},{from:2,to:2,exact:true}]};
+    const p=[{from:1,to:1,exact:true},{from:2,to:2,exact:true},{from:3,to:3,exact:true}];
+    if(t>=4) p.push({from:4,to:4,exact:true});
+    // lower bracket elimination sequence for M: for i=R-1..2: M/2^(i+1) twice; then 1 once (4th)
+    let start=5;
+    const seq=[]; for(let i=R-1;i>=2;i--){ seq.push(M/Math.pow(2,i+1), M/Math.pow(2,i+1)); }
+    seq.reverse(); // from higher places (5-6) to lower
+    for(const cnt of seq){ if(start>t) break; p.push({from:start,to:Math.min(t,start+cnt-1),exact:false}); start+=cnt; }
+    return {matches:2*t-4+g, rounds:2*R-2+g, min:2, max:2*R-2+g, byes, M, places:p};
+  }
+}
+
+function compute(){
+  const N=S.N, out={stages:[], errors:[], warns:[], hints:[], fixes:[]};
+  const qOn=S.qual.on, gOn=S.groups.on, fOn=S.fin.on;
+  const Q = qOn ? S.Q : 0;
+  const DA = N - Q - S.WC;
+  out.DA=DA; out.Q=Q;
+  // qualification
+  if(qOn){ out.qual={Q}; }
+  // groups
+  let sizes=null, G=0, Smax=0, Smin=0;
+  if(gOn){
+    sizes=groupSizes(N); G=sizes.length; Smax=Math.max(...sizes); Smin=Math.min(...sizes);
+    let m=0, r=0; sizes.forEach(s=>{const c=rrCalc(s); m+=c.matches; r=Math.max(r,c.rounds);});
+    out.groups={sizes,G,Smax,Smin,matches:m,rounds:r,min:Smin-1,max:Smax-1};
+  }
+  // final tiers
+  let tiers=[];
+  if(fOn){
+    if(!gOn){ tiers=[{t:N,label:'Основная сетка',offset:0}]; }
+    else {
+      const k=Math.min(S.groups.k,Smax); let t=0; sizes.forEach(s=>t+=Math.min(k,s));
+      tiers=[{t,label:'Плей-офф',offset:0,k}];
+    }
+    tiers.forEach(tr=>{ tr.c=bracketCalc(tr.t,S.fin); tr.c.R = S.fin.type==='FG' ? 0 : log2(tr.c.M); });
+    const matches=tiers.reduce((a,t)=>a+t.c.matches,0), rounds=Math.max(...tiers.map(t=>t.c.rounds));
+    const byes=tiers.reduce((a,t)=>a+t.c.byes,0);
+    out.fin={tiers,matches,rounds,byes,
+      min:Math.min(...tiers.map(t=>t.c.min)), max:Math.max(...tiers.map(t=>t.c.max))};
+  }
+  // places
+  const places=[];
+  if(fOn){
+    out.fin.tiers.forEach(tr=>{ tr.c.places.forEach(p=>{ if(p.label) places.push({...p}); else places.push({from:p.from+tr.offset,to:p.to+tr.offset,exact:p.exact}); }); });
+    if(gOn){
+      const k=out.fin.tiers[0].k; let off=out.fin.tiers[0].t;
+      for(let i=k+1;i<=Smax;i++){ const cnt=sizes.filter(s=>s>=i).length; places.push({from:off+1,to:off+cnt,exact:false,note:i+'-е в группах'}); off+=cnt; }
+    }
+  } else if(gOn){
+    if(G===1) places.push({from:1,to:N,exact:true});
+    else { let off=0; for(let i=1;i<=Smax;i++){ const cnt=sizes.filter(s=>s>=i).length; places.push({from:off+1,to:off+cnt,exact:false,note:i+'-е в группах'}); off+=cnt; } }
+  }
+  out.places=places;
+  // totals
+  out.byes=out.fin?out.fin.byes:0;
+  // validation
+  if(DA<0) out.errors.push({id:'V8',msg:`Прямой допуск + Q + WC больше вместимости на ${-DA}. Уменьшите Q или WC.`});
+  if(!gOn && !fOn) out.errors.push({id:'V5',msg:'Турнир не определяет победителя: включите групповой или финальный этап.'});
+  if(gOn && G>1 && !fOn) out.errors.push({id:'V4',msg:'Места между группами не разыграны. Включите финальный этап.',fix:[{l:'Включить финальный этап',a:'fin.on'}]});
+  if(fOn && S.fin.type==='FG' && !gOn) out.errors.push({id:'V6',msg:'Финальная группа возможна только после группового этапа.'});
+  if(fOn && !gOn && out.fin.byes>0 && S.fin.type!=='FG'){ out.warns.push({id:'V1',msg:`Сетка ${N}: ${out.fin.byes} ${plural(out.fin.byes,'пропуск','пропуска','пропусков')} в первом туре у сильнейших по посеву.`}); }
+  if(fOn && gOn && S.fin.type!=='FG'){
+    const t=out.fin.tiers[0].t, M=out.fin.tiers[0].c.M;
+    if(M!==t){
+      const fx=[]; const k=out.fin.tiers[0].k;
+      for(let kk=k-1;kk>=1;kk--){ if(pow2up(G*kk)===G*kk){ fx.push({l:'Первые '+kk,a:'k='+kk}); break; } }
+      const G2=pow2up(G); if(G2*k<=N && Math.floor(N/G2)>=2) fx.push({l:G2+' '+plural(G2,'группа','группы','групп'),a:'G='+G2});
+      out.warns.push({id:'V2',msg:`${G} ${plural(G,'группа','группы','групп')} × ${k} = ${t}: сетка ${M} с ${M-t} ${plural(M-t,'пропуском','пропусками','пропусками')}.`,fix:fx});
+    }
+  }
+  if(qOn && Q>N/2) out.warns.push({id:'V3',msg:'Через квалификацию больше половины мест основного турнира.'});
+  return out;
+}
+
+function formula(c){
+  const parts=[];
+  if(c.qual) parts.push(`Квал →${c.qual.Q}`);
+  if(c.groups){ const g=c.groups; const sz = g.Smax===g.Smin ? g.Smax : g.Smin+'–'+g.Smax;
+    let s=`Группы ${g.G}×${sz}`; if(c.fin) s+=` (выходят ${c.fin.tiers[0].k})`; parts.push(s); }
+  if(c.fin){
+    if(S.fin.type==='FG') parts.push(`Финальная группа ${c.fin.tiers.length>1?c.fin.tiers.map(t=>t.t).join('/'):c.fin.tiers[0].t}`);
+    else { const t=c.fin.tiers.length>1 ? c.fin.tiers.map(t=>t.t).join('/') : c.fin.tiers[0].t;
+      let s=`Плей-офф ${t} ${TYPES[S.fin.type].code}`;
+      if((S.fin.type==='O'&&S.fin.third)||(S.fin.type==='ODT'&&S.fin.thirdOT)) s+=', матч за 3-е';
+      if(S.fin.type==='UO2'&&S.fin.grand) s+=', гранд-финал';
+      parts.push(s); }
+  }
+  return parts.join(' · ');
+}
+function placesText(c){
+  const ex=c.places.filter(p=>p.exact&&!p.label), sh=c.places.filter(p=>!p.exact&&!p.label);
+  const exs = ex.length ? rng(Math.min(...ex.map(p=>p.from)),Math.max(...ex.map(p=>p.to))) : '—';
+  const shs = sh.length ? sh.map(p=>rng(p.from,p.to)).join(', ') : '—';
+  return {exact:exs, shared:shs};
+}
+
+/* ---------- render ---------- */
+const $ = s => document.querySelector(s);
+function render(){
+  const c=compute();
+  renderBase(c); renderStages(c);
+  const bad=c.errors.length>0;
+  $('#next').classList.toggle('dis',bad); $('#next').setAttribute('aria-disabled',bad);
+  $('#navnote').textContent = bad ? `${c.errors.length} ${plural(c.errors.length,'ошибка','ошибки','ошибок')} — исправьте, чтобы продолжить` : '';
+}
+function alertsHtml(list){ return list.length ? `<div class="alerts">${list.map(a=>`<div class="alert ${a.cls}"><span class="id">${a.id}</span><span>${a.msg}</span>${a.fix&&a.fix.length?`<span class="fix">${a.fix.map(f=>`<button data-act="${f.a}">${f.l}</button>`).join('')}</span>`:''}</div>`).join('')}</div>` : ''; }
+function pick(c, ids){ const all=[...c.errors.map(a=>({...a,cls:'err'})),...c.warns.map(a=>({...a,cls:'warn'})),...c.hints.map(a=>({...a,cls:'hint'}))]; return all.filter(a=>ids.includes(a.id)); }
+function renderBase(c){
+  $('#base').innerHTML=`
+    <div class="field"><label>Вместимость основного турнира</label>
+      <select class="num sel" data-change="N" title="Задаётся в основных настройках; здесь — для демонстрации">${[8,12,16,24,32,48,64].map(n=>`<option value="${n}" ${S.N===n?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="field"><label>Прямой допуск</label><input class="num ${c.DA<0?'bad':''}" disabled value="${c.DA}"></div>
+    <div class="field"><label>Квалификация Q</label><input class="num" type="number" min="1" max="${S.N}" value="${S.qual.on?S.Q:0}" ${S.qual.on?'':'disabled'} data-change="Q"></div>
+    <div class="field"><label>Приглашения WC</label><input class="num" type="number" min="0" max="${S.N}" value="${S.WC}" data-change="WC"></div>
+    <div class="eq">= ${S.N}${c.DA<0?` <span style="color:var(--err)">(превышение на ${-c.DA})</span>`:''}</div>
+    ${alertsHtml(pick(c,['V8','V3']))}`;
+}
+function arrow(n, off){ return `<div class="arrow ${off?'off':''}"><svg viewBox="0 0 36 16"><path d="M2 8h28m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${n}</span></div>`; }
+function typeView(k){ const T=TYPES[k]; return `<div class="typeview"><div class="tt"><span><b>${T.name}</b> <span class="code">${T.code}</span></span><button class="change" data-act="openpicker">Изменить</button></div><span class="anim">${typeAnim(k)}</span><p>${T.desc}</p></div>`; }
+function renderStages(c){
+  const q=S.qual, g=S.groups, f=S.fin;
+  const gOn=g.on, fOn=f.on;
+  const qCard=`<div class="card ${q.on?'':'off'}">
+    <div class="head"><button class="toggle ${q.on?'on':''}" data-act="qual.on" aria-label="Включить квалификацию"></button>
+      <div class="headtitle"><span class="kind">Этап 1</span><input class="name" value="${q.name}" data-change="qual.name"></div></div>
+    <div class="body">
+      <div class="prow"><label>Проходят в основной турнир</label><div class="val"><b>${q.on?S.Q:'—'}</b></div></div>
+      <div class="note">Мини-сетки по олимпийской системе, победитель каждой проходит в основной турнир. Число туров определяется автоматически по числу заявок.</div>
+    </div>
+    <div class="foot">${q.on?`<span>Проходят <b>${S.Q}</b></span>`:'<span>Выключена</span>'}</div></div>`;
+  const sz = c.groups ? c.groups.sizes : groupSizes(S.N);
+  const gCard=`<div class="card ${gOn?'':'off'}">
+    <div class="head"><button class="toggle ${gOn?'on':''}" data-act="groups.on" aria-label="Включить групповой этап"></button>
+      <div class="headtitle"><span class="kind">Этап 2 · круговая (К)</span><input class="name" value="${g.name}" data-change="groups.name"></div></div>
+    <div class="body">
+      <div class="prow"><label>Число групп</label><div class="val"><input class="num" type="number" min="1" max="${Math.floor(S.N/2)}" value="${g.G}" data-change="groups.G"></div></div>
+      <div class="prow"><label>Состав групп</label><div class="val"><b>${sz.length}</b><span class="note">${sz.length>8?'групп':'× '+(Math.max(...sz)===Math.min(...sz)?sz[0]:sz.join(' · '))}</span></div></div>
+      <div class="prow"><label>Выходят в финальный этап из группы</label><div class="val"><input class="num" type="number" min="1" max="${Math.max(...sz)}" value="${g.k}" data-change="groups.k"></div></div>
+      <div class="note">Каждый с каждым внутри группы. Кто с кем встречается в финальном этапе, организатор задаёт на жеребьёвке финального этапа.</div>
+    </div>
+    <div class="foot">${gOn?`<span>Матчей <b>${c.groups.matches}</b></span><span>Туров <b>${c.groups.rounds}</b></span>${!fOn&&c.groups.G===1?'<span class="tag">Система К</span>':''}`:'<span>Выключен</span>'}</div></div>`;
+  let fBody=typeView(f.type);
+  if(f.type==='O') fBody+=`<label class="check"><input type="checkbox" ${f.third?'checked':''} data-act="fin.third"> Матч за 3-е место</label>`;
+  if(f.type==='ODT') fBody+=`
+    <div class="prow"><label>В утешительную попадают</label><div class="val"><select data-change="fin.dt">
+      <option value="r1" ${f.dt==='r1'?'selected':''}>Проигравшие 1-го тура</option>
+      <option value="r12" ${f.dt==='r12'?'selected':''}>Проигравшие 1-го и 2-го туров</option>
+      <option value="all" ${f.dt==='all'?'selected':''}>Проигравшие всех туров</option></select></div></div>
+    <label class="check"><input type="checkbox" ${f.thirdOT?'checked':''} data-act="fin.thirdOT"> Матч за 3-е место в основной сетке</label>
+    <label class="check"><input type="checkbox" ${f.thirdDT?'checked':''} data-act="fin.thirdDT"> Матч за 3-е место в утешительной</label>`;
+  if(f.type==='UO2') fBody+=`<label class="check"><input type="checkbox" ${f.grand?'checked':''} data-act="fin.grand"> Гранд-финал между победителями сеток</label><div class="note">${f.grand?'1–2 места по гранд-финалу, 3-е — проигравший финала верхней сетки.':'По регламенту: 1–2 из финала верхней сетки, 3-е — победитель нижней.'}</div>`;
+  if(fOn && c.fin){ const t=c.fin.tiers[0];
+    fBody+=`<div class="prow"><label>Участников</label><div class="val"><b>${t.t}</b>${c.fin.byes?`<span class="note">сетка ${t.c.M}, пропусков ${c.fin.byes}</span>`:''}</div></div>`; }
+  fBody+=alertsHtml(pick(c,['V1','V2','V4','V5','V6']));
+  const canOff = gOn;
+  const fCard=`<div class="card ${fOn?'':'off'}">
+    <div class="head"><button class="toggle ${fOn?'on':''}" data-act="fin.on" ${canOff?'':'disabled'} title="${canOff?'':'Финальный этап обязателен без группового'}" aria-label="Включить финальный этап"></button>
+      <div class="headtitle"><span class="kind">Этап 3 · финал</span><input class="name" value="${f.name}" data-change="fin.name"></div></div>
+    <div class="body">${fBody}</div>
+    <div class="foot">${fOn?`<span>Матчей <b>${c.fin.matches}</b></span><span>Туров <b>${c.fin.rounds}</b></span>`:'<span>Выключен</span>'}</div></div>`;
+  const a1 = arrow(S.N, false);
+  const a2 = arrow(c.fin ? c.fin.tiers[0].t : '—', !fOn);
+  $('#stages').innerHTML = qCard + a1 + gCard + a2 + fCard;
+}
+/* ---------- events ---------- */
+function setPath(path,val){ const ks=path.split('.'); let o=S; for(let i=0;i<ks.length-1;i++) o=o[ks[i]]; o[ks[ks.length-1]]=val; }
+function getPath(path){ return path.split('.').reduce((o,k)=>o[k],S); }
+function act(a){
+  if(a==='openpicker'){ openPicker(); return; }
+  if(a==='preview'){ openPreview(); return; }
+  if(a.startsWith('type=')){ const t=a.slice(5); if(t==='FG'&&!S.groups.on) return; S.fin.type=t; S.fin.on=true; closeModal('picker'); render(); return; }
+  if(a.includes('=')){
+    const [k,v]=a.split('=');
+    if(k==='N'){ S.N=+v; }
+    else if(k==='k'){ S.groups.k=+v; }
+    else if(k==='G'){ S.groups.G=+v; }
+    else setPath(k, isNaN(+v)?v:+v);
+    normalize(); render(); return;
+  }
+  // toggles
+  if(a==='qual.on'||a==='groups.on'||a==='fin.on'){ setPath(a,!getPath(a)); if(a==='fin.on'&&!S.fin.on&&!S.groups.on) S.fin.on=true; normalize(); render(); return; }
+  if(a.startsWith('fin.')){ setPath(a,!getPath(a)); render(); return; }
+  if(a.startsWith('pv.')){ return; }
+}
+function normalize(){
+  S.N=Math.max(2,Math.min(128,S.N|0));
+  S.Q=Math.max(1,Math.min(S.N,S.Q|0)); S.WC=Math.max(0,Math.min(S.N,S.WC|0));
+  S.groups.G=Math.max(1,Math.min(Math.floor(S.N/2),S.groups.G|0)); S.groups.k=Math.max(1,Math.min(Math.ceil(S.N/S.groups.G),S.groups.k|0));
+  if(!S.groups.on && !S.fin.on) S.fin.on=true;
+  if(!S.groups.on && S.fin.type==='FG') S.fin.type='O';
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(b){ act(b.dataset.act); return; }
+  const x=e.target.closest('[data-close]'); if(x){ closeModal(x.dataset.close); return; }
+  if(e.target.classList.contains('modal')) e.target.classList.remove('open');
+});
+document.addEventListener('change',e=>{
+  const el=e.target; const k=el.dataset.change; if(!k) return;
+  const v = el.type==='number' ? +el.value : el.value;
+  if(k==='N') S.N=v; else if(k==='Q') S.Q=v; else if(k==='WC') S.WC=v; else setPath(k,v);
+  if(k.startsWith('pv.')){ S.pv[k.slice(3)] = isNaN(+v)?v:+v; drawPreview(); return; }
+  normalize(); render();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open')); });
+function closeModal(id){ $('#'+id).classList.remove('open'); }
+
+/* ---------- SVG drawing engine ---------- */
+/* Bracket layout: returns {svg, nodes:{id:{x,y}}, w, h}. cols = array of node counts per column; conn(colIdx,i) -> target index in next col or null */
+function layoutCols(cols, x0, y0, colW, h, r){
+  const nodes={}; let parts='';
+  const maxN=Math.max(...cols);
+  const step = h/maxN;
+  cols.forEach((n,ci)=>{
+    const s = h/n;
+    for(let i=0;i<n;i++){ nodes[ci+':'+i]={x:x0+ci*colW, y:y0+s*(i+.5)}; }
+  });
+  return {nodes, step};
+}
+function circ(p, cls, r=4){ return `<circle class="${cls}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}"/>`; }
+function elbow(a,b){ const mx=(a.x+b.x)/2; return `<path class="ln" d="M${a.x.toFixed(1)} ${a.y.toFixed(1)}H${mx.toFixed(1)}V${b.y.toFixed(1)}H${b.x.toFixed(1)}"/>`; }
+
+/* Single elimination bracket with M slots, t real; prefix for ids. Returns svg parts and node map. */
+function drawSE(pre, M, t, x, y, w, h, opts={}){
+  const R=log2(M); const cols=[]; for(let r=0;r<=R;r++) cols.push(M/Math.pow(2,r));
+  const colW = w/(cols.length-1 || 1);
+  const {nodes}=layoutCols(cols,x,y,colW,h);
+  let s='', map={};
+  const byeSet=new Set(); // bye positions: last (M-t) pairs' second slot get byes: indices 2i+1 for i from M/2-1 down
+  let byes=M-t; for(let i=M/2-1;i>=0&&byes>0;i--,byes--) byeSet.add(2*i+1);
+  cols.forEach((n,ci)=>{ for(let i=0;i<n;i++){ const p=nodes[ci+':'+i]; map[pre+':'+ci+':'+i]=p;
+    if(ci<cols.length-1){ const q=nodes[(ci+1)+':'+(i>>1)]; s+=elbow(p,q); } } });
+  cols.forEach((n,ci)=>{ for(let i=0;i<n;i++){ const p=nodes[ci+':'+i]; const bye=ci===0&&byeSet.has(i); s+=circ(p, 'n'+(bye?' bye':'')+(opts.inCls&&ci===0?' in':''), ci===cols.length-1?5:3.5); } });
+  if(opts.label) s+=`<text class="lab" x="${x}" y="${y-6}">${opts.label}</text>`;
+  if(opts.third && t>=4){ const f=nodes[(R)+':0']; const p={x:f.x, y:Math.min(y+h+14, f.y+Math.max(28, h/M*2))}; map[pre+':3rd']=p; s+=circ(p,'n',3.5)+`<text class="lab" x="${p.x+8}" y="${p.y+3.5}">за 3-е</text>`; }
+  return {s, map, R, cols, byeSet};
+}
+/* Placement bracket (УО): R+1 columns of M nodes each; winner top half of block, loser bottom half */
+function drawUO(pre, M, t, x, y, w, h){
+  const R=log2(M); const cols=[]; for(let r=0;r<=R;r++) cols.push(M);
+  const colW=w/R; const {nodes}=layoutCols(cols,x,y,colW,h); let s='', map={};
+  for(let r=0;r<R;r++){ const B=M/Math.pow(2,r); for(let i=0;i<M;i++){ const b=Math.floor(i/B), pIdx=Math.floor((i%B)/2); const wI=b*B+pIdx, lI=b*B+B/2+pIdx; const p=nodes[r+':'+i]; s+=elbow(p,nodes[(r+1)+':'+wI]); s+=elbow(p,nodes[(r+1)+':'+lI]); } }
+  cols.forEach((n,ci)=>{ for(let i=0;i<n;i++){ const p=nodes[ci+':'+i]; map[pre+':'+ci+':'+i]=p; s+=circ(p,'n'+(ci===0&&i>=t?' bye':''),ci===R?4:3); if(ci===R) s+=`<text class="pl" x="${p.x+8}" y="${p.y+3.5}">${i+1}</text>`; } });
+  return {s,map,R};
+}
+/* Double elimination: upper SE + lower bracket columns */
+function drawUO2(pre, M, t, x, y, w, h, grand){
+  const R=log2(M);
+  const upH = h*0.5, loH = h*0.42;
+  const up=drawSE(pre+':U',M,t,x,y,w*(grand?0.85:1),upH,{label:'Верхняя сетка'});
+  // lower cols
+  const drop=[]; for(let r=2;r<=R-1;r++) drop.push(M/Math.pow(2,r));
+  const cols=[M/2]; let cur=M/2; const merge=[];
+  drop.forEach(d=>{ cur=cur/2+d; cols.push(cur); merge.push(cols.length-1); cur=cur/2; cols.push(cur); });
+  if(cur>1){ cols.push(1); }
+  const ly=y+upH+26; const colW=(w*(grand?0.85:1))/Math.max(1,cols.length-1);
+  const {nodes}=layoutCols(cols,x,ly,colW,loH); let s=up.s, map=up.map;
+  cols.forEach((n,ci)=>{ for(let i=0;i<n;i++){ const p=nodes[ci+':'+i]; map[pre+':L:'+ci+':'+i]=p;
+    if(ci<cols.length-1){ const nn=cols[ci+1]; const isMergeNext=merge.includes(ci+1); const q = isMergeNext ? nodes[(ci+1)+':'+(i>>1)] : nodes[(ci+1)+':'+(i>>1)]; s+=elbow(p,q); } } });
+  cols.forEach((n,ci)=>{ for(let i=0;i<n;i++){ const p=nodes[ci+':'+i]; const isDrop = merge.includes(ci) && i>=n/2; s+=circ(p,'n'+(isDrop?' in':''),ci===cols.length-1?5:3.5); } });
+  s+=`<text class="lab" x="${x}" y="${ly-6}">${w<200?'Нижняя сетка':'Нижняя сетка · входят проигравшие верхней'}</text>`;
+  if(grand){ const gf={x:x+w-4,y:y+upH/2+20}; map[pre+':GF']=gf; s+=elbow(map[pre+':U:'+R+':0'],gf)+elbow(nodes[(cols.length-1)+':0'],gf)+circ(gf,'n in',6)+`<text class="lab big" x="${gf.x-30}" y="${gf.y-10}">гранд-финал</text>`; }
+  return {s,map,R,cols,merge};
+}
+/* ODT: SE + consolation SE below with E entrants */
+function drawODT(pre, M, t, x, y, w, h, f){
+  const R=log2(M); const L1=t-M/2;
+  let E; if(f.dt==='r1') E=L1; else if(f.dt==='r12') E=L1+(R>=2?M/4:0); else E=t-1;
+  const upH=h*0.52, loH=h*0.38;
+  const up=drawSE(pre+':U',M,t,x,y,w,upH,{label:'Основная сетка (ОТ)',third:f.thirdOT});
+  let s=up.s, map=up.map;
+  if(E>=1){ const ME=pow2up(Math.max(2,E)); const ly=y+upH+34;
+    const lo=drawSE(pre+':D',ME,Math.max(1,E),x,ly,w*0.7,loH,{label:f.short?'Утешительная (ДТ)':'Утешительная (ДТ) · '+({r1:'проигравшие 1-го тура',r12:'проигравшие 1–2 туров',all:'проигравшие всех туров'})[f.dt],third:f.thirdDT,inCls:true});
+    s+=lo.s; Object.assign(map,lo.map);
+    // dashed feeds from R1 losers
+    let k=0; for(let i=0;i<M/2 && k<Math.min(E,ME);i++){ if(up.byeSet.has(2*i+1)) continue; const a=map[pre+':U:0:'+(2*i+1)], b=map[pre+':D:0:'+k]; if(a&&b) s+=`<path class="ln dash" d="M${a.x} ${a.y}C${a.x-18} ${a.y},${b.x-18} ${b.y},${b.x} ${b.y}"/>`; k++; }
+  }
+  return {s,map,R,E};
+}
+function drawGroupBox(pre, idx, size, x, y, w, h, hitPlace){
+  let s=`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="5"/><text class="lab big" x="${x+8}" y="${y+14}">Группа ${String.fromCharCode(65+idx)}</text>`;
+  const map={}; const step=(h-22)/size;
+  for(let i=0;i<size;i++){ const p={x:x+w-12,y:y+22+step*(i+.5)}; map[pre+':'+idx+':'+i]=p; s+=circ(p,'n',3.5)+`<text class="pl" x="${x+8}" y="${p.y+3.5}">${i+1}-е</text>`; }
+  return {s,map};
+}
+function drawRR(pre, t, x, y, w, h, label){
+  let s=`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="5"/><text class="lab big" x="${x+8}" y="${y+14}">${label}</text>`; const map={};
+  const step=(h-24)/t;
+  for(let i=0;i<t;i++){ const p={x:x+16,y:y+24+step*(i+.5)}; map[pre+':'+i]=p; s+=circ(p,'n',3.5)+`<text class="pl" x="${x+w-22}" y="${p.y+3.5}">${i+1}</text>`; }
+  // all-vs-all lines
+  for(let i=0;i<t;i++) for(let j=i+1;j<t;j++){ const a=map[pre+':'+i], b=map[pre+':'+j]; s+=`<path class="ln" d="M${a.x+4} ${a.y}C${a.x+30} ${a.y},${b.x+30} ${b.y},${b.x+4} ${b.y}" opacity=".5"/>`; }
+  return {s,map};
+}
+
+/* path ids for a bracket given loss round L (0 = never loses), slot i0 */
+function pathSE(pre, R, L, i0=0){ const ids=[]; const last = L===0 ? R : L-1; for(let r=0;r<=last;r++) ids.push(pre+':'+r+':'+(i0>>r)); return ids; }
+function pathUO(pre, M, L, i0=0){ const R=log2(M); const ids=[pre+':0:'+i0]; let i=i0; for(let r=0;r<R;r++){ const B=M/Math.pow(2,r); const b=Math.floor(i/B), pI=Math.floor((i%B)/2); const win = !(L===r+1); i = win ? b*B+pI : b*B+B/2+pI; ids.push(pre+':'+(r+1)+':'+i); } return {ids, place:i+1}; }
+
+/* ---------- type picker with animations ---------- */
+function typeAnim(type){
+  const W=270,H=190, CAP=H-8;
+  let s='', map={}, ids=[], endLabel='';
+  if(type==='O'){ const d=drawSE('a',8,8,14,20,180,112,{third:true}); s=d.s; map=d.map; ids=pathSE('a',3,2); endLabel='проиграл во 2-м туре → место 5–8'; }
+  if(type==='ODT'){ const d=drawODT('a',8,8,14,20,175,120,{dt:'r1',thirdOT:false,thirdDT:false,short:true}); s=d.s; map=d.map; ids=[...pathSE('a:U',3,1,1),...pathSE('a:D',2,0,0)]; endLabel='проиграл в 1-м туре → победитель ДТ'; }
+  if(type==='UO'){ const d=drawUO('a',8,8,14,20,180,132); s=d.s; map=d.map; const p=pathUO('a',8,1,0); ids=p.ids; endLabel='проиграл в 1-м туре → место '+p.place; }
+  if(type==='UO2'){ const d=drawUO2('a',8,8,14,20,180,124,false); s=d.s; map=d.map; ids=[...pathSE('a:U',3,1,1),'a:L:0:0','a:L:1:0','a:L:2:0','a:L:3:0']; endLabel='проиграл в верхней → 3-е через нижнюю'; }
+  if(type==='FG'){
+    const gw=78, gh=32; let g='';
+    for(let i=0;i<4;i++){ const y=14+i*38; g+=`<rect class="box" x="14" y="${y}" width="${gw}" height="${gh}" rx="5"/><text class="lab big" x="22" y="${y+13}">Группа ${String.fromCharCode(65+i)}</text>`;
+      for(let k=0;k<4;k++){ const p={x:26+k*14,y:y+24}; if(k===0) map['g:'+i+':0']=p; g+=circ(p,'n'+(k===0?' in':''),3); } }
+    const r=drawRR('r',4,140,20,112,132,'Финальная группа'); s=g+r.s; Object.assign(map,r.map);
+    for(let i=0;i<4;i++){ const a=map['g:'+i+':0'], b=map['r:'+i]; s+=`<path class="ln dash" d="M${a.x+gw-16} ${a.y}C${a.x+gw+10} ${a.y},${b.x-30} ${b.y},${b.x-4} ${b.y}"/>`; }
+    ids=['g:1:0','r:1']; endLabel='победители групп → одна таблица'; }
+  const pts=ids.map(i=>map[i]).filter(Boolean);
+  let len=0; for(let i=1;i<pts.length;i++) len+=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);
+  const poly=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join('');
+  s+=`<path class="pth" d="${poly}" style="--len:${len.toFixed(0)}"/>`+pts.map(p=>circ(p,'pn',3)).join('');
+  s+=`<line x1="0" y1="${CAP-14}" x2="${W}" y2="${CAP-14}" stroke="var(--border)" stroke-width="1"/><text class="cap" x="14" y="${CAP}">${endLabel}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${s}</svg>`;
+}
+function openPicker(){
+  $('#types').innerHTML=Object.keys(TYPES).map(k=>{ const T=TYPES[k]; const dis = k==='FG' && !S.groups.on;
+    return `<button class="tcard ${S.fin.type===k?'on':''} ${dis?'dis':''}" data-act="type=${k}" ${dis?'aria-disabled="true"':''}>
+      <span class="code">${T.code}</span><b>${T.name}</b><span class="anim">${typeAnim(k)}</span><p>${T.desc}</p>${dis?'<span class="why">Нужен групповой этап</span>':''}</button>`; }).join('');
+  $('#picker').classList.add('open');
+}
+
+/* ---------- preview ---------- */
+function openPreview(){ const c=compute(); if(c.errors.length){ return; } S.pv.loss=Math.min(S.pv.loss, 3); $('#preview').classList.add('open'); drawPreview(); }
+function drawPreview(){
+  const c=compute(); const f=S.fin;
+  $('#pvformula').textContent=formula(c);
+  const grpOn=S.groups.on;
+  const W=1000, colGap=70; let x=16; let s=''; let map={};
+  // rows needed
+  let rows=0;
+  if(grpOn){ rows=Math.max(rows, c.groups.sizes.reduce((a,b)=>a+b,0)+c.groups.sizes.length*1.6); }
+  if(c.fin){ const tr=c.fin.tiers[0]; const M=Math.max(2,tr.c.M);
+    const need = f.type==='UO2' ? M/0.5 : f.type==='ODT' ? M/0.52 : f.type==='FG' ? tr.t*1.4 : M;
+    rows=Math.max(rows, need); }
+  const H=Math.max(260, Math.round(rows*18));
+  let sizes=null;
+  if(grpOn){ sizes=c.groups.sizes; const G=sizes.length; const gh=(H-20)/G; const w=130;
+    sizes.forEach((sz,i)=>{ const b=drawGroupBox('g',i,sz,x,20+i*gh,w,gh-8); s+=b.s; Object.assign(map,b.map); });
+    x+=w+colGap; }
+  let tierDraw=[];
+  if(c.fin){ const tr=c.fin.tiers[0]; const pre='f0'; const w=W-x-80; const yy=20, th=H-30; let d;
+    if(tr.t<=1){ const p={x:x+10,y:yy+th/2}; map[pre+':0:0']=p; s+=circ(p,'n',4)+`<text class="lab" x="${x+20}" y="${p.y+3.5}">без матчей · место 1</text>`; d=null; }
+    else if(f.type==='FG'){ d=drawRR(pre,tr.t,x,yy,Math.min(w,320),th,'Финальная группа'); }
+    else if(f.type==='O'){ d=drawSE(pre,tr.c.M,tr.t,x,yy,w,th-(f.third&&tr.t>=4?0:0),{third:f.third}); }
+    else if(f.type==='ODT'){ d=drawODT(pre,tr.c.M,tr.t,x,yy,w,th,f); }
+    else if(f.type==='UO'){ d=drawUO(pre,tr.c.M,tr.t,x,yy,w-20,th); }
+    else if(f.type==='UO2'){ d=drawUO2(pre,tr.c.M,tr.t,x,yy,w,th,f.grand); }
+    if(d){ s+=d.s; Object.assign(map,d.map); }
+    tierDraw.push({tr,pre,d,ti:0}); x+=w; }
+  if(grpOn && c.fin){
+    const k=c.fin.tiers[0].k; let slot=0; for(let p=0;p<k;p++) sizes.forEach((sz,gi)=>{ if(p<sz){ const a=map['g:'+gi+':'+p], b=map['f0:0:'+slot]||map['f0:U:0:'+slot]||map['f0:'+slot]; if(a&&b) s+=`<path class="ln dash" d="M${a.x+4} ${a.y}C${a.x+40} ${a.y},${b.x-40} ${b.y},${b.x-4} ${b.y}"/>`; slot++; } });
+  }
+  // participant path
+  const pv=S.pv; let ids=[]; let placeHit=null; let story=[];
+  let tierIdx=0, slot=0;
+  if(grpOn){ const gp=Math.min(pv.gplace, sizes[0]); ids.push('g:0:'+(gp-1)); story.push(`в группе A занимает ${gp}-е место`);
+    if(c.fin){ const k=c.fin.tiers[0].k; if(gp>k){ tierIdx=-1; story.push('в финальный этап не выходит'); const pl=c.places.find(p=>p.note===gp+'-е в группах'); placeHit=pl; } else { slot=(gp-1)*sizes.length; } }
+    else { placeHit=c.places[0]; }
+  }
+  if(c.fin && tierIdx>=0){ const td=tierDraw[tierIdx]; const tr=td.tr; const pre=td.pre; const M=tr.c.M, R=tr.c.R||1; const L=Math.min(pv.loss, R);
+    if(tr.t<=1){ ids.push(pre+':0:0'); placeHit={from:tr.offset+1,to:tr.offset+1}; story.push('единственный в своей сетке'); }
+    else if(f.type==='FG'){ ids.push(pre+':'+slot); story.push('играет в финальной группе'); placeHit=c.places[0]; }
+    else if(f.type==='O'){ ids.push(...pathSE(pre,R,L,slot)); if(L===0){ story.push('выигрывает все матчи → 1-е место'); placeHit={from:tr.offset+1,to:tr.offset+1}; } else if(L===R){ story.push('проигрывает финал → 2-е'); placeHit={from:tr.offset+2,to:tr.offset+2}; } else if(L===R-1 && f.third && tr.t>=4){ ids.push(pre+':3rd'); story.push('проигрывает полуфинал → матч за 3-е'); placeHit={from:tr.offset+3,to:tr.offset+4}; } else { const cnt=Math.pow(2,R-L); const from=tr.offset+ (f.third&&tr.t>=4&&R-L>=2 ? Math.pow(2,R-L)+1 : Math.pow(2,R-L)+1); story.push(`проигрывает в ${L}-м туре → общее место`); placeHit={from:from,to:Math.min(tr.offset+tr.t,from+cnt-1)}; } }
+    else if(f.type==='ODT'){ const dtOK = (f.dt==='r1'&&L===1)||(f.dt==='r12'&&L>=1&&L<=2)||(f.dt==='all'&&L>=1&&L<R);
+      ids.push(...pathSE(pre+':U',R,L,slot));
+      if(L===0){ story.push('выигрывает основную сетку → 1-е'); placeHit={from:tr.offset+1,to:tr.offset+1}; }
+      else if(dtOK && map[pre+':D:0:0']){ const ME=pow2up(Math.max(2,tr.c.E)); ids.push(...pathSE(pre+':D',log2(ME),0,0)); story.push(`проигрывает в ${L}-м туре → утешительная → победитель ДТ`); placeHit=c.places.find(p=>p.label==='ДТ'); }
+      else { story.push(`проигрывает в ${L}-м туре → ${L===R?'2-е место':'выбывает'}`); placeHit = L===R?{from:tr.offset+2,to:tr.offset+2}:null; } }
+    else if(f.type==='UO'){ const p=pathUO(pre,M,L,slot); ids.push(...p.ids); story.push(L?`проигрывает в ${L}-м туре, дальше выигрывает → место ${tr.offset+p.place}`:`выигрывает всё → 1-е`); placeHit={from:tr.offset+p.place,to:tr.offset+p.place}; }
+    else if(f.type==='UO2'){ ids.push(...pathSE(pre+':U',R,L,slot)); const cols=td.d.cols, merge=td.d.merge;
+      if(L===0){ story.push('выигрывает верхнюю сетку → 1-е'); placeHit={from:tr.offset+1,to:tr.offset+1}; if(f.grand) ids.push(pre+':GF'); }
+      else if(L===R){ story.push('проигрывает финал верхней → 2-е'); placeHit={from:tr.offset+2,to:tr.offset+2}; }
+      else { let startCol = L===1 ? 0 : merge[L-2]; if(startCol===undefined) startCol=0; const i0 = L===1 ? Math.min(slot>>1, cols[0]-1) : cols[startCol]/2; for(let ci=startCol;ci<cols.length;ci++){ let i = ci===startCol ? i0 : 0; ids.push(pre+':L:'+ci+':'+i); } if(f.grand) ids.push(pre+':GF'); story.push(`проигрывает в ${L}-м туре верхней → нижняя сетка → выигрывает её → ${f.grand?'гранд-финал':'3-е место'}`); placeHit={from:tr.offset+3,to:tr.offset+3}; } }
+  }
+  const pts=ids.map(i=>map[i]).filter(Boolean);
+  let cross=null;
+  if(pts.length && ids.length===pts.length && c.fin && tierIdx>=0 && !placeHit && pv.loss>0){ // eliminated: stub towards next match
+    const last=ids[ids.length-1]; const m=last.match(/^(.*):(\d+):(\d+)$/);
+    if(m){ const nxt=map[`${m[1]}:${+m[2]+1}:${(+m[3])>>1}`]; const lp=map[last]; if(nxt){ cross={x:(lp.x+nxt.x)/2,y:lp.y}; pts.push(cross); } }
+  }
+  if(pts.length){ const poly=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(''); s+=`<path class="pth" d="${poly}"/>`+pts.slice(0,cross?-1:undefined).map(p=>circ(p,'pn',4)).join(''); }
+  if(cross) s+=`<path class="xm" d="M${cross.x-5} ${cross.y-5}l10 10M${cross.x+5} ${cross.y-5}l-10 10"/>`;
+  window.__pv={ids,pts:ids.map(i=>map[i]),W,H};
+  $('#pvcanvas').innerHTML=`<svg viewBox="0 0 ${W} ${H+24}" preserveAspectRatio="xMidYMin meet">${s}</svg>`;
+  // side
+  const R = c.fin && tierIdx>=0 ? (tierDraw[tierIdx].tr.c.R||1) : 1;
+  const lossOpts=[{v:0,l:'не проигрывает'}]; for(let r=1;r<=R;r++) lossOpts.push({v:r,l:r===R?'в финале':r===R-1?'в полуфинале':`в ${r}-м туре`});
+  const isBracket = c.fin && tierIdx>=0 && ['O','ODT','UO','UO2'].includes(f.type) && tierDraw[tierIdx].tr.t>1;
+  $('#pvside').innerHTML=`
+    <div class="pctl">
+      <h4>Путь участника</h4>
+      ${grpOn?`<label>Место в группе A</label><select data-change="pv.gplace">${Array.from({length:sizes[0]},(_,i)=>`<option value="${i+1}" ${pv.gplace===i+1?'selected':''}>${i+1}-е</option>`).join('')}</select>`:''}
+      ${isBracket?`<label>Проигрывает</label><select data-change="pv.loss">${lossOpts.map(o=>`<option value="${o.v}" ${Math.min(pv.loss,R)===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`:''}
+      <div class="note">${story.length?story.join(' → '):'—'}</div>
+    </div>
+    <div class="legend"><span><i style="background:var(--path)"></i>путь участника</span><span><i style="background:var(--accent-line);height:0;border-top:2px dashed var(--accent-line)"></i>переход между этапами</span></div>
+    <div><h4>Итоговые места</h4><div class="places">${c.places.map(p=>`<div class="${p.exact?'ex':''} ${placeHit&&p.from===placeHit.from&&p.to===placeHit.to&&(p.label||'')===(placeHit.label||'')?'hit':''}"><span>${p.label?p.label+' ':''}${rng(p.from,p.to)}</span><span>${p.exact?'точное':'общее'}${p.note?' · '+p.note:''}</span></div>`).join('')}</div></div>`;
+}
+document.addEventListener('change',e=>{ const k=e.target.dataset.change; if(k&&k.startsWith('pv.')){ const el=e.target; S.pv[k.slice(3)] = el.type==='checkbox'?el.checked:+el.value; drawPreview(); } });
+
+render();
+</script>

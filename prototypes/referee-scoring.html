@@ -1,0 +1,193 @@
+<title>Судейство на вышке</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#0b1214;--card:#141f22;--card2:#18262a;--line:#233438;--line2:#2e4348;
+  --ink:#fff;--muted:#8ba0a4;--dim:#5e7276;
+  --lime:#8ae81f;--lime-ink:#0b1b06;--blue:#e8eef0;--blue-ink:#0b1b06;
+  --warn:#f2b134;--danger:#ff5c5c;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif;
+}
+.phone[data-t="light"]{
+  --bg:#eef1f2;--card:#ffffff;--card2:#e6ebec;--line:#d3dadc;--line2:#bcc6c8;
+  --ink:#0d1618;--muted:#54666a;--dim:#8b9a9d;
+  --lime:#4ea408;--lime-ink:#ffffff;--blue:#1d2b2f;--blue-ink:#ffffff;
+  --warn:#b57200;--danger:#c9291f;
+  border-color:#cdd6d8;box-shadow:0 30px 90px rgba(0,0,0,.35)
+}
+.phone[data-t="light"] .pl .b{background:#d3dadc;border-color:#bcc6c8}
+.phone[data-t="light"] .pl.s .b{background:var(--lime);border-color:var(--lime);box-shadow:0 0 0 3px rgba(78,164,8,.18)}
+.phone[data-t="light"] .tm2.srv{background:linear-gradient(180deg,rgba(78,164,8,.14),var(--card) 60%)}
+.phone[data-t="light"] .rl .c{background:#eef2f3}
+.phone[data-t="light"] .rl.a .c.a{box-shadow:none}
+.phone[data-t="light"] .rl.now .c.a{outline-color:#0d1618}
+.phone[data-t="light"] .gms .row i{background:#eef2f3}
+.phone[data-t="light"] .pbtn.a{box-shadow:0 6px 0 #3a7d05}
+.phone[data-t="light"] .pbtn.b{box-shadow:0 6px 0 #0a1416}
+.phone[data-t="light"] .tbr{color:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--stage,#05090a);color:var(--ink);font-family:var(--sans);display:grid;place-items:center;overflow:hidden;user-select:none;padding:20px}
+.phone{width:430px;height:880px;background:var(--bg);color:var(--ink);border-radius:34px;border:1px solid #223236;box-shadow:0 30px 90px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column;position:relative}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.hd{display:flex;align-items:center;gap:10px;padding:11px 14px 9px;border-bottom:1px solid var(--line)}
+.hd .bk{width:32px;height:32px;border:1px solid var(--line2);border-radius:9px;display:grid;place-items:center;font-size:16px;color:var(--muted);flex:none}
+.hd .ti{flex:1;min-width:0}
+.hd .ti b{display:block;font-size:13.5px;font-weight:800;line-height:1.2}
+.hd .ti span{display:block;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .tm{text-align:right;flex:none}
+.hd .tm b{display:block;font-family:var(--display);font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.hd .tm span{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.hd .th{width:32px;height:32px;border:1px solid var(--line2);border-radius:9px;display:grid;place-items:center;color:var(--muted);flex:none}
+.hd .th svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+.phone[data-t="light"] .th .moon{display:none}
+.phone:not([data-t="light"]) .th .sun{display:none}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.teams>*,.sets>*,.big>*,.acts>*,.pts>*{min-width:0}
+.tm2{background:var(--card);padding:10px 12px 9px;position:relative}
+.tm2.srv{background:linear-gradient(180deg,rgba(138,232,31,.13),var(--card) 60%)}
+.pl{display:flex;align-items:center;gap:8px;padding:3px 0}
+.pl .b{width:13px;height:13px;border-radius:50%;background:#33474b;flex:none;border:1px solid #46605f}
+.pl.s .b{background:var(--lime);border-color:var(--lime);box-shadow:0 0 0 3px rgba(138,232,31,.2)}
+.pl .n{font-size:13px;font-weight:700;letter-spacing:-.01em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl.s .n{color:var(--lime)}
+.srvtag{position:absolute;left:12px;top:-8px;background:var(--lime);color:var(--lime-ink);border-radius:5px;padding:2px 8px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.sets{display:grid;grid-template-columns:1fr 1fr;background:var(--card2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.setcol{display:flex;justify-content:center;gap:6px;padding:8px 6px}
+.setcol .s{min-width:36px;text-align:center}
+.setcol .s span{display:block;font-size:8.5px;letter-spacing:.1em;color:var(--dim);font-weight:700;margin-bottom:2px}
+.setcol .s b{display:block;font-family:var(--display);font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:var(--muted)}
+.setcol .s.won b{color:var(--ink)}
+.setcol .s.cur b{color:var(--lime)}
+.big{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;position:relative;padding:10px 0 8px;align-content:center}
+.bcol{display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px}
+.bcol .lg{font-size:9px;letter-spacing:.14em;color:var(--dim);font-weight:800}
+.bcol .gm{font-family:var(--display);font-size:26px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;color:var(--muted)}
+.bcol .pt{font-family:var(--display);font-size:70px;font-weight:900;line-height:.94;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.bcol.lead .pt{color:var(--lime)}
+.big::before{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:1px;background:var(--line)}
+.tbr{position:absolute;left:50%;top:-1px;transform:translateX(-50%);background:var(--warn);color:#1a1200;border-radius:0 0 5px 5px;padding:2px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.rally{flex:none;height:196px;border-top:1px solid var(--line);background:var(--card2);padding:9px 12px 10px;display:flex;flex-direction:column}
+.rlhd{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
+.rlhd b{font-size:9.5px;letter-spacing:.14em;color:var(--muted);font-weight:800}
+.rlhd span{font-size:9.5px;color:var(--dim);margin-left:auto;font-weight:600}
+.lad{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:5px}
+.rl{display:grid;grid-template-rows:1fr 1fr auto;gap:5px;min-width:0}
+.rl .c{border-radius:5px;border:1px solid var(--line2);background:#152227}
+.rl.a .c.a{background:var(--lime);border-color:var(--lime);box-shadow:0 0 14px rgba(138,232,31,.28)}
+.rl.b .c.b{background:var(--blue);border-color:var(--blue)}
+.rl .sc{text-align:center;font-family:var(--display);font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);letter-spacing:-.01em}
+.rl.now .sc{color:var(--ink)}
+.rl.now .c.a{outline:2px solid #fff;outline-offset:1px}
+.rl.next .c{border-style:dashed;opacity:.45}
+.rl.next .sc{opacity:.4;font-size:11px}
+.gms{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line);background:var(--card)}
+.gms b{font-size:9.5px;letter-spacing:.14em;color:var(--muted);font-weight:800;white-space:nowrap}
+.gms .row{display:flex;gap:4px;margin-left:auto}
+.gms .row i{width:22px;height:16px;border-radius:4px;display:block;font-style:normal;border:1px solid var(--line2);background:#152227}
+.gms .row i.a{background:var(--lime);border-color:var(--lime)}
+.gms .row i.b{background:var(--blue);border-color:var(--blue)}
+.serve{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border-top:1px solid var(--line);background:var(--card);font-size:11.5px;font-weight:700;color:var(--muted)}
+.serve em{font-style:normal;color:var(--ink)}
+.serve .sd{display:inline-flex;gap:3px}
+.serve .sd u{width:16px;height:11px;border:1px solid var(--line2);border-radius:2px;text-decoration:none}
+.serve .sd u.on{background:var(--lime);border-color:var(--lime)}
+.acts{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.act{background:var(--card);padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.act svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.act span{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.act.undo{color:var(--warn)}
+.act.med{color:var(--danger)}
+.pts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:11px 12px 14px;background:var(--bg)}
+.pbtn{border-radius:14px;padding:17px 8px;font-family:var(--display);font-weight:900;font-style:italic;font-size:19px;letter-spacing:.02em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:2px}
+.pbtn small{font-family:var(--sans);font-style:normal;font-size:10px;font-weight:700;letter-spacing:.02em;opacity:.7;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pbtn.a{background:var(--lime);color:var(--lime-ink);box-shadow:0 6px 0 #6cb914}
+.pbtn.b{background:var(--blue);color:var(--blue-ink);box-shadow:0 6px 0 #b3bdbf}
+.pbtn:active{transform:translateY(3px)}
+</style>
+
+<div class="phone" id="ph">
+  <div class="hd">
+    <button class="bk" aria-label="Назад">‹</button>
+    <span class="ti"><b>1/8 финала · Матч 1</b><span>Корт 1 · Региональный турнир</span></span>
+    <span class="tm"><b>54:24</b><span>матч</span></span>
+    <button class="th" id="th" aria-label="Сменить тему">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg>
+    </button>
+  </div>
+
+  <div class="teams">
+    <div class="tm2 srv">
+      <span class="srvtag">подаёт</span>
+      <div class="pl s"><span class="b"></span><span class="n">Кутузова Влада</span></div>
+      <div class="pl"><span class="b"></span><span class="n">Чиркова Полина</span></div>
+    </div>
+    <div class="tm2">
+      <div class="pl"><span class="b"></span><span class="n">Петрова Вилена</span></div>
+      <div class="pl"><span class="b"></span><span class="n">Мехтиева Зарема</span></div>
+    </div>
+  </div>
+
+  <div class="sets">
+    <div class="setcol">
+      <span class="s won"><span>СЕТ 1</span><b>6</b></span>
+      <span class="s"><span>СЕТ 2</span><b>4</b></span>
+      <span class="s cur"><span>СЕТ 3</span><b>5</b></span>
+    </div>
+    <div class="setcol">
+      <span class="s"><span>СЕТ 1</span><b>3</b></span>
+      <span class="s won"><span>СЕТ 2</span><b>6</b></span>
+      <span class="s cur"><span>СЕТ 3</span><b>5</b></span>
+    </div>
+  </div>
+
+  <div class="big">
+    <span class="tbr">решающий сет</span>
+    <div class="bcol lead">
+      <span class="lg">ГЕЙМЫ</span><span class="gm">5</span>
+      <span class="lg">ОЧКИ</span><span class="pt">40</span>
+    </div>
+    <div class="bcol">
+      <span class="lg">ГЕЙМЫ</span><span class="gm">5</span>
+      <span class="lg">ОЧКИ</span><span class="pt">30</span>
+    </div>
+  </div>
+
+  <div class="rally">
+    <div class="rlhd"><b>ХОД ГЕЙМА</b><span>верх — Кутузова / Чиркова · низ — Петрова / Мехтиева</span></div>
+    <div class="lad">
+      <div class="rl b"><span class="c a"></span><span class="c b"></span><span class="sc">0:15</span></div>
+      <div class="rl a"><span class="c a"></span><span class="c b"></span><span class="sc">15:15</span></div>
+      <div class="rl a"><span class="c a"></span><span class="c b"></span><span class="sc">30:15</span></div>
+      <div class="rl b"><span class="c a"></span><span class="c b"></span><span class="sc">30:30</span></div>
+      <div class="rl a now"><span class="c a"></span><span class="c b"></span><span class="sc">40:30</span></div>
+      <div class="rl next"><span class="c a"></span><span class="c b"></span><span class="sc">гейм</span></div>
+    </div>
+  </div>
+
+  <div class="gms"><b>ГЕЙМЫ В СЕТЕ</b><span class="row"><i class="a"></i><i class="b"></i><i class="a"></i><i class="a"></i><i class="b"></i><i class="b"></i><i class="a"></i><i class="b"></i><i class="a"></i><i class="b"></i></span></div>
+
+  <div class="serve"><span>Подача: <em>Кутузова Влада</em>, правая сторона</span><span class="sd"><u></u><u class="on"></u></span></div>
+
+  <div class="acts">
+    <button class="act undo"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><span>Отменить</span></button>
+    <button class="act"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Стороны</span></button>
+    <button class="act"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Пауза</span></button>
+    <button class="act med"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M12 10v5M9.5 12.5h5M9 6V4h6v2"/></svg><span>Медпомощь</span></button>
+    <button class="act"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="11" height="15" rx="2"/><path d="M5 7v14h11"/></svg><span>Карточка</span></button>
+  </div>
+
+  <div class="pts">
+    <button class="pbtn a">+ Очко<small>Кутузова / Чиркова</small></button>
+    <button class="pbtn b">+ Очко<small>Петрова / Мехтиева</small></button>
+  </div>
+</div>
+
+<script>
+const ph=document.getElementById('ph'), th=document.getElementById('th');
+function set(t){ if(t==='light'){ ph.dataset.t='light'; document.body.style.setProperty('--stage','#c9d2d4'); } else { delete ph.dataset.t; document.body.style.setProperty('--stage','#05090a'); } try{localStorage.setItem('ref-theme',t)}catch(e){} }
+set(new URLSearchParams(location.search).get('t') || (()=>{try{return localStorage.getItem('ref-theme')}catch(e){return null}})() || 'dark');
+th.addEventListener('click',()=>set(ph.dataset.t==='light'?'dark':'light'));
+</script>

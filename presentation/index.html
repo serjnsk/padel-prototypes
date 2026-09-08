@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PADEL.СЕЛЕКТ — презентация для федерации</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,700;0,800;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#0c1719;--stripe:#101f22;--panel:#0a0e13;--line:#25363a;--ink:#fff;--muted:#8a9ea0;--lime:#8ae81f;--lime-ink:#0b1b06;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#000;color:var(--ink);font-family:var(--sans);overflow:hidden}
+.deck{position:relative;width:100vw;height:100vh;display:grid;place-items:center}
+.slide{position:absolute;width:min(100vw,calc(100vh*16/9));height:min(100vh,calc(100vw*9/16));background:repeating-linear-gradient(180deg,var(--bg) 0 42px,var(--stripe) 42px 84px);overflow:hidden;opacity:0;transform:translateX(40px);transition:opacity .45s ease,transform .45s ease;pointer-events:none;padding:5% 6%;display:flex;flex-direction:column;justify-content:center;font-size:calc(min(100vw,100vh*16/9)/100)}
+.slide.on{opacity:1;transform:none;pointer-events:auto}
+.slide.prev{transform:translateX(-40px)}
+.wm{position:absolute;left:1%;top:-6%;font-family:var(--display);font-weight:900;font-style:italic;font-size:22em;line-height:1;color:transparent;-webkit-text-stroke:.12em rgba(255,255,255,.1);pointer-events:none;white-space:nowrap}
+.eyebrow{display:inline-block;align-self:flex-start;border:1px solid var(--line);border-radius:.3em;padding:.5em 1em;font-size:1.1em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#cfd9da;margin-bottom:1.6em;position:relative}
+h1{font-family:var(--display);font-weight:900;font-style:italic;font-size:6.2em;line-height:1;text-transform:uppercase;margin:0 0 .4em;position:relative;letter-spacing:-.01em}
+h2{font-family:var(--display);font-weight:900;font-style:italic;font-size:4.2em;line-height:1;text-transform:uppercase;margin:0 0 .5em;position:relative}
+.lead{font-size:1.9em;line-height:1.5;color:#b6c4c6;max-width:34em;margin:0 0 1.6em;position:relative}
+.shot{position:relative;border:1px solid var(--line);border-radius:.6em;overflow:hidden;box-shadow:0 2em 6em rgba(0,0,0,.5);background:#fff;flex:1;min-height:0}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.split{display:grid;grid-template-columns:34% 1fr;gap:4em;align-items:stretch;flex:1;min-height:0;position:relative}
+.split .txt{display:flex;flex-direction:column;justify-content:center}
+.split h2{font-size:3.6em}
+ul.pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em;font-size:1.7em;line-height:1.35;color:#dfe7e8}
+ul.pts li{padding-left:1.3em;position:relative}
+ul.pts li::before{content:"";position:absolute;left:0;top:.45em;width:.5em;height:.5em;border-radius:50%;background:var(--lime)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6em;position:relative}
+.card{border:1px solid var(--line);border-radius:.6em;padding:1.8em;background:rgba(255,255,255,.03);min-height:11em}
+.card b{display:block;font-family:var(--display);font-style:italic;font-size:1.9em;line-height:1.1;margin-bottom:.5em}
+.card span{font-size:1.4em;color:var(--muted);line-height:1.45}
+.card i{display:inline-block;font-style:normal;font-size:1em;font-weight:700;letter-spacing:.1em;color:var(--lime);margin-bottom:1em}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+.todo{position:relative;border:1px dashed var(--line);border-radius:.6em;padding:2em;color:var(--muted);font-size:1.6em;line-height:1.5;max-width:40em}
+.todo b{color:var(--ink)}
+.num{position:absolute;right:6%;bottom:5%;font-size:1.3em;color:var(--muted);font-variant-numeric:tabular-nums}
+.logo{position:absolute;left:6%;bottom:5%;font-family:var(--display);font-weight:800;font-style:italic;font-size:1.5em;letter-spacing:.04em}
+.logo em{font-style:italic;color:var(--lime)}
+.hint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);color:#6b7c7f;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.slide.final{background:var(--panel)}
+.slide.full{padding:0;background:#0c1719}
+.slide.full img{width:100%;height:100%;object-fit:contain;display:block}
+.slide.full .num{display:none}
+.slide.rm{padding:0;display:grid;grid-template-columns:1fr 1.12fr;align-items:stretch}
+.slide.rm .tx{padding:5% 3% 5% 5.5%;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.slide.rm .eyebrow{margin-bottom:1.3em}
+.slide.rm h2{font-size:3.5em;margin-bottom:.5em}
+.slide.rm ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.8em}
+.slide.rm li{font-size:1.42em;line-height:1.4;color:#cfdadc;padding-left:1.4em;position:relative}
+.slide.rm li::before{content:"";position:absolute;left:0;top:.52em;width:.5em;height:.5em;border-radius:50%;background:var(--lime)}
+.slide.rm li b{color:#fff;font-weight:800}
+.slide.rm .shot2{position:relative;display:flex;align-items:center;justify-content:center;gap:3%;padding:3.5% 4% 3.5% 0;min-width:0;min-height:0}
+.slide.rm .shot2 img{max-width:48%;max-height:100%;object-fit:contain;display:block}
+.slide.rm .shot2.one img{max-width:100%;border-radius:.5em;border:1px solid var(--line)}
+.slide.big2{padding:3.2% 3.5% 3.6%;display:flex;flex-direction:column;gap:1.4em}
+.slide.big2 .hh{display:flex;align-items:baseline;gap:1.2em;flex:none}
+.slide.big2 h2{font-size:2.7em;margin:0;line-height:1}
+.slide.big2 .eyebrow{margin:0;align-self:center}
+.slide.big2 .imgs{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:1.6em}
+.slide.big2 .imgs img{max-width:100%;max-height:100%;object-fit:contain;border-radius:.4em;border:1px solid var(--line);box-shadow:0 1.2em 3em rgba(0,0,0,.45)}
+.slide.big2 .imgs.two img{max-width:49%}
+</style></head><body>
+<div class="deck" id="deck">
+
+<section class="slide full"><img src="screenshots/01-landing.png" alt="Главная страница padel.select"></section>
+
+<section class="slide full"><img src="screenshots/02-cabinet.png" alt="Кабинет организатора: список турниров"></section>
+
+<section class="slide full"><img src="screenshots/03-wizard-1-basic.png" alt="Создание турнира: основные настройки"></section>
+
+<section class="slide full"><img src="screenshots/04-wizard-2-type.png" alt="Создание турнира: тип турнира"></section>
+
+<section class="slide full"><img src="screenshots/05-wizard-3-matches.png" alt="Создание турнира: настройки матчей"></section>
+
+<section class="slide full"><img src="screenshots/06-wizard-4-participants.png" alt="Создание турнира: участники"></section>
+
+<section class="slide full"><img src="screenshots/07-run-1-applications.png" alt="Приём заявок: кабинет организатора"></section>
+
+<section class="slide full"><img src="screenshots/08-run-1-showcase.png" alt="Приём заявок: витрина для зрителей"></section>
+
+<section class="slide full"><img src="screenshots/09-run-2-draw.png" alt="Жеребьёвка: кабинет организатора"></section>
+
+<section class="slide full"><img src="screenshots/10-run-2-tv-draw.png" alt="Жеребьёвка: ТВ-табло для трансляции"></section>
+
+<section class="slide full"><img src="screenshots/11-run-3-schedule.png" alt="Расписание: кабинет организатора"></section>
+
+<section class="slide full"><img src="screenshots/12-run-3-bracket.png" alt="Сетка: витрина для зрителей"></section>
+
+<section class="slide full"><img src="screenshots/13-run-3-tv-schedule.png" alt="Расписание: ТВ-табло"></section>
+
+<section class="slide full"><img src="screenshots/14-run-4-results.png" alt="Итоги турнира: призёры и результаты"></section>
+
+<section class="slide rm">
+  <div class="tx">
+    <span class="eyebrow">Роадмап · 3.1</span>
+    <h2>Судейство<br>на вышке</h2>
+    <ul>
+      <li>Новый тип аккаунта <b>«Судья»</b>: организатор назначает судей на турнир и на конкретные матчи</li>
+      <li>Судья видит только свои матчи и ведёт счёт с телефона или планшета прямо на вышке</li>
+      <li>Одно касание на розыгрыш, отмена последнего действия, смена сторон, подача и решающий сет считаются автоматически</li>
+      <li>Полоса «Ход гейма» показывает, кто выиграл каждый розыгрыш и как менялся счёт</li>
+      <li>Медицинские перерывы, карточки и видеопросмотры фиксируются по регламенту ФПР</li>
+      <li>Тёмная и светлая темы: судья переключает экран под освещение на корте</li>
+      <li>Счёт сразу уходит на витрину турнира и на ТВ-табло</li>
+    </ul>
+  </div>
+  <div class="shot2"><img src="screenshots/19-roadmap-referee-c.png" alt="Экран судьи, тёмная тема"><img src="screenshots/20-roadmap-referee-c-light.png" alt="Экран судьи, светлая тема"></div>
+</section>
+
+<section class="slide rm">
+  <div class="tx">
+    <span class="eyebrow">Роадмап · 3.2</span>
+    <h2>Табло<br>у корта</h2>
+    <ul>
+      <li>Полноэкранное табло на телевизор рядом с кортом: счёт видно с трибуны и с площадки</li>
+      <li>Источник данных — судья на вышке, счёт меняется в момент розыгрыша</li>
+      <li>Сеты, геймы, текущие очки и подающая пара в одной строке на каждую пару</li>
+      <li>Внизу — следующий матч на этом корте, чтобы пары знали своё время</li>
+      <li>Логотипы организатора и спонсоров турнира на том же экране</li>
+    </ul>
+  </div>
+  <div class="shot2 one"><img src="screenshots/21-roadmap-tv-live.png" alt="Табло у корта с лайв-счётом"></div>
+</section>
+
+<section class="slide rm">
+  <div class="tx">
+    <span class="eyebrow">Роадмап · 3.2</span>
+    <h2>Виджет счёта<br>в трансляции</h2>
+    <ul>
+      <li>Компактный виджет в левом верхнем углу кадра: не перекрывает игровую зону</li>
+      <li>Тот же счёт от судьи, что и на табло, без ручного дублирования оператором</li>
+      <li>Пары, сеты, геймы, текущие очки, подающая пара и время матча</li>
+      <li>Подключается в OBS или vMix ссылкой на страницу матча</li>
+      <li>Цвета и логотипы настраиваются под оформление трансляции</li>
+    </ul>
+  </div>
+  <div class="shot2 one"><img src="screenshots/22-roadmap-broadcast.png" alt="Виджет счёта поверх кадра трансляции"></div>
+</section>
+
+<section class="slide big2">
+  <div class="hh"><span class="eyebrow">Роадмап · 3.3</span><h2>Брендирование турнира · табло у корта</h2></div>
+  <div class="imgs"><img src="screenshots/23-roadmap-brand-tv.png" alt="Табло у корта в бело-красной схеме"></div>
+</section>
+
+<section class="slide big2">
+  <div class="hh"><span class="eyebrow">Роадмап · 3.3</span><h2>Брендирование турнира · витрина</h2></div>
+  <div class="imgs"><img src="screenshots/24-roadmap-brand-showcase.png" alt="Витрина турнира в бело-красной схеме"></div>
+</section>
+
+<section class="slide big2">
+  <div class="hh"><span class="eyebrow">Роадмап · 3.3</span><h2>Логотипы спонсоров на табло</h2></div>
+  <div class="imgs"><img src="screenshots/25-roadmap-brand-sponsors.png" alt="Четыре варианта размещения логотипов спонсоров"></div>
+</section>
+
+</div>
+<div class="hint">← → или пробел · листать</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')]; let i=Math.max(0,Math.min(slides.length-1,+location.hash.slice(1)-1||0));
+function show(n){ i=Math.max(0,Math.min(slides.length-1,n)); slides.forEach((s,k)=>{ s.classList.toggle('on',k===i); s.classList.toggle('prev',k<i); const num=s.querySelector('.num'); if(num) num.textContent=(k+1)+' / '+slides.length; }); try{ history.replaceState(null,'','#'+(i+1)); }catch(e){} }
+slides.forEach(s=>{ const n=document.createElement('div'); n.className='num'; s.appendChild(n); });
+document.addEventListener('keydown',e=>{ if(['ArrowRight',' ','PageDown','Enter'].includes(e.key)){ e.preventDefault(); show(i+1);} if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); show(i-1);} if(e.key==='Home') show(0); if(e.key==='End') show(slides.length-1); });
+document.addEventListener('click',e=>{ if(e.target.closest('a')) return; show(e.clientX>innerWidth/3 ? i+1 : i-1); });
+let tx=null; document.addEventListener('touchstart',e=>tx=e.touches[0].clientX); document.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>40) show(dx<0?i+1:i-1); tx=null; });
+show(i);
+</script>
+</body></html>

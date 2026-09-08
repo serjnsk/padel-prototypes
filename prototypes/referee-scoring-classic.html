@@ -1,0 +1,145 @@
+<title>Судейство на вышке · вариант Б</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#0b1214;--card:#141f22;--card2:#18262a;--line:#233438;--line2:#2e4348;
+  --ink:#fff;--muted:#8ba0a4;--dim:#5e7276;
+  --box:#ffffff;--box-ink:#0d1618;--box-line:#ffffff;
+  --strip:#f2b134;--strip-ink:#241800;
+  --lime:#8ae81f;--lime-ink:#0b1b06;--danger:#ff5c5c;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif;
+}
+.phone[data-t="light"]{
+  --bg:#e9edee;--card:#ffffff;--card2:#dfe5e6;--line:#cdd6d8;--line2:#b6c1c3;
+  --ink:#0d1618;--muted:#54666a;--dim:#8b9a9d;
+  --box:#ffffff;--box-ink:#0d1618;--box-line:#c6d0d2;
+  --strip:#f2b134;--strip-ink:#241800;
+  --lime:#4ea408;--lime-ink:#ffffff;--danger:#c9291f;
+  border-color:#cdd6d8;box-shadow:0 30px 90px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--stage,#05090a);color:var(--ink);font-family:var(--sans);display:grid;place-items:center;overflow:hidden;user-select:none;padding:20px}
+.phone{width:430px;height:880px;background:var(--bg);color:var(--ink);border-radius:34px;border:1px solid #223236;box-shadow:0 30px 90px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column;position:relative}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+
+.hd{display:flex;align-items:center;gap:10px;padding:11px 14px 9px;border-bottom:1px solid var(--line)}
+.hd .bk{width:32px;height:32px;border:1px solid var(--line2);border-radius:9px;display:grid;place-items:center;font-size:16px;color:var(--muted);flex:none}
+.hd .ti{flex:1;min-width:0}
+.hd .ti b{display:block;font-size:13.5px;font-weight:800;line-height:1.2}
+.hd .ti span{display:block;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .tm{text-align:right;flex:none}
+.hd .tm b{display:block;font-family:var(--display);font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.hd .tm span{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.hd .th{width:32px;height:32px;border:1px solid var(--line2);border-radius:9px;display:grid;place-items:center;color:var(--muted);flex:none}
+.hd .th svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+.phone[data-t="light"] .th .moon{display:none}
+.phone:not([data-t="light"]) .th .sun{display:none}
+
+.board{flex:1;min-height:0;display:grid;grid-template-columns:1fr 82px 1fr}
+.col{display:flex;flex-direction:column;min-width:0;padding:10px 12px 12px}
+.col.r{align-items:stretch}
+.nm{margin-bottom:10px}
+.pl{display:flex;align-items:center;gap:8px;padding:4px 0}
+.pl .b{width:16px;height:16px;border-radius:50%;background:#33474b;flex:none;border:1px solid #46605f}
+.pl.s .b{background:var(--lime);border-color:var(--lime);box-shadow:0 0 0 3px rgba(138,232,31,.22)}
+.pl .n{font-size:12.5px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase;letter-spacing:.01em}
+.pl.s .n{color:var(--lime)}
+.pl .cd{width:15px;height:19px;border-radius:3px;background:var(--danger);opacity:.85;flex:none}
+.rev{display:inline-block;border:1px solid var(--line2);border-radius:999px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--muted);margin-top:4px}
+
+.rows{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+.rw{flex:1;display:grid;grid-template-columns:52px 1fr;align-items:center;gap:8px;min-height:0}
+.col.r .rw{grid-template-columns:52px 1fr}
+.rw .lb{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--muted);text-align:right}
+.col.r .rw .lb{text-align:right}
+.rw .bx{height:100%;background:var(--box);color:var(--box-ink);border:1px solid var(--box-line);border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;font-size:30px;line-height:1}
+.rw.game{flex:1.25}
+.rw.game .bx{font-size:36px}
+.rw.pts{flex:2}
+.rw.pts .lb{font-size:12px;color:var(--ink)}
+.rw.pts .bx{font-size:64px;font-weight:900;letter-spacing:-.02em}
+.rw.dim .bx{color:var(--dim)}
+
+.strip{background:var(--strip);color:var(--strip-ink);display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:12px 4px 10px;gap:6px}
+.strip .it{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
+.strip .it b{font-size:9px;font-weight:800;letter-spacing:.04em;text-align:center;line-height:1.1}
+.strip .it .ic{width:38px;height:38px;border-radius:10px;background:rgba(0,0,0,.14);display:grid;place-items:center}
+.strip .it svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.strip .med{display:flex;gap:3px;width:100%;justify-content:center}
+.strip .med i{font-style:normal;flex:1;text-align:center;background:rgba(0,0,0,.14);border-radius:7px;padding:5px 0;font-size:10px;font-weight:800}
+.strip .undo{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.16);display:grid;place-items:center}
+.strip .undo svg{width:26px;height:26px;stroke-width:2.2}
+
+.pts2{display:grid;grid-template-columns:1fr 82px 1fr;gap:0;background:var(--bg);padding:0 12px 14px}
+.pbtn{background:var(--lime);color:var(--lime-ink);border-radius:14px;padding:18px 8px;font-family:var(--display);font-weight:900;font-style:italic;font-size:19px;letter-spacing:.02em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 6px 0 rgba(0,0,0,.28)}
+.pbtn small{font-family:var(--sans);font-style:normal;font-size:10px;font-weight:700;opacity:.72;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pbtn:active{transform:translateY(3px)}
+.serveline{grid-column:2;display:grid;place-items:center;font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-align:center;line-height:1.2}
+</style>
+
+<div class="phone" id="ph">
+  <div class="hd">
+    <button class="bk" aria-label="Назад">‹</button>
+    <span class="ti"><b>1/8 финала · Матч 1</b><span>Корт 1 · Региональный турнир</span></span>
+    <span class="tm"><b>54:24</b><span>матч</span></span>
+    <button class="th" id="th" aria-label="Сменить тему">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg>
+    </button>
+  </div>
+
+  <div class="board">
+    <div class="col">
+      <div class="nm">
+        <div class="pl s"><span class="b"></span><span class="n">Кутузова В.</span><span class="cd"></span></div>
+        <div class="pl"><span class="b"></span><span class="n">Чиркова П.</span><span class="cd"></span></div>
+        <span class="rev">видеопросмотр 0/1</span>
+      </div>
+      <div class="rows">
+        <div class="rw dim"><span class="lb">СЕТ 1</span><span class="bx">6</span></div>
+        <div class="rw dim"><span class="lb">СЕТ 2</span><span class="bx">4</span></div>
+        <div class="rw"><span class="lb">СЕТ 3</span><span class="bx">5</span></div>
+        <div class="rw game"><span class="lb">ГЕЙМ</span><span class="bx">5</span></div>
+        <div class="rw pts"><span class="lb">ОЧКИ</span><span class="bx">40</span></div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="it"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span><b>СМЕНА<br>СТОРОН</b></div>
+      <div class="it"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.4"/><path d="M9 21l1.5-6L8 12l1.5-3.5L14 9l3 2M10.5 15l3.5 1 1 5"/></svg></span><b>ПОДАЧА</b></div>
+      <div class="it"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><b>ПАУЗА</b></div>
+      <div class="it"><b>МЕДПОМОЩЬ</b><span class="med"><i>3′</i><i>5′</i><i>15′</i></span></div>
+      <button class="undo" aria-label="Отменить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+    </div>
+
+    <div class="col r">
+      <div class="nm">
+        <div class="pl"><span class="b"></span><span class="n">Петрова В.</span><span class="cd"></span></div>
+        <div class="pl"><span class="b"></span><span class="n">Мехтиева З.</span><span class="cd"></span></div>
+        <span class="rev">видеопросмотр 0/1</span>
+      </div>
+      <div class="rows">
+        <div class="rw dim"><span class="lb">СЕТ 1</span><span class="bx">3</span></div>
+        <div class="rw dim"><span class="lb">СЕТ 2</span><span class="bx">6</span></div>
+        <div class="rw"><span class="lb">СЕТ 3</span><span class="bx">5</span></div>
+        <div class="rw game"><span class="lb">ГЕЙМ</span><span class="bx">5</span></div>
+        <div class="rw pts"><span class="lb">ОЧКИ</span><span class="bx">30</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pts2">
+    <button class="pbtn">+ Очко<small>Кутузова / Чиркова</small></button>
+    <span class="serveline">подаёт<br>Кутузова<br>справа</span>
+    <button class="pbtn">+ Очко<small>Петрова / Мехтиева</small></button>
+  </div>
+</div>
+
+<script>
+const ph=document.getElementById('ph'), th=document.getElementById('th');
+function set(t){ if(t==='light'){ ph.dataset.t='light'; document.body.style.setProperty('--stage','#c9d2d4'); } else { delete ph.dataset.t; document.body.style.setProperty('--stage','#05090a'); } try{localStorage.setItem('ref-theme-b',t)}catch(e){} }
+set(new URLSearchParams(location.search).get('t') || (()=>{try{return localStorage.getItem('ref-theme-b')}catch(e){return null}})() || 'dark');
+th.addEventListener('click',()=>set(ph.dataset.t==='light'?'dark':'light'));
+</script>

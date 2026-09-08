@@ -1,0 +1,68 @@
+<title>Региональный рейтинговый турнир · Итоги</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#0c1719;--stripe:#101f22;--panel:#0a0e13;--line:#1c2a2d;--line-strong:#25363a;--ink:#fff;--muted:#8a9ea0;--dim:#5e7174;--lime:#8ae81f;--lime-ink:#0b1b06;--display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;-webkit-font-smoothing:antialiased}
+.top{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;background:var(--panel)}
+.logo{font-family:var(--display);font-weight:800;font-style:italic;font-size:15px;letter-spacing:.04em}.logo em{font-style:italic;color:var(--lime)}
+.share{border:1px solid var(--line-strong);background:transparent;color:var(--ink);border-radius:6px;padding:7px 13px;font:inherit;font-weight:600;font-size:13px}
+.hero{position:relative;overflow:hidden;background:repeating-linear-gradient(180deg,var(--bg) 0 42px,var(--stripe) 42px 84px);padding:22px 30px 0;text-align:center}
+.wm{position:absolute;left:50%;top:-6%;transform:translateX(-50%);font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(170px,14vw,290px);line-height:1;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.08);white-space:nowrap;pointer-events:none}
+.rel{position:relative}
+.status{display:inline-block;border:1px solid var(--line-strong);background:#182428;border-radius:4px;padding:5px 13px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#cfd9da}
+.meta{color:#b6c4c6;margin:10px 0 4px;font-size:13px}
+h1{font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(30px,3.3vw,50px);line-height:1.05;text-transform:uppercase;margin:0 0 10px}
+.club{display:inline-flex;align-items:center;gap:9px;color:#b6c4c6;font-size:14px;margin-bottom:16px}
+.club i{width:23px;height:23px;border-radius:50%;background:#e9e2c8;border:2px solid #c9b76a}
+.win{border:1px solid var(--line-strong);border-radius:6px;background:#101c1f;padding:14px 20px;max-width:520px;margin:0 auto 18px;text-align:left}
+.win .t{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.win .r{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:16px;font-weight:700}
+.win .r .m{font-size:17px}
+.win .r.g1 .nm{color:var(--lime)}
+.win .r .pos{margin-left:auto;color:var(--muted);font-weight:500;font-size:14px}
+.tabrow{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 0;display:flex;justify-content:center;gap:5px}
+.tabrow span{padding:9px 18px;border-radius:4px;font-weight:600;font-size:14px;color:#b6c4c6;background:#18262a}
+.tabrow span.on{background:var(--lime);color:var(--lime-ink)}
+.body{padding:16px 30px 26px}
+.days{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.days span{padding:9px 18px;text-align:center;font-weight:800;line-height:1.15;color:#b6c4c6}
+.days span b{display:block;font-size:19px}.days span i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.days span.on{background:var(--lime);color:var(--lime-ink)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cc{display:flex;flex-direction:column;gap:11px}
+.ch{background:#18262a;border-radius:6px;padding:11px 16px;font-weight:800;font-size:13px;letter-spacing:.06em}
+.mc{border:1px solid var(--line);border-radius:6px;background:#101c1f;padding:12px 15px}
+.mh{display:flex;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin-bottom:9px}
+.mh .st{margin-left:auto}
+.pl{display:flex;align-items:center;gap:10px;padding:4px 0 4px 10px;position:relative;font-size:15px}
+.pl .nm{flex:1}
+.pl.w{font-weight:700}
+.pl.w::before{content:"";position:absolute;left:0;top:5px;bottom:5px;width:3px;border-radius:2px;background:var(--lime)}
+.pl.bye .nm{color:var(--dim);font-style:italic}
+.pl .sc{display:flex;gap:16px;font-variant-numeric:tabular-nums;font-weight:700}
+.pl .sc span{width:12px;text-align:right}
+.tm{margin-top:9px;color:var(--muted);font-size:13px}
+</style>
+
+<div class="top"><span class="logo">PADEL.<em>СЕЛЕКТ</em></span><button class="share">⇪ Поделиться</button></div>
+<section class="hero">
+  <div class="wm" aria-hidden="true">НОВОСИБИРСК</div>
+  <div class="rel">
+    <span class="status">Завершён</span>
+    <div class="meta">29–30 августа 2026 · ФПР 250</div>
+    <h1>Региональный рейтинговый турнир<br>(Новосибирск)</h1>
+    <div class="club"><i></i>Padel Tennis Club Станционная</div>
+    <div class="win">
+      <div class="t">Призёры турнира</div>
+      <div class="r g1"><span class="m">🥇</span><span class="nm">Филичев И. / Денисов И.</span><span class="pos">1-е место</span></div>
+      <div class="r"><span class="m">🥈</span><span class="nm">Дьяконов И. / Шехватов С.</span><span class="pos">2-е место</span></div>
+      <div class="r"><span class="m">🥉</span><span class="nm">Парыгин М. / Никитин А.</span><span class="pos">3-е место</span></div>
+    </div>
+  </div>
+  <div class="tabrow rel"><span class="on">Расписание</span><span>Сетка</span><span>Игроки</span><span>Регламент</span></div>
+</section>
+<section class="body">
+  <div class="days"><span class="on"><b>29</b><i>авг</i></span><span><b>30</b><i>авг</i></span></div>
+  <div class="cols"><div class="cc"><div class="ch">КОРТ 1</div><div class="mc"><div class="mh"><span>1/8 ФИНАЛА</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl"><span class="nm">Виленкин А. / Смит Д.</span><span class="sc"><span>4</span><span>2</span></span></div><div class="pl w"><span class="nm">Мироносицкий А. / Елисеев Д.</span><span class="sc"><span>6</span><span>6</span></span></div><div class="tm">начало в 10:00</div></div><div class="mc"><div class="mh"><span>1/8 ФИНАЛА</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl"><span class="nm">Таргоня Ю. / Кузнецов Р.</span><span class="sc"><span>0</span><span>1</span></span></div><div class="pl w"><span class="nm">Филичев И. / Денисов И.</span><span class="sc"><span>6</span><span>6</span></span></div><div class="tm">начало в 11:30</div></div></div><div class="cc"><div class="ch">КОРТ 2</div><div class="mc"><div class="mh"><span>1/8 ФИНАЛА</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl"><span class="nm">Овчаренко И. / Антипин А.</span><span class="sc"><span>6</span><span>4</span><span>4</span></span></div><div class="pl w"><span class="nm">Петров М. / Кочанов П.</span><span class="sc"><span>3</span><span>6</span><span>6</span></span></div><div class="tm">начало в 10:00</div></div><div class="mc"><div class="mh"><span>1/8 ФИНАЛА</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl w"><span class="nm">Глушко Д. / Оверченко М.</span><span class="sc"><span>6</span><span>6</span></span></div><div class="pl"><span class="nm">Горбунов Е. / Бородин С.</span><span class="sc"><span>2</span><span>3</span></span></div><div class="tm">начало в 11:30</div></div></div><div class="cc"><div class="ch">КОРТ 3</div><div class="mc"><div class="mh"><span>НИЖНЯЯ СЕТКА · 1-Й КРУГ</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl bye"><span class="nm">бай</span><span class="sc"></span></div><div class="pl w"><span class="nm">Виленкин А. / Смит Д.</span><span class="sc"></span></div><div class="tm">не ранее 12:00</div></div><div class="mc"><div class="mh"><span>НИЖНЯЯ СЕТКА · 1-Й КРУГ</span><span class="st">ЗАВЕРШЁН</span></div><div class="pl w"><span class="nm">Загрядский Р. / Семьянинов М.</span><span class="sc"><span>6</span><span>6</span></span></div><div class="pl"><span class="nm">Маталин А. / Прибылов Е.</span><span class="sc"><span>1</span><span>4</span></span></div><div class="tm">не ранее 13:30</div></div></div></div>
+</section>

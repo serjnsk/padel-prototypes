@@ -1,0 +1,13 @@
+/* Токены стиля кабинета организатора PADEL.СЕЛЕКТ.
+   Источник для прототипов и презентации. Прототипы держат копию инлайн,
+   потому что публикуются как самодостаточные страницы. При изменении токенов
+   обновить здесь и в прототипах. Шрифт: Inter (Google Fonts), моно: JetBrains Mono. */
+:root{
+  --bg:#f5f6f8;--surface:#ffffff;--surface-2:#f3f4f6;--border:#e5e7eb;--border-strong:#d1d5db;
+  --ink:#111827;--muted:#6b7280;--faint:#9ca3af;
+  --accent:#84cc16;--accent-ink:#111827;--accent-soft:#ecfccb;--accent-line:#65a30d;
+  --black:#111111;--black-ink:#ffffff;
+  --path:#111827;
+  --warn:#92400e;--warn-bg:#fef3c7;--err:#b91c1c;--err-bg:#fee2e2;--hint:#1e40af;--hint-bg:#dbeafe;
+  --r:8px;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}

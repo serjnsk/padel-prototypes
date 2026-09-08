@@ -1,0 +1,64 @@
+<title>Витрина турнира · брендирование</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#ffffff;--stripe:#f5f7f8;--panel:#ffffff;--line:#e6eaec;--line-strong:#d5dcde;--ink:#12181b;--muted:#68777d;--dim:#9aa8ad;--lime:#e11b22;--lime-ink:#ffffff;--display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;-webkit-font-smoothing:antialiased}
+.hero{position:relative;overflow:hidden;background:repeating-linear-gradient(180deg,var(--bg) 0 42px,var(--stripe) 42px 84px);padding:18px 32px 0;text-align:center}
+.wm{position:absolute;left:50%;top:-14%;transform:translateX(-50%);font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(180px,15vw,300px);line-height:1;color:transparent;-webkit-text-stroke:2px rgba(225,27,34,.10);white-space:nowrap;pointer-events:none}
+.rel{position:relative}
+.status{display:inline-block;background:var(--lime);color:var(--lime-ink);border-radius:4px;padding:6px 14px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.meta{color:var(--muted);margin:10px 0 6px;font-size:13px}
+h1{font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(30px,3.2vw,46px);line-height:1.05;text-transform:uppercase;margin:0 0 10px}
+.club{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;margin-bottom:16px}
+.club i{width:24px;height:24px;border-radius:50%;background:#e9e2c8;border:2px solid #c9b76a}
+.tabrow{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 0;display:flex;justify-content:center;gap:6px}
+.tabrow span{padding:10px 20px;border-radius:4px;font-weight:600;font-size:15px;color:var(--muted)}
+.tabrow span.on{background:var(--lime);color:var(--lime-ink)}
+.tabrow span.g{background:#f0f3f4}
+.body{padding:16px 32px 24px}
+.sw{display:flex;gap:10px;margin-bottom:14px}
+.sw span{padding:9px 18px;border-radius:4px;font-weight:700;font-size:14px;background:#f0f3f4;color:var(--muted)}
+.sw span.on{background:var(--lime);color:var(--lime-ink)}
+.br{display:grid;grid-template-columns:repeat(4,1fr);gap:0 32px;align-items:start}
+.col{display:flex;flex-direction:column;justify-content:space-around}
+.rh{text-align:center;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.sl{display:flex;flex-direction:column}
+.cell{border:1px solid var(--line-strong);border-radius:4px;background:#f7f9fa;padding:8px 12px;font-family:var(--display);font-weight:800;font-style:italic;font-size:13px;letter-spacing:.01em;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.ph{font-family:var(--sans);font-style:italic;font-weight:400;color:var(--dim);background:#fbfcfc}
+.cell i{font-style:normal;background:var(--lime);color:var(--lime-ink);border-radius:3px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:6px}
+.sp{height:11px}.sp2{height:58px}.sp3{height:152px}
+.brandbar{display:flex;align-items:center;gap:18px;background:var(--lime);color:#fff;padding:12px 32px}
+.brandbar .lg{font-family:var(--display);font-weight:800;font-style:italic;font-size:16px;letter-spacing:.04em}
+.brandbar .lg em{font-style:italic;color:#fff}
+.brandbar .sp{display:flex;align-items:center;gap:12px;margin-left:14px}
+.brandbar .sp .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.brandbar .sp .spwm{background:#fff;color:var(--lime);border-radius:6px;padding:6px 14px;font-family:var(--display);font-weight:900;font-style:italic;font-size:18px}
+.brandbar .partners{margin-left:auto;display:flex;gap:10px}
+.brandbar .partners i{font-style:normal;border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+</style>
+
+<div class="brandbar">
+  <span class="lg">PADEL.<em>СЕЛЕКТ</em></span>
+  <span class="sp"><span class="lbl">Титульный спонсор</span><span class="spwm">FONBET</span></span>
+  <span class="partners"><i>партнёр</i><i>партнёр</i><i>клуб</i></span>
+</div>
+<section class="hero">
+  <div class="wm" aria-hidden="true">НОВОСИБИРСК</div>
+  <div class="rel">
+    <span class="status">Скоро · старт 9 сентября</span>
+    <div class="meta">9–10 сентября 2026 · ФПР 250</div>
+    <h1>Региональный турнир</h1>
+    <div class="club"><i></i>Padel Tennis Club Станционная</div>
+  </div>
+  <div class="tabrow rel"><span class="g">Расписание</span><span class="on">Сетка</span><span class="g">Игроки</span></div>
+</section>
+<section class="body">
+  <div class="sw"><span class="on">Верхняя сетка</span><span>Нижняя сетка</span></div>
+  <div class="br">
+    <div class="col"><div class="rh">1/8</div><div class="sl"><div class="cell">ФИЛИЧЕВ И. | ДЕНИСОВ И.</div></div><div class="sl"><div class="cell">БОНДАРЕНКО Р. | ЕЛИСЕЕВ Н.</div></div><div class="sp"></div><div class="sl"><div class="cell">ПАРЫГИН М. | НИКИТИН А.</div></div><div class="sl"><div class="cell wc">РУСОВ Д. | КОЛЬЯКОВ С. <i>WC</i></div></div><div class="sp"></div><div class="sl"><div class="cell">ВИЛЕНКИН А. | СМИТ Д.</div></div><div class="sl"><div class="cell">ГОРБУНОВ Е. | БОРОДИН С.</div></div><div class="sp"></div><div class="sl"><div class="cell">ОВЧАРЕНКО И. | АНТИПИН А.</div></div><div class="sl"><div class="cell">ГЛУШКО Д. | ОВЕРЧЕНКО М.</div></div><div class="sp"></div><div class="sl"><div class="cell">ПЕТРОВ М. | КОЧАНОВ П.</div></div><div class="sl"><div class="cell">ТАРГОНЯ Ю. | КУЗНЕЦОВ Р.</div></div><div class="sp"></div><div class="sl"><div class="cell">МИРОНОСИЦКИЙ А. | ЕЛИСЕЕВ Д.</div></div><div class="sl"><div class="cell">ЗАГРЯДСКИЙ Р. | СЕМЬЯНИНОВ М.</div></div><div class="sp"></div><div class="sl"><div class="cell">ДЬЯКОНОВ И. | ШЕХВАТОВ С.</div></div><div class="sl"><div class="cell">ПОПОВ М. | БОРИСОВ Е.</div></div><div class="sp"></div><div class="sl"><div class="cell">МАТАЛИН А. | ПРИБЫЛОВ Е.</div></div><div class="sl"><div class="cell">БОГОМОЛОВ М. | СЫЧЕВ И.</div></div><div class="sp"></div></div>
+    <div class="col"><div class="rh">1/4</div><div class="sp"></div><div class="sp"></div><div class="sl"><div class="cell ph">победитель 1/8 №1</div></div><div class="sl"><div class="cell ph">победитель 1/8 №2</div></div><div class="sp2"></div><div class="sl"><div class="cell ph">победитель 1/8 №3</div></div><div class="sl"><div class="cell ph">победитель 1/8 №4</div></div><div class="sp2"></div><div class="sl"><div class="cell ph">победитель 1/8 №5</div></div><div class="sl"><div class="cell ph">победитель 1/8 №6</div></div><div class="sp2"></div><div class="sl"><div class="cell ph">победитель 1/8 №7</div></div><div class="sl"><div class="cell ph">победитель 1/8 №8</div></div><div class="sp2"></div></div>
+    <div class="col"><div class="rh">1/2</div><div class="sp2"></div><div class="sp2"></div><div class="sl"><div class="cell ph">победитель 1/4 №1</div></div><div class="sl"><div class="cell ph">победитель 1/4 №2</div></div><div class="sp3"></div><div class="sl"><div class="cell ph">победитель 1/4 №3</div></div><div class="sl"><div class="cell ph">победитель 1/4 №4</div></div><div class="sp3"></div></div>
+    <div class="col"><div class="rh">Финал</div><div class="sp3"></div><div class="sp3"></div><div class="sl"><div class="cell ph">победитель 1/2 №1</div></div><div class="sl"><div class="cell ph">победитель 1/2 №2</div></div></div>
+  </div>
+</section>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Прототипы PADEL.СЕЛЕКТ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/tokens.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 20px}
+.logo{font-weight:800;letter-spacing:.06em;font-size:15px}.logo em{font-style:normal;color:var(--accent-line)}
+.pillchip{background:var(--surface-2);color:var(--muted);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600}
+main{max-width:920px;margin:0 auto;padding:28px 24px}
+h1{font-size:22px;margin:0 0 6px;font-weight:700}
+p.lead{color:var(--muted);margin:0 0 22px}
+.list{display:grid;gap:12px}
+a.card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 18px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+a.card b{font-size:15px;display:block}
+a.card span{color:var(--muted);font-size:13px}
+a.card .go{background:var(--black);color:var(--black-ink);border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px}
+.sec{font-size:12px;font-weight:700;color:var(--muted);margin:22px 0 8px;text-transform:uppercase;letter-spacing:.06em}
+</style></head><body>
+<div class="topbar"><span class="logo">PADEL.<em>СЕЛЕКТ</em></span><span class="pillchip">прототипы</span></div>
+<main>
+<h1>Прототипы интерфейса</h1>
+<p class="lead">Рабочие макеты экранов в стиле сервиса. Каждый прототип — самодостаточная страница с живой логикой.</p>
+<div class="sec">Вход в сервис</div>
+<div class="list">
+  <a class="card" href="prototypes/landing.html"><div><b>Главная страница</b><span>Незалогиненный вид: концепция сервиса, преимущества и форма входа. Кнопка «Войти» ведёт в кабинет организатора.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Раздел «Турниры»</div>
+<div class="list">
+  <a class="card" href="prototypes/tournaments-list.html"><div><b>Список турниров</b><span>Типовая страница списка: даты, площадка, пары, состояние, действия. Отсюда открывается визард создания.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tournament-basic-step.html"><div><b>Визард · шаг 1 «Основные настройки»</b><span>Название, категория, площадки и корты, даты, описание, регламент.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tournament-type-step.html"><div><b>Визард · шаг 2 «Тип турнира»</b><span>Конструктор из трёх этапов: квалификация, групповой этап, финальный этап по системам регламента. Живой расчёт матчей и предпросмотр пути участника.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tournament-matches-step.html"><div><b>Визард · шаг 3 «Настройки матчей»</b><span>Сеты, геймы, тай-брейк и решение при равенстве сетов, один набор правил для всех этапов.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tournament-participants-step.html"><div><b>Визард · шаг 4 «Участники»</b><span>Заявки из ЕЦП по ссылке, срок приёма заявок, кнопка «Создать турнир».</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Проведение турнира · приём заявок</div>
+<div class="list">
+  <a class="card" href="prototypes/tournament-applications.html"><div><b>Страница турнира · Приём заявок</b><span>Заявки из ЕЦП, распределение пар: основная сетка, резерв, WC, посев по рейтингу.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/showcase-applications.html"><div><b>Витрина для зрителей · Приём заявок</b><span>Публичная страница турнира: список заявленных пар с посевом и рейтингом, запись на турнир.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Проведение турнира · жеребьёвка</div>
+<div class="list">
+  <a class="card" href="prototypes/tournament-draw.html"><div><b>Жеребьёвка · кабинет организатора</b><span>Пары в очереди и 16 позиций сетки: ручная расстановка, случайная пара, очистка.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tv-draw.html"><div><b>Жеребьёвка · ТВ-табло</b><span>Полноэкранная сетка для видеотрансляции и экрана у корта, live-индикатор.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Проведение турнира · расписание и сетка</div>
+<div class="list">
+  <a class="card" href="prototypes/tournament-schedule.html"><div><b>Расписание · кабинет организатора</b><span>Матчи по кортам и дням, автоматическая расстановка времени, ввод счёта.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/showcase-bracket.html"><div><b>Сетка · витрина для зрителей</b><span>Публичная сетка турнира: 1/8, 1/4, 1/2 и финал, верхняя и нижняя сетки.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tv-schedule.html"><div><b>Расписание · ТВ-табло</b><span>Ближайшие матчи по кортам для экрана у корта и трансляции.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Проведение турнира · завершение</div>
+<div class="list">
+  <a class="card" href="prototypes/showcase-results.html"><div><b>Итоги турнира · витрина для зрителей</b><span>Призёры турнира, сыгранное расписание по кортам со счётом по сетам.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Роадмап · прототипы будущих модулей</div>
+<div class="list">
+  <a class="card" href="prototypes/referee-scoring.html"><div><b>Судейство на вышке · вариант А</b><span>Экран судьи: очки, геймы, сеты, ход гейма розыгрыш за розыгрышем, подача, медпомощь, карточки. Переключение тёмной и светлой темы в шапке.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/referee-scoring-classic.html"><div><b>Судейство на вышке · вариант Б</b><span>Привычный судьям макет: две колонки со счётом в белых боксах и центральная панель действий. Те же две темы.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/referee-scoring-mix.html"><div><b>Судейство на вышке · вариант В</b><span>Макет варианта Б плюс лестница хода гейма внизу: видно и привычные боксы счёта, и очерёдность розыгрышей.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/tv-live-score.html"><div><b>Видеотабло · табло у корта</b><span>Полноэкранное табло на телевизор рядом с кортом: сеты, геймы, очки, подача, следующий матч.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/broadcast-overlay.html"><div><b>Видеотабло · виджет в трансляции</b><span>Компактный виджет счёта в углу кадра для OBS или vMix.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/brand-tv-fonbet.html"><div><b>Брендирование · табло</b><span>Табло у корта в бело-красной схеме турнира с титульным спонсором и партнёрами.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/brand-showcase-fonbet.html"><div><b>Брендирование · витрина</b><span>Публичная страница турнира в цветовой схеме турнира.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/brand-sponsor-variants.html"><div><b>Брендирование · логотипы спонсоров</b><span>Четыре варианта размещения на табло: подвал, угловая плашка, водяной знак, заставка в перерыве.</span></div><span class="go">Открыть →</span></a>
+</div>
+<div class="sec">Раздел «Чемпионаты / Лиги»</div>
+<div class="list">
+  <a class="card" href="prototypes/championships-list.html"><div><b>Список чемпионатов</b><span>Отдельный пункт меню в дизайне списка турниров: дивизионы, пары, состояние, действия.</span></div><span class="go">Открыть →</span></a>
+  <a class="card" href="prototypes/championship-format-step.html"><div><b>Визард · шаг 2 «Формат»</b><span>Отдельный раздел «Чемпионаты / Лиги»: число кругов и дивизионы по категориям. Без квалификации, жеребьёвки и матча за 3-е место.</span></div><span class="go">Открыть →</span></a>
+</div>
+</main></body></html>

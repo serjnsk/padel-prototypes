@@ -1,0 +1,69 @@
+<title>Табло у корта · лайв-счёт</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@600;700;800&display=swap">
+<style>
+:root{--bg:#0a1113;--stripe:#0d1719;--card:#131f22;--line:#22343a;--ink:#fff;--muted:#8ba0a4;--dim:#5d7175;
+ --lime:#7ee81f;--lime-ink:#08190a;--display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:repeating-linear-gradient(180deg,var(--bg) 0 54px,var(--stripe) 54px 108px);color:var(--ink);font-family:var(--sans);display:flex;flex-direction:column;overflow:hidden}
+.top{display:flex;align-items:center;gap:26px;padding:26px 44px 20px}
+.cat{background:var(--lime);color:var(--lime-ink);border-radius:8px;padding:12px 22px;font-family:var(--display);font-weight:800;font-style:italic;font-size:30px}
+.ttl b{display:block;font-family:var(--display);font-weight:800;font-style:italic;font-size:38px;text-transform:uppercase;line-height:1.02;letter-spacing:-.01em}
+.ttl span{display:block;font-size:20px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-top:5px}
+.right{margin-left:auto;display:flex;align-items:center;gap:26px}
+.live{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:.1em}
+.live i{width:15px;height:15px;border-radius:50%;background:#ff4d4d;animation:b 1.6s infinite}
+@keyframes b{0%,100%{opacity:1}50%{opacity:.3}}
+.clock{font-family:var(--display);font-weight:800;font-size:34px;font-variant-numeric:tabular-nums;color:var(--muted)}
+
+.board{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:18px 44px}
+.hdr{display:grid;grid-template-columns:1fr repeat(3,116px) 150px 190px;gap:14px;padding:0 30px 2px}
+.hdr span{font-size:20px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:center}
+.hdr span:first-child{text-align:left}
+.row{flex:1;max-height:210px;display:grid;grid-template-columns:1fr repeat(3,116px) 150px 190px;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 30px}
+
+.row.srv{border-color:rgba(126,232,31,.45);background:linear-gradient(90deg,rgba(126,232,31,.1),var(--card) 42%)}
+.team{display:flex;align-items:center;gap:20px;min-width:0}
+.dot{width:24px;height:24px;border-radius:50%;background:#2c4045;flex:none}
+.row.srv .dot{background:var(--lime);box-shadow:0 0 0 6px rgba(126,232,31,.18)}
+.nm{font-family:var(--display);font-weight:800;font-style:italic;font-size:52px;text-transform:uppercase;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.05}
+.sd{font-family:var(--display);font-weight:800;font-size:54px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+.sd.w{color:var(--ink)}
+.sd.cur{color:var(--lime)}
+.gm{font-family:var(--display);font-weight:800;font-size:64px;text-align:center;font-variant-numeric:tabular-nums}
+.pt{font-family:var(--display);font-weight:900;font-size:96px;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.row.srv .pt{color:var(--lime)}
+
+.foot{display:flex;align-items:center;gap:20px;padding:20px 44px 26px;border-top:1px solid var(--line)}
+.foot .lb{font-size:17px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.foot .nx{font-size:24px;font-weight:700}
+.foot .nx b{font-weight:800}
+.foot .brand{margin-left:auto;display:flex;align-items:center;gap:18px;color:var(--dim);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.foot .brand .lg{font-family:var(--display);font-weight:800;font-style:italic;font-size:20px;letter-spacing:.04em;color:var(--ink)}
+.foot .brand .lg em{font-style:italic;color:var(--lime)}
+.sponsor{width:78px;height:30px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;font-size:11px;color:var(--dim)}
+</style>
+
+<div class="top">
+  <span class="cat">ФПР 250</span>
+  <span class="ttl"><b>Региональный турнир</b><span>1/8 финала · Корт 1</span></span>
+  <span class="right"><span class="clock">54:24</span><span class="live"><i></i>LIVE</span></span>
+</div>
+
+<div class="board">
+  <div class="hdr"><span>Пара</span><span>Сет 1</span><span>Сет 2</span><span>Сет 3</span><span>Геймы</span><span>Очки</span></div>
+  <div class="row srv">
+    <span class="team"><span class="dot"></span><span class="nm">Кутузова / Чиркова</span></span>
+    <span class="sd w">6</span><span class="sd">4</span><span class="sd cur">5</span><span class="gm">5</span><span class="pt">40</span>
+  </div>
+  <div class="row">
+    <span class="team"><span class="dot"></span><span class="nm">Петрова / Мехтиева</span></span>
+    <span class="sd">3</span><span class="sd w">6</span><span class="sd cur">5</span><span class="gm">5</span><span class="pt">30</span>
+  </div>
+</div>
+
+<div class="foot">
+  <span class="lb">Следующий матч</span>
+  <span class="nx">1/8 финала · <b>Виленкин / Смит</b> — <b>Горбунов / Бородин</b></span>
+  <span class="brand"><span class="sponsor">спонсор</span><span class="sponsor">спонсор</span><span class="lg">PADEL.<em>СЕЛЕКТ</em></span></span>
+</div>
