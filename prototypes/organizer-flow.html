@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Кабинет организатора · единый путь турнира</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f8;--surface:#ffffff;--surface-2:#f3f4f6;--border:#e5e7eb;--border-strong:#d1d5db;
+  --ink:#111827;--muted:#6b7280;--faint:#9ca3af;
+  --accent:#84cc16;--accent-ink:#111827;--accent-soft:#ecfccb;--accent-line:#65a30d;
+  --black:#111111;--black-ink:#ffffff;
+  --path:#111827;
+  --warn:#92400e;--warn-bg:#fef3c7;--err:#b91c1c;--err-bg:#fee2e2;--hint:#1e40af;--hint-bg:#dbeafe;
+  --r:8px;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ---- shell ---- */
+.topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 20px;position:sticky;top:0;z-index:30}
+.logo{font-weight:800;letter-spacing:.06em;font-size:15px}
+.logo em{font-style:normal;color:var(--accent-line)}
+.pillchip{background:var(--surface-2);color:var(--muted);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600}
+.topbar .user{margin-left:auto;display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-weight:600;font-size:13px}
+.topbar .user i{width:24px;height:24px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:800}
+.topbar .out{color:var(--ink);font-weight:500;font-size:13px;background:none;border:0}
+.shell{display:grid;grid-template-columns:184px 1fr;min-height:calc(100vh - 50px)}
+.sidenav{background:var(--surface);border-right:1px solid var(--border);padding:14px 8px;display:flex;flex-direction:column;gap:4px;font-weight:500;font-size:15px;position:sticky;top:50px;height:calc(100vh - 50px)}
+.sidenav a{color:var(--ink);text-decoration:none;padding:9px 10px;border-radius:8px}
+.sidenav a:hover{background:var(--surface-2)}
+.sidenav a.cur{font-weight:700;background:var(--surface-2)}
+.sidenav .reset{margin-top:auto;font-size:12px;color:var(--muted);padding:9px 10px}
+.page{padding:20px 24px 60px;min-width:0;max-width:1736px}/* контент кабинета: ширина как на экране 1920 (1920 − меню 184 − отступы), шире не растягивается */
+/* ---- page header ---- */
+.crumbs{color:var(--muted);font-size:13px;margin-bottom:4px}
+.crumbs a{text-decoration:none;color:var(--muted)}
+.crumbs a:hover{color:var(--ink)}
+.ph{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px}
+.ph .tt{min-width:0;flex:1}
+.ph h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ph .meta{color:var(--muted);font-size:13px;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
+.ph .meta i{font-style:normal;color:var(--faint)}
+.ph .act{display:flex;gap:8px;align-items:center;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;white-space:nowrap;line-height:1.3;vertical-align:middle}
+.pill.live{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pill.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-ink);opacity:.6}
+.pill.done{color:var(--muted)}
+.pill.draft{color:var(--muted);border-style:dashed}
+/* ---- stage bar (steps of wizard and stages of tournament are one component) ---- */
+.steps{display:flex;gap:8px;list-style:none;margin:0 0 14px;padding:0;flex-wrap:wrap;align-items:center}
+.steps li,.steps a{display:flex;align-items:center;gap:10px;padding:5px 14px 5px 10px;min-height:36px;border-radius:8px;color:var(--muted);font-weight:600;font-size:14px;background:var(--surface);border:1px solid var(--border);text-decoration:none;white-space:nowrap}
+.steps b{width:20px;height:20px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--muted);flex:none}
+.steps .done{color:var(--ink)}
+.steps .done b{background:var(--accent-soft);color:var(--accent-line)}
+.steps .cur{background:var(--black);color:var(--black-ink);border-color:var(--black)}
+.steps .view{border-color:var(--black);color:var(--ink);box-shadow:inset 0 0 0 1px var(--black)}
+.steps .view b{background:var(--black);color:#fff}
+.steps .cur b{background:var(--accent);color:var(--accent-ink)}
+.steps .lock{opacity:.55;cursor:not-allowed}
+.steps .skip{opacity:.45;border-style:dashed}
+.steps .sep{color:var(--faint);font-size:12px;padding:0 2px}
+.steps .lbl{display:flex;flex-direction:column;line-height:1.15;font-size:13px}
+.steps .lbl small{font-size:11px;font-weight:500;opacity:.7;margin-top:2px}
+.steps .right{margin-left:auto;display:flex;gap:8px}
+/* ---- status band: one per stage, holds substatus and the single green action ---- */
+.band{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px}
+.band .dot{width:10px;height:10px;border-radius:50%;background:var(--faint);flex:none}
+.band.live .dot{background:var(--accent)}
+.band.done .dot{background:var(--ink)}
+.band.warn .dot{background:#f59e0b}
+.band .txt{min-width:0;flex:1;line-height:1.35}
+.band .txt b{font-size:14px;display:flex;align-items:center;gap:8px}
+.band .txt span{font-size:12.5px;color:var(--muted)}
+.band .acts{display:flex;gap:8px;flex:none;align-items:center}
+.band-h{display:flex;align-items:center;gap:14px;padding:12px 16px}
+.band-h b{font-size:14px;display:flex;align-items:center;gap:8px;flex:1}
+.band-h .acts{display:flex;gap:8px;align-items:center}
+.band-b{padding:0 16px 14px}
+.sh2{display:flex;align-items:center;gap:12px;margin:4px 0 12px;min-height:32px}
+.sh2 h2{margin:0;font-size:16px;font-weight:700}
+.sh2 h2 .st{color:var(--muted);font-weight:500;margin-left:8px}
+.sh2 .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+/* ---- buttons ---- */
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:0 16px;height:36px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--black);color:var(--black-ink);border-color:var(--black)}
+.btn.primary:hover{background:#000}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.go:hover{background:#78bd0f}
+.btn.danger{color:var(--err);border-color:var(--err-bg);background:var(--surface)}
+.btn.danger:hover{background:var(--err-bg)}
+.btn.ghost{border-color:transparent;background:transparent;font-weight:600}
+.btn.sm{height:30px;padding:0 11px;font-size:12px;border-radius:6px}
+.btn.xs{height:24px;padding:0 8px;font-size:11px;border-radius:5px;font-weight:600}
+.btn.ic{width:30px;padding:0;justify-content:center}
+.btn.trash{color:var(--muted)}
+.btn.trash:hover{color:var(--err);border-color:var(--err-bg);background:var(--err-bg)}
+.btn:disabled,.btn.dis{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn svg{width:14px;height:14px;flex:none}
+/* ---- panels & forms ---- */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px}
+.panel-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);min-height:48px}
+.panel-h h3{margin:0;font-size:14px;font-weight:700}
+.panel-h .hint{color:var(--muted);font-size:12.5px;font-weight:400}
+.panel-h .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.panel-b{padding:16px}
+.panel.flat .panel-b{padding:0}
+.panel.locked .panel-h h3::after{content:"";display:inline-block;width:12px;height:12px;margin-left:8px;vertical-align:-1px;background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>') no-repeat center/contain}
+.form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.field>label i{color:var(--err);font-style:normal}
+.field .hint{font-size:12px;color:var(--muted)}
+.field.locked .in,.field.locked .sel{color:var(--muted);background:var(--surface);border-style:dashed}
+.panel-h h3 .q,.sh h3 .q{margin-left:8px;vertical-align:2px;font-weight:700}
+.q{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:700;cursor:help;position:relative;white-space:normal;letter-spacing:0;text-transform:none;flex:none}
+.q:hover{background:var(--ink);color:#fff}
+.q::after{content:attr(data-t);position:absolute;left:-10px;top:24px;background:var(--surface);color:var(--ink);border:1px solid var(--border);box-shadow:0 10px 30px rgba(17,24,39,.14);font-weight:400;font-size:12.5px;line-height:1.45;padding:10px 12px;border-radius:8px;width:max-content;max-width:340px;text-align:left;z-index:40;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .12s,transform .12s}
+.q::before{content:"";position:absolute;left:3px;top:17px;width:10px;height:10px;background:var(--surface);border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg) translateY(-4px);z-index:41;opacity:0;pointer-events:none;transition:opacity .12s}
+.q:hover::after,.q:hover::before{opacity:1;transform:none}
+.q:hover::before{transform:rotate(45deg)}
+.r .q::after,.tt .q::after{left:auto;right:-10px}
+.r .q::before,.tt .q::before{left:auto;right:3px}
+.in,.sel,.ta{width:100%;height:36px;padding:0 11px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--ink);font-weight:500}
+.ta{height:auto;min-height:72px;padding:9px 11px;resize:vertical;font-weight:400}
+.in::placeholder,.ta::placeholder{color:var(--faint);font-weight:400}
+.in.mono{font-family:var(--mono);font-size:13px}
+.sel{appearance:auto}
+.num{width:84px;text-align:center;font-variant-numeric:tabular-nums}
+/* ширина поля по объёму данных: даты, числа и селекты не растягиваются, во всю строку только текст */
+.grid2,.grid3,.grid4{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-start}
+:where(.grid2,.grid3,.grid4)>.field{flex:1 1 260px;max-width:440px}
+/* flex-basis только внутри рядов полей: в колонках (модалки) он стал бы высотой */
+:where(.grid2,.grid3,.grid4)>.field:has(>input[type="date"]),:where(.grid2,.grid3,.grid4)>.field:has(>.inl>input[type="date"]){flex:0 0 190px}
+:where(.grid2,.grid3,.grid4)>.field:has(>input[type="datetime-local"]){flex:0 0 250px}
+:where(.grid2,.grid3,.grid4)>.field:has(>input[type="number"]){flex:0 0 auto}
+:where(.grid2,.grid3,.grid4)>.field:has(>select){flex:0 0 280px}
+:where(.grid2,.grid3,.grid4)>.field:has(>label+.btn),:where(.grid2,.grid3,.grid4)>.field:has(>.inl>select){flex:0 0 auto}
+.field:has(>input[type="date"]),.field:has(>.inl>input[type="date"]){max-width:190px}
+.field:has(>input[type="datetime-local"]){max-width:250px}
+.field:has(>input[type="number"]){max-width:none}
+.field:has(>input[type="number"])>.in{width:150px}
+.field>label{white-space:nowrap}
+.field:has(>select){max-width:280px}
+.field:has(>label+.btn),.field:has(>.inl>select){max-width:none}
+.field:has(>.inl>select) .sel{width:260px}
+.field:has(>input.num){max-width:150px}
+.inl{display:flex;gap:8px;align-items:center}
+.inl .in{flex:1}
+.wizwrap{max-width:1040px}
+.wizwrap.wide{max-width:1400px}/* шаг «Тип турнира»: три карточки этапов со схемами, при необходимости сужается */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--surface-2);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.chip.ok{background:var(--accent-soft);color:var(--accent-line)}
+button.chip{border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:700}
+button.chip:hover{background:var(--border)}
+.chip.on{background:var(--black);color:var(--black-ink)}
+.chip.on.bad{background:var(--err);color:#fff}
+.chip.bad{background:var(--err-bg);color:var(--err)}
+.chip.x{border:1px solid var(--border);background:var(--surface)}
+.chip.x button{border:0;background:transparent;color:var(--muted);padding:0;font-size:14px;line-height:1}
+.chip.add{border:1px dashed var(--border-strong);background:transparent;color:var(--muted);cursor:pointer}
+.toggle{position:relative;width:38px;height:22px;flex:none;border-radius:999px;background:var(--border-strong);border:0;transition:background .15s;padding:0}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{left:19px}
+.toggle:disabled{opacity:.4;cursor:not-allowed}
+.trow{display:flex;align-items:center;gap:10px}
+.trow b{font-size:13px;font-weight:600;white-space:nowrap}
+.trow span{color:var(--muted);font-size:12px}
+.vrow{display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:6px;padding:8px 12px}
+.vrow .b{width:28px;height:28px;border-radius:6px;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.vrow .t{flex:1;min-width:0}
+.vrow .t b{display:block;font-size:13px}
+.vrow .t span{font-size:12px;color:var(--muted)}
+.vrow .courts{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.vrow .courts input{width:56px;height:30px;text-align:center;font-weight:600;border:1px solid var(--border);border-radius:6px;background:var(--surface-2)}
+.alert{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:6px;font-size:12.5px;flex-wrap:wrap}
+.alert.warn{background:var(--warn-bg);color:var(--warn)}
+.alert.err{background:var(--err-bg);color:var(--err)}
+.alert.hint{background:var(--hint-bg);color:var(--hint)}
+.alert .fix{margin-left:auto;display:flex;gap:6px}
+.alert .fix button{border:1px solid currentColor;background:transparent;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:600;color:inherit}
+/* ---- wizard footer ---- */
+.wizfoot{position:sticky;bottom:0;background:var(--bg);padding:12px 0 0;margin-top:6px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border)}
+.wizfoot .sp{flex:1;color:var(--err);font-size:13px}
+/* ---- stage cards (type step) ---- */
+.stages{display:grid;grid-template-columns:1fr 48px 1fr 48px 1fr;gap:0;align-items:stretch}
+.arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:12px;font-weight:700}
+.arrow svg{width:28px;height:14px}
+.arrow.off{opacity:.35}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;min-height:300px}
+.scard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.scard.off{opacity:.65}
+.scard.off .sbody{pointer-events:none}
+.scard .shead{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.scard .shead .k{font-size:11px;color:var(--muted);font-weight:600}
+.scard .shead .n{font-weight:700;font-size:14px}
+.scard .sbody{padding:12px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.scard .sfoot{display:flex;gap:14px;padding:9px 14px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500}
+.scard .sfoot b{color:var(--ink);font-size:13px}
+.prow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px;font-weight:600}
+.prow .sel,.prow .in{width:auto;height:32px}
+.tview{display:flex;flex-direction:column;gap:8px}
+.tview .tt{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tview .tt b{font-size:14px}
+.tview .tt .code{font-family:var(--mono);font-size:11px;color:var(--accent-line);margin-left:4px}
+.tview .tt .q{margin-left:8px;vertical-align:1px}
+.tview .tt .nw{white-space:nowrap}
+.tview p{margin:0;color:var(--muted);font-size:12.5px}
+.anim{background:var(--surface-2);border-radius:6px;border:1px solid var(--border);aspect-ratio:1.5;display:block;overflow:hidden}
+.anim svg{width:100%;height:100%;display:block}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tcard{border:1px solid var(--border);border-radius:10px;padding:16px;text-align:left;background:var(--surface);display:flex;flex-direction:column;gap:10px;min-width:0;position:relative;cursor:pointer;font:inherit}
+.tcard:hover{border-color:var(--border-strong)}
+.tcard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tcard.dis{cursor:default}
+.tcard.dis:hover{border-color:var(--border)}
+.tcard.dis b,.tcard.dis p{color:var(--muted)}
+.tcard.dis .anim{opacity:.6}
+.tcard .codes{display:flex;gap:6px;align-items:center}
+.tcard .code{display:inline-block;background:var(--surface-2);color:var(--muted);border-radius:6px;padding:3px 8px;font-family:var(--mono);font-size:11px;font-weight:600}
+.tcard .selp{background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700}
+.tcard b{font-size:15px;line-height:1.3}
+.tcard p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.tcard .soon{color:#e0655a;font-weight:700;font-size:13px;margin-top:auto}
+.sheet.wide{max-width:1140px}
+.n{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.2}
+.n.bye{stroke-dasharray:2 2;fill:transparent}
+.n.in{fill:var(--accent-soft);stroke:var(--accent-line)}
+.ln{fill:none;stroke:var(--border-strong);stroke-width:1.1}
+.ln.dash{stroke-dasharray:3 3;stroke:var(--accent-line)}
+.pth{fill:none;stroke:var(--path);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.pn{fill:var(--accent);stroke:var(--path);stroke-width:1.5}
+.lab{font-size:10px;fill:var(--muted);font-family:var(--sans);font-weight:600}
+.lab.big{font-size:11px;fill:var(--ink)}
+.cap{font-size:11px;fill:var(--ink);font-family:var(--sans);font-weight:600}
+.box{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.2;rx:5}
+.pl{font-size:10px;fill:var(--ink);font-family:var(--mono)}
+.anim .pth{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 4s linear infinite}
+@keyframes draw{0%{stroke-dashoffset:var(--len)}70%{stroke-dashoffset:0}100%{stroke-dashoffset:0}}
+/* ---- modal ---- */
+.modal{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}
+.modal.open{display:flex}
+.sheet{background:var(--surface);border-radius:12px;border:1px solid var(--border);max-width:560px;width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;overflow:hidden}
+.sheet .sh{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.sheet .sh h3{margin:0;font-size:16px}
+.sheet .sh .hint{color:var(--muted);font-size:12.5px}
+.sheet .sh .x{margin-left:auto;border:0;background:transparent;font-size:20px;line-height:1;color:var(--muted);padding:4px 8px;border-radius:6px}
+.sheet .sb{padding:18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.sheet .sf{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);align-items:center}
+.sheet .sf .sp{flex:1;font-size:12.5px;color:var(--muted)}
+/* ---- tournament page grid with links aside ---- */
+.tgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.tmain{min-width:0}
+.taside{position:sticky;top:64px}
+.lkr{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--border);min-width:0}
+.lkr:last-child{border-bottom:0}
+.lkr .ic{width:28px;height:28px;border-radius:7px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.lkr .ic svg{width:14px;height:14px}
+.lkr .t{flex:1;min-width:0}
+.lkr .t b{display:block;font-size:13px}
+.lkr .t span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lkr .a{display:flex;gap:4px;flex:none}
+.taside .gh{padding:7px 14px;font-size:11px}
+/* ---- public links module ---- */
+.links{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px}
+.links .lh{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.links .lh h3{margin:0;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.links .lh .hint{color:var(--muted);font-size:12.5px}
+.links .lh .r{margin-left:auto;display:flex;gap:8px}
+.links .lb{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.lk{display:flex;align-items:center;gap:10px;padding:11px 16px;border-right:1px solid var(--border);min-width:0}
+.lk:last-child{border-right:0}
+.lk .ic{width:32px;height:32px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.lk .ic svg{width:16px;height:16px}
+.lk .t{flex:1;min-width:0}
+.lk .t b{display:block;font-size:13px}
+.lk .t span{display:block;font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk .a{display:flex;gap:4px;flex:none}
+.links .courts{border-top:1px solid var(--border);padding:8px 16px 10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px 24px}
+.links .courts .cr{display:grid;grid-template-columns:64px 1fr auto;gap:8px;align-items:center;font-size:12.5px;padding:4px 0}
+.links .courts .cr b{font-size:12.5px}
+.links .courts .cr span{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.links .courts .cr .a{display:flex;gap:4px}
+.links.collapsed .lb,.links.collapsed .courts{display:none}
+/* ---- toolbar & row lists ---- */
+.tb{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tb .sp{flex:1}
+.tb .search{width:220px;height:32px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:0 10px;height:28px;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.seg button:disabled{cursor:not-allowed;opacity:.6}
+.seg.lg button{height:34px;padding:0 14px;font-size:13px}
+.seg.lg button.on{background:var(--black);color:var(--black-ink)}
+.gh{display:flex;align-items:center;gap:10px;padding:9px 16px;background:var(--surface-2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border)}
+.gh b{color:var(--ink)}
+.gh .r{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
+.row{display:grid;grid-template-columns:32px 1fr 70px auto auto 34px;gap:12px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);font-size:14px;min-height:46px}
+.row:last-child{border-bottom:0}
+.row:hover{background:#fafafa}
+.row .n{color:var(--faint);font-weight:600;font-size:12px;text-align:right}
+.row .nm{min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row .nm b{font-weight:600}
+.row .nm small{color:var(--muted);font-size:12px;font-weight:500}
+.row .rt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.row .wcb{border:1px solid var(--border);border-radius:5px;padding:0 7px;height:24px;font-size:10px;font-weight:800;color:var(--faint);background:transparent}
+.row .wcb.on{border-color:var(--accent-line);color:var(--accent-line);background:var(--accent-soft)}
+.row.off{opacity:.5}
+.row.off .nm b{text-decoration:line-through}
+.tag{display:inline-block;border-radius:5px;padding:1px 6px;font-size:10px;font-weight:800;letter-spacing:.02em}
+.tag.wc{background:var(--accent-soft);color:var(--accent-line)}
+.tag.q{background:var(--hint-bg);color:var(--hint)}
+.tag.res{background:var(--surface-2);color:var(--muted)}
+.menu{position:relative}
+.menu .dd{position:absolute;right:0;top:34px;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(17,24,39,.12);min-width:200px;z-index:15;padding:4px;display:none}
+.menu.open .dd{display:block}
+.menu .dd button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:6px;font-size:13px;font-weight:500}
+.menu .dd button:hover{background:var(--surface-2)}
+.menu .dd button.danger{color:var(--err)}
+.empty{border:1px dashed var(--border-strong);border-radius:8px;padding:22px;text-align:center;color:var(--muted);font-size:13px}
+/* ---- draw ---- */
+.dcols{display:grid;grid-template-columns:420px 1fr;gap:14px;align-items:start}
+.wp{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13.5px;font-weight:600;cursor:pointer}
+.wp:last-child{border-bottom:0}
+.wp:hover{background:#fafafa}
+.wp.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.wp .r{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted)}
+.wp.ph{color:var(--hint);font-style:italic}
+.slots{padding:12px 30px 12px 16px;display:grid;grid-template-columns:1fr;gap:8px}
+.pair{position:relative;display:flex;flex-direction:column;gap:6px;padding-right:0;margin-bottom:6px}
+.pair::after{content:"";position:absolute;right:-14px;top:18px;bottom:18px;width:12px;border:1px solid var(--border-strong);border-left:0;border-radius:0 6px 6px 0}
+.pos{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
+.pos .n{color:var(--faint);font-weight:700;text-align:right;font-size:12px}
+.pos .s{border:1px solid var(--border);border-radius:6px;padding:0 12px;height:38px;font-size:13.5px;font-weight:600;color:var(--faint);background:var(--surface);display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0}
+.pos .s:hover{border-color:var(--border-strong)}
+.pos .s.can{border-style:dashed;border-color:var(--accent-line);color:var(--accent-line)}
+.pos .s.f{background:var(--surface-2);color:var(--ink);cursor:default}
+.pos .s.f.ph{color:var(--hint);font-style:italic;background:var(--hint-bg)}
+.pos .s .x{margin-left:auto;color:var(--muted);font-weight:400;border:0;background:transparent;font-size:16px;padding:0 2px;cursor:pointer}
+.pos .s .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ro .pos .s{cursor:default}
+/* ---- schedule ---- */
+.days{display:inline-flex;gap:4px;background:var(--surface-2);border-radius:8px;padding:4px}
+.days button{border:0;background:transparent;border-radius:6px;padding:4px 12px;text-align:center;line-height:1.1;color:var(--muted)}
+.days button b{display:block;font-size:14px;font-weight:800;color:inherit}
+.days button span{font-size:10px;letter-spacing:.06em;font-weight:700}
+.days button.on{background:var(--accent);color:var(--accent-ink)}
+.days button.on span{color:var(--accent-ink)}
+.courts3{display:grid;grid-template-columns:repeat(var(--nc,3),1fr);gap:14px;align-items:start;margin-bottom:18px}
+.ch{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-weight:800;font-size:12px;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ch span{margin-left:auto;font-weight:500;letter-spacing:0;color:var(--muted);text-transform:none}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:10px}
+.mc.done{border-color:var(--border)}
+.mc.live{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.mc .h{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.mc .h .dr{color:var(--faint);font-weight:400;cursor:grab}
+.mc .h .st{margin-left:auto;font-weight:600;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted)}
+.mc .h .st.ok{color:var(--accent-line)}
+.mc .p{padding:8px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13.5px;align-items:center}
+.mc .p .t{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mc .p .t.ph{color:var(--muted);font-style:italic;font-weight:500}
+.mc .p .t.w{color:var(--ink)}
+.mc .p .t.l{color:var(--muted)}
+.mc .p .sc{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.mc .p .sc b{color:var(--ink)}
+.mc .c{display:flex;gap:6px;align-items:center;padding:8px 12px;border-top:1px solid var(--border);flex-wrap:wrap}
+.mc .c .sel,.mc .c .in{height:30px;font-size:12.5px;padding:0 8px;width:auto;background:var(--surface-2)}
+.mc .c .in.time{width:96px;font-family:var(--mono)}
+.mc .c .sel.j{flex:1;min-width:110px}
+.mc .c .btn{margin-left:auto}
+.mc.compact .c{display:none}
+.nos{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin:8px 0 10px;text-transform:uppercase}
+.gridm{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+.emptyc{border:1px dashed var(--border-strong);border-radius:8px;padding:14px;text-align:center;color:var(--faint);font-size:12.5px;margin-bottom:10px}
+/* ---- bracket view ---- */
+.brk{overflow:auto;padding:16px}
+.brk h4{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brow{display:flex;gap:16px;align-items:flex-start;margin-bottom:22px}
+.bcol{display:flex;flex-direction:column;width:250px;flex:none}
+.bcol .rh{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;text-align:center;height:16px}
+.bslot{display:flex;align-items:center}
+.bm{border:1px solid var(--border);border-radius:8px;background:var(--surface-2);padding:8px 12px;width:100%;font-size:13px}
+.bm .k{font-size:10px;font-weight:800;color:var(--faint);letter-spacing:.04em;margin-bottom:4px}
+.bm .l{display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-weight:600;min-width:0}
+.bm .l .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm .l.ph{color:var(--muted);font-weight:500;font-style:italic}
+.bm .l.w{color:var(--ink)}
+.bm .l.lo{color:var(--muted)}
+.bm .l span:last-child{font-family:var(--mono);font-size:11.5px;color:var(--muted);flex:none}
+.bm.done{background:var(--surface)}
+.bm.bye{background:var(--surface);border-style:dashed;color:var(--muted)}
+/* ---- inline score editor ---- */
+.sced{padding:10px 12px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;background:var(--surface-2)}
+.sced .sets{gap:6px 8px}
+.sced .sets input{height:32px;font-size:13px;background:var(--surface)}
+.sced .sets .who{font-size:13px}
+.sced .inl .sel{height:30px;font-size:12.5px;padding:0 8px;background:var(--surface)}
+.sced .wline{font-size:12px}
+/* ---- score modal ---- */
+.sets{display:grid;grid-template-columns:1fr repeat(3,64px);gap:8px 10px;align-items:center}
+.sets .hd{font-size:11px;color:var(--muted);font-weight:700;text-align:center;letter-spacing:.04em}
+.sets .who{font-weight:600;font-size:13.5px}
+.sets input{height:38px;text-align:center;font-family:var(--mono);font-size:15px;font-weight:600;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);width:100%}
+.sets input.ok{border-color:var(--accent-line);background:var(--accent-soft)}
+.wline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.wline b{color:var(--ink)}
+/* ---- list page ---- */
+.tbl{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;text-align:left;padding:12px 16px;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:14px}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--surface-2)}
+td.name b{display:block}
+td.name span{color:var(--muted);font-size:12px}
+td.act{text-align:right;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--black);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.settings-col{max-width:1040px}
+.sec-h{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;margin:6px 0 10px}
+.sec-h b{width:24px;height:24px;border-radius:50%;background:var(--black);color:var(--accent);display:grid;place-items:center;font-size:12px}
+.panel+.sec-h{margin-top:22px}
+.savebar{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:12px 0 0;display:flex;gap:10px;align-items:center;margin-top:4px}
+.savebar .sp{flex:1;color:var(--muted);font-size:12.5px}
+.jrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.jrow:last-child{border-bottom:0}
+.jrow .t{flex:1}
+.jrow .t span{display:block;color:var(--muted);font-size:12px}
+.divsw{display:flex;align-items:center;gap:10px;margin:-4px 0 14px}
+.divsw .lbl{font-size:12px;color:var(--muted);font-weight:600}
+@media (max-width:1400px){.links .lb{grid-template-columns:1fr 1fr 1fr}.gridm{grid-template-columns:1fr 1fr}}
+</style></head><body>
+<div class="topbar">
+  <span class="logo">PADEL.<em>SELECT</em></span>
+  <span class="pillchip">кабинет организатора</span>
+  <span class="user"><i>АМ</i>Алексей Мироносицкий · организатор</span>
+  <button class="out">Выйти</button>
+</div>
+<div class="shell">
+<nav class="sidenav" id="nav"></nav>
+<div class="page" id="app"></div>
+</div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+/* =====================================================================
+   Единый прототип пути организатора. Состояние живёт в localStorage.
+   Маршруты: #/tournaments · #/new/1..4 · #/t/<stage> (apps, drawq, drawm, qual, main, settings)
+   ===================================================================== */
+const KEY='ps-organizer-flow-v1';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plural=(n,a,b,c)=>{const m=n%100,d=n%10;if(m>=11&&m<=19)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c};
+const pow2up=n=>{let m=2;while(m<n)m*=2;return m};
+const log2=n=>Math.round(Math.log2(n));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const MONTHS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const MONTHS_G=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const fmtD=iso=>{if(!iso)return '';const [y,m,d]=iso.split('-');return `${+d} ${MONTHS[+m-1]}`};
+const fmtRange=(a,b)=>{if(!a)return '';if(!b||b===a)return `${+a.split('-')[2]} ${MONTHS_G[+a.split('-')[1]-1]} ${a.split('-')[0]}`;const [y1,m1,d1]=a.split('-'),[y2,m2,d2]=b.split('-');return m1===m2?`${+d1}–${+d2} ${MONTHS_G[+m1-1]} ${y1}`:`${+d1} ${MONTHS_G[+m1-1]} – ${+d2} ${MONTHS_G[+m2-1]} ${y1}`};
+const daysBetween=(a,b)=>{if(!a)return 1;if(!b)return 1;return Math.max(1,Math.round((new Date(b)-new Date(a))/86400000)+1)};
+const addDays=(iso,n)=>{const d=new Date(iso);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const sur=n=>n.split(' ')[0];
+const pairName=(p,full)=>full?`${p.a.n} (${p.a.r}) / ${p.b.n} (${p.b.r})`:`${sur(p.a.n)} / ${sur(p.b.n)}`;
+const pairShort=p=>`${sur(p.a.n)} (${p.a.r}) / ${sur(p.b.n)} (${p.b.r})`;
+
+const TYPES={
+  O:{code:'О',name:'Олимпийская система',desc:'Одно поражение — участник выбывает. Определяются 1-е и 2-е места, с матчем за 3-е — 1–4. Остальные места общие по туру вылета.'},
+  ODT:{code:'О и ДТ',name:'Олимпийская система с ДТ',desc:'Проигравший в основной сетке продолжает в утешительной, которая тоже играется на выбывание и имеет своего победителя.'},
+  UO:{code:'УО',name:'Олимпийская усовершенствованная система',desc:'После поражения участник не выбывает, а играет за более низкое место. Каждый проводит одинаковое число матчей, все места точные.'},
+  UO2:{code:'УО-2',name:'Олимпийская усовершенствованная система до 2 поражений',desc:'Проигравший верхней сетки переходит в нижнюю. Верхняя ветвь разыгрывает места 1–2, проигравшие полуфиналов — матч за 3-е, финал нижней ветви даёт 5-е место.'},
+  FG:{code:'К',name:'Круговая система',desc:'Вышедшие из групп играют каждый с каждым в одной таблице. Все места финальной группы точные.'}
+};
+const TYPES_READY=['O','UO2'];const TYPES_ORDER=['O','FG','UO2','ODT','UO'];
+const CATS=['ФПР 100','ФПР 250','ФПР 500','ФПР 1000','Региональный турнир','Клубный турнир'];
+const DIVS={m:'Мужской',w:'Женский',x:'Микст'};const DIVB={m:'М',w:'Ж',x:'МЖ','':'—'};const DIVK=[['m','Мужской'],['w','Женский'],['x','Микст'],['','Не указан']];
+const JUDGES_FPR=[{id:'j1',n:'Осадчая Дарья Владимировна',e:'osadchaya@fpr.ru',kind:'fpr'},{id:'j2',n:'Кузнецов Игорь Петрович',e:'kuznetsov@fpr.ru',kind:'fpr'},{id:'j3',n:'Лебедева Марина Сергеевна',e:'lebedeva@fpr.ru',kind:'fpr'}];
+const DEUCE={star:'Star Point: при 40:40 играют до двух «больше» — AD1 и AD2. При третьем 40:40 разыгрывается одно решающее очко, принимающего выбирает принимающая пара.',adv:'Больше-меньше: после 40:40 гейм выигрывает пара, взявшая два очка подряд. Число возвратов к 40:40 не ограничено.',gold:'Золотой мяч: при первом 40:40 разыгрывается одно решающее очко, принимающего выбирает принимающая пара.'};
+const DEUCE_N={star:'Star Point',adv:'больше-меньше',gold:'золотой мяч'};
+
+/* ---------- демо-данные ---------- */
+const MEN=[
+ ['Бондаренко Роман Владимирович',600,'Матус Артём Игоревич',9140,'main'],['Глушко Дмитрий Иванович',130,'Ахременко Никита Витальевич',419,'main',1],
+ ['Таргоня Юрий Владимирович',572,'Елисеев Николай Игоревич',1410,'main'],['Дорогой Тимофей Дмитриевич',149,'Тулупов Савелий Михайлович',3720,'main'],
+ ['Богданов Марк Андреевич',1675,'Василюк Александр Александрович',1675,'main'],['Борисов Евгений Валерьевич',463,'Оверченко Макарий Александрович',1605,'main'],
+ ['Филичев Илья Владимирович',1393,'Денисов Иван Алексеевич',1700,'main'],['Парыгин Максим Константинович',922,'Карпушкин Павел Сергеевич',5730,'main'],
+ ['Дьяконов Игорь Александрович',666,'Бобров Богдан Александрович',4510,'main'],['Шутов Андрей Олегович',1650,'Никитин Артем Сергеевич',1020,'main'],
+ ['Митрофанов Никита Владимирович',1650,'Холодов Данила Михайлович',1495,'main'],['Курмаев Марсель Валерьевич',1675,'Татарников Павел Александрович',2335,'main'],
+ ['Талапин Евгений Сергеевич',189,'Коломбо Сантиаго',598,'main',1],['Яшков Павел Евгеньевич',114,'Томайдис Эрик',7115,'main'],
+ ['Сычев Иван Константинович',1065,'Богомолов Максим Витальевич',811,'qual'],['Бородин Антон Павлович',64,'Ужгин Анатолий Алексеевич',80,'qual'],
+ ['Виленкин Алексей Михайлович',448,'Зенков Святослав Артемович',378,'qual'],['Агасян Эдгар Гургенович',439,'Попов Максим Андреевич',688,'qual'],
+ ['Матейс Григорий Алексеевич',50,'Закиров Самат Рустемович',1105,'qual'],['Бредихин Олег Сергеевич',572,'Бабаян Артур Ашотович',200,'qual'],
+ ['Загрядский Роман Сергеевич',140,'Семьянинов Михаил Олегович',208,'qual'],['Козлов Денис Игоревич',262,'Рыльский Антон Павлович',1480,'qual'],
+ ['Маталин Андрей Викторович',38,'Прибылов Егор Дмитриевич',34,'res']
+];
+const WOMEN=[
+ ['Осипова Анна Сергеевна',2140,'Громова Екатерина Ильинична',1980,'main'],['Ткаченко Мария Андреевна',1730,'Белова Дарья Олеговна',1610,'main'],
+ ['Ковалёва Полина Игоревна',1420,'Зайцева Юлия Викторовна',1385,'main'],['Соколова Алина Дмитриевна',1290,'Романова Вера Павловна',1205,'main'],
+ ['Фёдорова Ольга Николаевна',1180,'Лебедева Ксения Артёмовна',1120,'main'],['Никифорова Елена Юрьевна',1015,'Мельникова Ирина Сергеевна',990,'main'],
+ ['Павлова Светлана Андреевна',940,'Титова Наталья Игоревна',905,'main'],['Кузьмина Евгения Олеговна',870,'Орлова Татьяна Валерьевна',820,'main'],
+ ['Крылова Анастасия Петровна',790,'Захарова Виктория Романовна',760,'main'],['Гусева Маргарита Львовна',700,'Егорова Софья Денисовна',655,'main'],
+ ['Волкова Диана Максимовна',610,'Смирнова Алёна Витальевна',590,'main'],['Данилова Кристина Олеговна',540,'Жукова Елизавета Ивановна',515,'main'],
+ ['Морозова Валерия Андреевна',480,'Комарова Яна Сергеевна',450,'main',1],['Антонова Ульяна Павловна',400,'Сорокина Милана Игоревна',380,'main',1],
+ ['Макарова Инна Георгиевна',350,'Степанова Лариса Юрьевна',330,'qual'],['Николаева Регина Артуровна',300,'Тарасова Дина Романовна',290,'qual'],
+ ['Беляева Марина Сергеевна',260,'Королёва Нина Олеговна',240,'qual'],['Ильина Оксана Владимировна',210,'Фомина Алиса Дмитриевна',190,'qual']
+];
+const MIX=[
+ ['Иванов Пётр Сергеевич',1800,'Иванова Мария Олеговна',1650,'main'],['Петров Артём Ильич',1600,'Кузнецова Анна Павловна',1520,'main'],
+ ['Сидоров Максим Андреевич',1480,'Смирнова Ольга Игоревна',1400,'main'],['Козлов Илья Романович',1350,'Попова Елена Сергеевна',1290,'main'],
+ ['Лебедев Кирилл Олегович',1240,'Новикова Дарья Артёмовна',1180,'main'],['Морозов Денис Викторович',1120,'Волкова Юлия Максимовна',1060,'main'],
+ ['Соловьёв Егор Павлович',1010,'Зайцева Полина Денисовна',960,'main'],['Васильев Никита Игоревич',920,'Павлова Алина Романовна',880,'main'],
+ ['Зайцев Тимур Русланович',840,'Семёнова Вера Олеговна',800,'main'],['Голубев Матвей Сергеевич',770,'Виноградова Ксения Ильинична',730,'main'],
+ ['Богданов Роман Андреевич',700,'Воробьёва Софья Петровна',660,'main'],['Фёдоров Глеб Максимович',620,'Михайлова Ева Артуровна',590,'main'],
+ ['Белов Арсений Олегович',560,'Тарасова Алёна Викторовна',520,'main'],['Комаров Лев Игоревич',490,'Орлова Ника Сергеевна',450,'main'],
+ ['Орлов Савва Дмитриевич',420,'Киселёва Злата Романовна',390,'main',1],['Медведев Ян Артёмович',360,'Макарова Мила Олеговна',330,'main',1]
+];
+const mkPairs=src=>src.map(r=>({id:uid(),a:{n:r[0],r:r[1]},b:{n:r[2],r:r[3]},zone:r[4],wc:!!r[5],off:false}));
+function mkDivision(code,ecp,pairs){return {code,kind:code,name:DIVS[code],ecp,pairs:pairs||[],synced:pairs?'сегодня 12:40':null,
+  apps:'open',drawQ:{slots:[],done:false},drawM:{slots:[],done:false},qualDone:false,mainDone:false,matches:[],qualWinners:[]};}
+function defaultStruct(){return {N:16,Q:2,WC:2,qual:true,groups:false,G:4,k:2,fin:{type:'UO2',third:true,grand:false,dt:'r1',thirdOT:true,thirdDT:false}}}
+const S_=(t,dv)=>(dv&&dv.struct)||t; /* структура этапов: своя у каждого дивизиона */
+function wizCur(w){if(!w.divisions.length)return {st:w.struct,bp:'wiz.struct',d:null,i:-1};let i=w.divisions.findIndex(d=>d.id===w.divSel);if(i<0)i=0;return {st:w.divisions[i].struct,bp:'wiz.divisions.'+i+'.struct',d:w.divisions[i],i}}
+function defaultWiz(){return {step:1,name:'',cat:'ФПР 250',gender:'',venues:[],vq:'',courts:2,start:'',end:'',color:'green',desc:'',reg:'',
+  struct:defaultStruct(),divSel:null,multiDiv:false,judges:[],judgesLocal:[],
+  divisions:[{id:'d'+uid(),kind:'m',name:'Дивизион 1',struct:defaultStruct()}],pairs:{},rules:{sets:2,games:6,tb:'7',dec:'stb',deuce:'star'},sameRules:true,rulesPer:{},ecp:{},deadline:''};}
+function seedDemo(){
+  const t={id:'demo',name:'КУБОК СВЕТЛОЙ СТОРОНЫ V.V ФИНАНС',cat:'ФПР 500',gender:'',venues:[{name:'Padel Tennis Club Станционная',city:'Новосибирск'}],courts:3,
+    start:'2026-09-24',end:'2026-09-27',color:'blue',desc:'Организатор — V.V Финанс. Взнос 6 000 ₽ с пары, призовой фонд 150 000 ₽.',reg:'',regPdf:'РЕГЛАМЕНТ.pdf',
+    N:16,Q:2,WC:2,qual:true,groups:false,G:4,k:2,fin:{type:'UO2',third:true,grand:false,dt:'r1',thirdOT:true,thirdDT:false},
+    rules:{sets:2,games:6,tb:'7',dec:'stb',deuce:'star'},sameRules:true,rulesPer:{},deadline:'2026-09-22T19:00',
+    judgesLocal:[{id:'jl1',n:'Александр Петров',e:'sasha@club.ru',kind:'local'}],judges:[],
+    sponsors:{main:'',extra:'',plate:'default',tv:'corner',wm:false},
+    slug:'4daf356d',created:'2026-09-05',
+    divisions:[mkDivision('m','https://sb.padelrus.ru/tournaments/1614/applications',mkPairs(MEN)),mkDivision('w','https://sb.padelrus.ru/tournaments/1615/applications',mkPairs(WOMEN)),mkDivision('x','https://sb.padelrus.ru/tournaments/1616/applications',mkPairs(MIX))],
+    div:'m'};
+  t.divisions.forEach(d=>{d.struct={N:t.N,Q:t.Q,WC:t.WC,qual:t.qual,groups:t.groups,G:t.G,k:t.k,fin:{...t.fin}};d.apps='closed';d.synced='22 сен, 19:00'});
+  return {tournaments:[t],cur:'demo',wiz:defaultWiz(),ui:{linksOpen:true,day:{},view:{}}};
+}
+let DB=null;
+function load(){try{const s=localStorage.getItem(KEY);if(s){DB=JSON.parse(s);return}}catch(e){}DB=seedDemo();save()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function T(){return DB.tournaments.find(t=>t.id===DB.cur)}
+function D(t){t=t||T();return t.divisions.find(d=>d.code===t.div)||t.divisions[0]}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800)}
+function copy(s){try{navigator.clipboard.writeText(s)}catch(e){}toast('Скопировано: '+s)}
+function setPath(o,path,val){const ks=path.split('.');for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=val}
+function getPath(o,path){return path.split('.').reduce((a,k)=>a==null?a:a[k],o)}
+
+/* ---------- расчёт структуры (портировано из конструктора типа) ---------- */
+function rrCalc(s){return {matches:s*(s-1)/2,rounds:s<2?0:(s%2?s:s-1)}}
+function groupSizes(n,G){if(n<2)return [n];G=Math.max(1,Math.min(G,Math.floor(n/2)));const base=Math.floor(n/G),extra=n%G,sizes=[];for(let i=0;i<G;i++)sizes.push(base+(i<extra?1:0));return sizes}
+function bracketCalc(t,f){
+  if(t<=1)return {matches:0,rounds:0,byes:0,M:1};
+  if(f.type==='FG'){const c=rrCalc(t);return {...c,byes:0,M:t}}
+  const M=pow2up(t),R=log2(M),byes=M-t;
+  if(f.type==='O')return {matches:t-1+(f.third&&t>=4?1:0),rounds:R,byes,M};
+  if(f.type==='ODT'){const L1=t-M/2;let E,dtR;if(f.dt==='r1'){E=L1;dtR=E>=2?log2(pow2up(E)):0}else if(f.dt==='r12'){E=L1+(R>=2?M/4:0);dtR=Math.max(1,L1>=2?log2(pow2up(L1)):0)+(R>=2?1:0)}else{E=t-1;dtR=R}
+    return {matches:t-1+(f.thirdOT&&t>=4?1:0)+Math.max(0,E-1)+(f.thirdDT&&E>=4?1:0),rounds:Math.max(R,1+dtR),byes,M}}
+  if(f.type==='UO')return {matches:(M/2)*R-byes,rounds:R,byes,M};
+  if(f.type==='UO2'){const g=f.grand?1:0;return {matches:2*t-4+g+(f.third&&t>=4?1:0),rounds:2*R-2+g,byes,M}}
+}
+function structure(w){
+  const N=+w.N,Q=w.qual?+w.Q:0,WC=+w.WC,DA=N-Q-WC,out={N,Q,WC,DA,errors:[],warns:[]};
+  if(w.groups){const sizes=groupSizes(N,+w.G);let m=0,r=0;sizes.forEach(s=>{const c=rrCalc(s);m+=c.matches;r=Math.max(r,c.rounds)});out.groups={sizes,G:sizes.length,matches:m,rounds:r,out:sizes.reduce((a,s)=>a+Math.min(+w.k,s),0)}}
+  if(w.finOn!==false){const t=w.groups?out.groups.out:N;out.fin={t,...bracketCalc(t,w.fin)}}
+  if(DA<0)out.errors.push({id:'V8',msg:`Прямой допуск + Q + WC больше вместимости на ${-DA}. Уменьшите Q или WC.`});
+  if(w.groups&&out.groups.G>1&&w.finOn===false)out.errors.push({id:'V4',msg:'Места между группами не разыграны. Включите финальный этап.'});
+  if(!w.groups&&w.finOn===false)out.errors.push({id:'V5',msg:'Турнир не определяет победителя: включите групповой или финальный этап.'});
+  if(w.finOn!==false&&w.fin.type==='FG'&&!w.groups)out.errors.push({id:'V6',msg:'Финальная группа возможна только после группового этапа.'});
+  if(out.fin&&out.fin.byes>0&&w.fin.type!=='FG')out.warns.push({id:'V1',msg:`Сетка ${out.fin.M}: ${out.fin.byes} ${plural(out.fin.byes,'пропуск','пропуска','пропусков')} в первом туре у сильнейших по посеву.`});
+  if(w.qual&&Q>N/2)out.warns.push({id:'V3',msg:'Через квалификацию больше половины мест основного турнира.'});
+  return out;
+}
+function formula(w){const c=structure(w),p=[];if(w.qual)p.push(`Квал →${c.Q}`);if(c.groups)p.push(`Группы ${c.groups.G}×${Math.max(...c.groups.sizes)}${c.fin?` (выходят ${w.k})`:''}`);
+  if(c.fin){if(w.fin.type==='FG')p.push(`Финальная группа ${c.fin.t}`);else{let s=`Плей-офф ${c.fin.t} ${TYPES[w.fin.type].code}`;if((w.fin.type==='O'||w.fin.type==='UO2')&&w.fin.third)s+=', матч за 3-е';if(w.fin.type==='ODT'&&w.fin.thirdOT)s+=', матч за 3-е';if(w.fin.type==='UO2'&&w.fin.grand)s+=', гранд-финал';p.push(s)}}
+  return p.join(' · ')}
+function rulesText(r){return `до ${r.sets} ${plural(+r.sets,'победы','побед','побед')} · сет до ${r.games} · тай-брейк ${r.tb==='off'?'выкл':'до '+r.tb} · ${r.dec==='stb'?'решающий — супер-тай-брейк до 10':'решающий — полный сет'} · 40:40 — ${DEUCE_N[r.deuce]}`}
+
+/* ---------- мини-схемы типов (SVG) ---------- */
+function layoutCols(cols,x0,y0,colW,h){const nodes={};cols.forEach((n,ci)=>{const s=h/n;for(let i=0;i<n;i++)nodes[ci+':'+i]={x:x0+ci*colW,y:y0+s*(i+.5)}});return {nodes}}
+function circ(p,cls,r=4){return `<circle class="${cls}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}"/>`}
+function elbow(a,b){const mx=(a.x+b.x)/2;return `<path class="ln" d="M${a.x.toFixed(1)} ${a.y.toFixed(1)}H${mx.toFixed(1)}V${b.y.toFixed(1)}H${b.x.toFixed(1)}"/>`}
+function drawSE(pre,M,t,x,y,w,h,opts={}){const R=log2(M);const cols=[];for(let r=0;r<=R;r++)cols.push(M/Math.pow(2,r));const colW=w/(cols.length-1||1);const {nodes}=layoutCols(cols,x,y,colW,h);let s='',map={};const byeSet=new Set();let byes=M-t;for(let i=M/2-1;i>=0&&byes>0;i--,byes--)byeSet.add(2*i+1);
+  cols.forEach((n,ci)=>{for(let i=0;i<n;i++){const p=nodes[ci+':'+i];map[pre+':'+ci+':'+i]=p;if(ci<cols.length-1){s+=elbow(p,nodes[(ci+1)+':'+(i>>1)])}}});
+  cols.forEach((n,ci)=>{for(let i=0;i<n;i++){const p=nodes[ci+':'+i];const bye=ci===0&&byeSet.has(i);s+=circ(p,'n'+(bye?' bye':'')+(opts.inCls&&ci===0?' in':''),ci===cols.length-1?5:3.5)}});
+  if(opts.label)s+=`<text class="lab" x="${x}" y="${y-6}">${opts.label}</text>`;
+  if(opts.third&&t>=4){const f=nodes[R+':0'];const p={x:f.x,y:Math.min(y+h+14,f.y+Math.max(28,h/M*2))};map[pre+':3rd']=p;s+=circ(p,'n',3.5)+`<text class="lab" x="${p.x+8}" y="${p.y+3.5}">за 3-е</text>`}
+  return {s,map,R,cols,byeSet}}
+function drawUO(pre,M,t,x,y,w,h){const R=log2(M);const cols=[];for(let r=0;r<=R;r++)cols.push(M);const colW=w/R;const {nodes}=layoutCols(cols,x,y,colW,h);let s='',map={};
+  for(let r=0;r<R;r++){const B=M/Math.pow(2,r);for(let i=0;i<M;i++){const b=Math.floor(i/B),pI=Math.floor((i%B)/2);const p=nodes[r+':'+i];s+=elbow(p,nodes[(r+1)+':'+(b*B+pI)]);s+=elbow(p,nodes[(r+1)+':'+(b*B+B/2+pI)])}}
+  cols.forEach((n,ci)=>{for(let i=0;i<n;i++){const p=nodes[ci+':'+i];map[pre+':'+ci+':'+i]=p;s+=circ(p,'n'+(ci===0&&i>=t?' bye':''),ci===R?4:3);if(ci===R)s+=`<text class="pl" x="${p.x+8}" y="${p.y+3.5}">${i+1}</text>`}});
+  return {s,map,R}}
+function drawUO2(pre,M,t,x,y,w,h){const R=log2(M);const upH=h*.5,loH=h*.42;const up=drawSE(pre+':U',M,t,x,y,w,upH,{label:'Верхняя сетка'});
+  const drop=[];for(let r=2;r<=R-1;r++)drop.push(M/Math.pow(2,r));const cols=[M/2];let cur=M/2;const merge=[];drop.forEach(d=>{cur=cur/2+d;cols.push(cur);merge.push(cols.length-1);cur=cur/2;cols.push(cur)});if(cur>1)cols.push(1);
+  const ly=y+upH+26;const colW=w/Math.max(1,cols.length-1);const {nodes}=layoutCols(cols,x,ly,colW,loH);let s=up.s,map=up.map;
+  cols.forEach((n,ci)=>{for(let i=0;i<n;i++){const p=nodes[ci+':'+i];map[pre+':L:'+ci+':'+i]=p;if(ci<cols.length-1)s+=elbow(p,nodes[(ci+1)+':'+(i>>1)])}});
+  cols.forEach((n,ci)=>{for(let i=0;i<n;i++){const p=nodes[ci+':'+i];const isDrop=merge.includes(ci)&&i>=n/2;s+=circ(p,'n'+(isDrop?' in':''),ci===cols.length-1?5:3.5)}});
+  s+=`<text class="lab" x="${x}" y="${ly-6}">Нижняя сетка</text>`;return {s,map,R,cols,merge}}
+function drawODT(pre,M,t,x,y,w,h,f){const R=log2(M);const L1=t-M/2;let E;if(f.dt==='r1')E=L1;else if(f.dt==='r12')E=L1+(R>=2?M/4:0);else E=t-1;const upH=h*.52,loH=h*.38;
+  const up=drawSE(pre+':U',M,t,x,y,w,upH,{label:'Основная сетка (ОТ)',third:f.thirdOT});let s=up.s,map=up.map;
+  if(E>=1){const ME=pow2up(Math.max(2,E));const ly=y+upH+34;const lo=drawSE(pre+':D',ME,Math.max(1,E),x,ly,w*.7,loH,{label:'Утешительная (ДТ)',third:f.thirdDT,inCls:true});s+=lo.s;Object.assign(map,lo.map);
+    let k=0;for(let i=0;i<M/2&&k<Math.min(E,ME);i++){if(up.byeSet.has(2*i+1))continue;const a=map[pre+':U:0:'+(2*i+1)],b=map[pre+':D:0:'+k];if(a&&b)s+=`<path class="ln dash" d="M${a.x} ${a.y}C${a.x-18} ${a.y},${b.x-18} ${b.y},${b.x} ${b.y}"/>`;k++}}
+  return {s,map,R,E}}
+function drawRR(pre,t,x,y,w,h,label){let s=`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="5"/><text class="lab big" x="${x+8}" y="${y+14}">${label}</text>`;const map={};const step=(h-24)/t;
+  for(let i=0;i<t;i++){const p={x:x+16,y:y+24+step*(i+.5)};map[pre+':'+i]=p;s+=circ(p,'n',3.5)+`<text class="pl" x="${x+w-22}" y="${p.y+3.5}">${i+1}</text>`}
+  for(let i=0;i<t;i++)for(let j=i+1;j<t;j++){const a=map[pre+':'+i],b=map[pre+':'+j];s+=`<path class="ln" d="M${a.x+4} ${a.y}C${a.x+30} ${a.y},${b.x+30} ${b.y},${b.x+4} ${b.y}" opacity=".5"/>`}
+  return {s,map}}
+function pathSE(pre,R,L,i0=0){const ids=[];const last=L===0?R:L-1;for(let r=0;r<=last;r++)ids.push(pre+':'+r+':'+(i0>>r));return ids}
+function pathUO(pre,M,L,i0=0){const R=log2(M);const ids=[pre+':0:'+i0];let i=i0;for(let r=0;r<R;r++){const B=M/Math.pow(2,r);const b=Math.floor(i/B),pI=Math.floor((i%B)/2);const win=!(L===r+1);i=win?b*B+pI:b*B+B/2+pI;ids.push(pre+':'+(r+1)+':'+i)}return {ids,place:i+1}}
+function typeAnim(type){const W=270,H=190,CAP=H-8;let s='',map={},ids=[],endLabel='';
+  if(type==='O'){const d=drawSE('a',8,8,14,20,180,112,{third:true});s=d.s;map=d.map;ids=pathSE('a',3,2);endLabel='проиграл во 2-м туре → место 5–8'}
+  if(type==='ODT'){const d=drawODT('a',8,8,14,20,175,120,{dt:'r1',thirdOT:false,thirdDT:false});s=d.s;map=d.map;ids=[...pathSE('a:U',3,1,1),...pathSE('a:D',2,0,0)];endLabel='проиграл в 1-м туре → победитель ДТ'}
+  if(type==='UO'){const d=drawUO('a',8,8,14,20,180,132);s=d.s;map=d.map;const p=pathUO('a',8,1,0);ids=p.ids;endLabel='проиграл в 1-м туре → место '+p.place}
+  if(type==='UO2'){const d=drawUO2('a',8,8,14,20,180,124);s=d.s;map=d.map;ids=[...pathSE('a:U',3,1,1),'a:L:0:0','a:L:1:0','a:L:2:0','a:L:3:0'];endLabel='проиграл в 1-м туре → нижняя сетка, 5-е'}
+  if(type==='QUAL'){const a1=drawSE('a',4,4,14,22,110,64,{label:'Мини-сетка 1'}),a2=drawSE('b',4,4,14,110,110,64,{label:'Мини-сетка 2'});s=a1.s+a2.s;map={...a1.map,...a2.map};
+    const m1=map['a:2:0'],m2=map['b:2:0'];const box={x:170,y:40,w:86,h:110};s+=`<rect class="box" x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}" rx="5"/><text class="lab big" x="${box.x+8}" y="${box.y+14}">Основной</text><text class="lab big" x="${box.x+8}" y="${box.y+26}">турнир</text>`;
+    [m1,m2].forEach((m,i)=>{const p={x:box.x+20,y:box.y+50+i*30};map['q:'+i]=p;s+=`<path class="ln dash" d="M${m.x+4} ${m.y}C${m.x+30} ${m.y},${p.x-30} ${p.y},${p.x-4} ${p.y}"/>`+circ(p,'n in',4)});
+    ids=['a:0:0','a:1:0','a:2:0','q:0'];endLabel='победитель мини-сетки → основной турнир'}
+  if(type==='GROUPS'){const g1=drawRR('r',4,14,20,110,132,'Группа A'),g2=drawRR('s',4,146,20,110,132,'Группа B');s=g1.s+g2.s;map={...g1.map,...g2.map};ids=['r:0','r:1','r:2','r:3'];endLabel='каждый с каждым внутри группы'}
+  if(type==='FG'){const gw=78,gh=32;let g='';for(let i=0;i<4;i++){const y=14+i*38;g+=`<rect class="box" x="14" y="${y}" width="${gw}" height="${gh}" rx="5"/><text class="lab big" x="22" y="${y+13}">Группа ${String.fromCharCode(65+i)}</text>`;for(let k=0;k<4;k++){const p={x:26+k*14,y:y+24};if(k===0)map['g:'+i+':0']=p;g+=circ(p,'n'+(k===0?' in':''),3)}}
+    const r=drawRR('r',4,140,20,112,132,'Финальная группа');s=g+r.s;Object.assign(map,r.map);for(let i=0;i<4;i++){const a=map['g:'+i+':0'],b=map['r:'+i];s+=`<path class="ln dash" d="M${a.x+gw-16} ${a.y}C${a.x+gw+10} ${a.y},${b.x-30} ${b.y},${b.x-4} ${b.y}"/>`}ids=['g:1:0','r:1'];endLabel='победители групп → одна таблица'}
+  const pts=ids.map(i=>map[i]).filter(Boolean);let len=0;for(let i=1;i<pts.length;i++)len+=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);
+  const poly=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join('');s+=`<path class="pth" d="${poly}" style="--len:${len.toFixed(0)}"/>`+pts.map(p=>circ(p,'pn',3)).join('');
+  s+=`<line x1="0" y1="${CAP-14}" x2="${W}" y2="${CAP-14}" stroke="var(--border)" stroke-width="1"/><text class="cap" x="14" y="${CAP}">${endLabel}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${s}</svg>`}
+
+/* =====================================================================
+   Общие компоненты: меню, шапка, шаги, статусная полоса, модалка
+   ===================================================================== */
+const ICO={copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5h10"/></svg>',
+  open:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  tv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+  dice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>'};
+function renderNav(cur){document.getElementById('nav').innerHTML=`<a class="${cur==='t'?'cur':''}" href="#/tournaments">Турниры</a><a href="championships-list.html">Чемпионаты / Лиги</a><a href="#">Игроки</a><a href="#">Судьи</a><a href="#">Спонсоры</a><a class="reset" href="#" data-act="reset">Сбросить прототип</a>`}
+function stepsBar(items){return `<ol class="steps">${items.map((it,i)=>{const cls=[it.state,it.skip?'skip':''].join(' ');const inner=`<b>${it.state==='done'?'✓':(it.num??i+1)}</b><span class="lbl">${esc(it.label)}${(it.sub||(it.state==='lock'?'ожидает':''))?`<small>${esc(it.sub||'ожидает')}</small>`:''}</span>`;
+  return it.href&&it.state!=='lock'?`<a class="${cls}" href="${it.href}">${inner}</a>`:`<li class="${cls}" title="${esc(it.title||'')}">${inner}</li>`}).join('')}</ol>`}
+function band(kind,title,sub,acts){return `<div class="band ${kind}"><span class="dot"></span><div class="txt"><b>${title}${sub?`<span class="q" data-t="${esc(sub)}">?</span>`:''}</b></div><div class="acts">${acts||''}</div></div>`}
+function stageHead(title,status,acts,go){VIEW.foot=stageActs(go);return `<div class="sh2"><h2>${title}<span class="st">· ${status}</span></h2><span class="r">${acts||''}</span></div>${VIEW&&VIEW.divsw||''}`}
+function stageActs(go){const {t,stage}=VIEW;const act=activeStage(t),prev=prevStage(t);if(stage!==act||!go)return '';
+  const back=stage==='apps'&&!t.divisions.every(d=>d.apps==='open')?`<button class="btn" data-act="reopen-apps">← Открыть приём заново</button>`:prev?`<button class="btn" data-act="undo" data-s="${prev}">← ${UNDO_L[prev]}</button>`:'';
+  return `<div class="wizfoot">${back}<span class="sp"></span>${go}</div>`}
+function stageFoot(){return ''}
+function field(label,control,hint,opts={}){const q=[opts.q,hint].filter(Boolean).join(' ');return `<div class="field ${opts.cls||''}"><label>${label}${opts.req?' <i>*</i>':''}${q?` <span class="q" data-t="${esc(q.replace(/<[^>]+>/g,''))}">?</span>`:''}</label>${control}</div>`}
+function sel(bind,opts,val,extra=''){return `<select class="sel" data-bind="${bind}" ${extra}>${opts.map(o=>{const [v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}" ${String(v)===String(val)?'selected':''}>${esc(l)}</option>`}).join('')}</select>`}
+function openModal(html){document.getElementById('sheet').innerHTML=html;document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('sheet').classList.remove('wide')}
+function confirmModal(title,text,okLabel,act,danger){openModal(`<div class="sh"><h3>${title}</h3><button class="x" data-act="close">×</button></div><div class="sb"><p style="margin:0;color:var(--muted)">${text}</p></div><div class="sf"><span class="sp"></span><button class="btn" data-act="close">Отмена</button><button class="btn ${danger?'danger':'primary'}" data-act="${act}">${okLabel}</button></div>`)}
+
+/* =====================================================================
+   Список турниров
+   ===================================================================== */
+function tStatus(t){const d=D(t);const stages=t.divisions.map(dv=>divStage(t,dv));
+  if(stages.every(s=>s.key==='done'))return {cls:'done',l:'завершён'};
+  if(stages.some(s=>s.key==='main'||s.key==='qual'))return {cls:'live',l:'турнир идёт'};
+  if(stages.some(s=>s.key==='drawq'||s.key==='drawm'))return {cls:'',l:'жеребьёвка'};
+  return {cls:'',l:'приём заявок'}}
+function pageList(){renderNav('t');const rows=DB.tournaments.map(t=>{const st=tStatus(t);const pairs=t.divisions.reduce((a,d)=>a+d.pairs.filter(p=>!p.off).length,0);
+  return `<tr><td class="name"><b>${esc(t.name)}</b><span>${esc(t.cat)}${t.divisions.length>1?' · дивизионы: '+t.divisions.map(d=>d.name.toLowerCase()).join(', '):''}</span></td><td>${fmtRange(t.start,t.end)}</td><td>${t.venues[0]?esc(t.venues[0].name+', '+t.venues[0].city):'<span style="color:var(--faint)">площадка не указана</span>'}</td><td>${pairs||'—'}</td><td><span class="pill ${st.cls}">${st.l}</span></td><td style="color:var(--muted);font-size:12px">${fmtRange(t.created)}</td><td class="act"><a class="btn sm ${st.cls==='live'?'primary':''}" href="#/t" data-act="open" data-id="${t.id}">${st.cls==='live'?'Вести матчи':'Открыть'}</a></td></tr>`}).join('');
+  document.getElementById('app').innerHTML=`<div class="ph"><div class="tt"><h1>Турниры</h1><div class="meta">Ваши турниры: создание, публикация, ведение</div></div><div class="act"><a class="btn go" href="#/new/1" data-act="newwiz">+ Новый турнир</a></div></div>
+  <div class="tbl"><table><thead><tr><th>Турнир</th><th>Даты</th><th>Площадка</th><th>Пары</th><th>Состояние</th><th>Создан</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`}
+
+/* =====================================================================
+   Визард создания турнира: 4 шага + сводка справа
+   ===================================================================== */
+const WSTEPS=['Основные настройки','Тип турнира','Настройки матчей','Участники'];
+function wizErrors(w){const e=[];if(!w.name.trim())e.push({step:1,msg:'название турнира'});if(!w.start)e.push({step:1,msg:'дата начала'});if(!(+w.courts>0))e.push({step:1,msg:'число кортов'});(w.divisions.length?w.divisions:[{struct:w.struct}]).forEach(d=>structure(d.struct).errors.forEach(x=>e.push({step:2,msg:(d.name?d.name+': ':'')+x.msg})));return e}
+function stepDone(w,i){return !wizErrors(w).some(e=>e.step===i)&&(i===1?!!(w.name.trim()&&w.start):true)}
+function pageWiz(step){renderNav('t');const w=DB.wiz;w.step=step;const errs=wizErrors(w);
+  const items=WSTEPS.map((l,i)=>({label:l,state:i+1===step?'cur':(i+1<step&&stepDone(w,i+1))?'done':'',href:`#/new/${i+1}`}));
+  const body=[null,wizStep1,wizStep2,wizStep3,wizStep4][step](w);
+  const missing=errs.length?`<div class="alert err" style="margin-bottom:12px">Чтобы создать турнир, заполните: ${errs.map(e=>`<a href="#/new/${e.step}" style="font-weight:600">${e.msg}</a> (шаг ${e.step})`).join(', ')}</div>`:'';
+  const foot=`<div class="wizfoot">${step>1?`<a class="btn" href="#/new/${step-1}">← Назад</a>`:''}<span class="sp"></span>${step<4?`<a class="btn primary" href="#/new/${step+1}">Далее →</a>`:`<button class="btn go" data-act="create" ${errs.length?'disabled':''}>Создать турнир</button>`}</div>`;
+  if(step===4)return void(document.getElementById('app').innerHTML=`<div class="ph"><div class="tt"><h1>Создание турнира</h1></div></div>${stepsBar(items)}
+  <div class="wizwrap">${body}${missing}${foot}</div>`);
+  document.getElementById('app').innerHTML=`<div class="ph"><div class="tt"><h1>Создание турнира</h1></div></div>${stepsBar(items)}
+  <div class="wizwrap ${step===2?'wide':''}">${body}${foot}</div>`}
+function divTabs(w,edit){const c=wizCur(w);const tabs=`<div class="tb" style="gap:10px;padding:10px 16px"><span class="seg lg">${w.divisions.map(d=>`<button class="${d.id===c.d.id?'on':''}" data-act="seldiv" data-d="${d.id}">${esc(d.name)}${!edit&&structure(d.struct).errors.length?' <span style="color:var(--err)">•</span>':''}</button>`).join('')}</span>${edit?`<button class="btn sm" data-act="adddiv">+ Добавить дивизион</button>`:''}<span class="sp"></span>${!edit&&w.divisions.length>1?`<button class="btn sm" data-act="copystruct" data-d="${c.d.id}">Скопировать настройки во все дивизионы</button>`:''}</div>`;
+  if(!edit)return tabs;
+  return tabs+`<div class="panel-b" style="padding-top:12px"><div class="grid3">${field('Название дивизиона',`<input class="in" data-bind="wiz.divisions.${c.i}.name" value="${esc(c.d.name)}" placeholder="Дивизион 1">`,'Так дивизион называется на витрине и в расписании')}${field('Состав',sel(`wiz.divisions.${c.i}.kind`,DIVK,c.d.kind),'От пола зависит, каким аккаунтом ЕЦП загружаются заявки')}<div class="field"><label>&nbsp;</label><button class="btn ${w.divisions.length>1?'danger':''}" data-act="deldiv" data-d="${c.d.id}" ${w.divisions.length>1?'':'disabled'}>Удалить дивизион</button></div></div></div>`}
+function judgesPanel(o){const attached=[...JUDGES_FPR,...o.judgesLocal].filter(j=>o.judges.includes(j.id));const free=[...JUDGES_FPR,...o.judgesLocal].filter(j=>!o.judges.includes(j.id));
+  return `<div class="panel"><div class="panel-h"><h3>Судьи турнира<span class="q" data-t="Из закреплённых выбирается судья матча в расписании. Судьи ФПР видны всем организаторам, локальных заводит организатор и видит только он. Без судей матчи идут без судьи">?</span></h3><span class="r"><button class="btn sm" data-act="judge-new">Завести судью</button></span></div><div class="panel-b">
+    ${attached.length?attached.map(j=>`<div class="jrow"><span class="t"><b>${esc(j.n)}</b><span>${esc(j.e)} · ${j.kind==='fpr'?'аккредитован ФПР':'мой судья'}</span></span><span class="chip ${j.kind==='fpr'?'ok':''}">${j.kind==='fpr'?'ФПР':'локальный'}</span><button class="btn xs" data-act="judge-detach" data-id="${j.id}">Открепить</button></div>`).join(''):'<div class="empty" style="margin-bottom:12px">Судей пока нет</div>'}
+    <div class="inl" style="margin-top:12px"><select class="sel" data-act-change="judge-attach" style="max-width:360px"><option value="">+ Закрепить судью…</option><optgroup label="Судьи ФПР · видны всем организаторам">${free.filter(j=>j.kind==='fpr').map(j=>`<option value="${j.id}">${esc(j.n)}</option>`).join('')}</optgroup><optgroup label="Мои судьи · видны только мне">${free.filter(j=>j.kind==='local').map(j=>`<option value="${j.id}">${esc(j.n)}</option>`).join('')}</optgroup></select></div>
+  </div></div>`}
+function judgeCtx(){return location.hash.startsWith('#/new')?DB.wiz:T()}
+function wizStep1(w){const courts=+w.courts||0;w.judges=w.judges||[];w.judgesLocal=w.judgesLocal||[];
+  return `<div class="panel"><div class="panel-h"><h3>О турнире</h3><span class="r"><label class="trow"><span>Несколько дивизионов</span><span class="q" data-t="У каждого дивизиона свой состав, своя сетка и своя схема проведения. Выключено — турнир играется одной общей сеткой">?</span><button class="toggle ${w.multiDiv?'on':''}" data-toggle="wiz.multiDiv"></button></label></span></div><div class="panel-b"><div class="form">
+  ${field('Название турнира',`<input class="in" data-bind="wiz.name" value="${esc(w.name)}" placeholder="Осенний кубок клуба">`,'',{req:true})}
+  <div class="grid4">${field('Категория',sel('wiz.cat',CATS,w.cat))}${w.multiDiv?'':field('Состав',sel('wiz.divisions.0.kind',DIVK,w.divisions[0].kind),'От пола зависит, каким аккаунтом ЕЦП загружаются заявки')}${field('Начало',`<input class="in mono" type="date" data-bind="wiz.start" value="${w.start}">`,'',{req:true})}${field('Окончание',`<input class="in mono" type="date" data-bind="wiz.end" value="${w.end}">`,'Пусто — однодневный турнир')}</div>
+  </div></div>
+  ${w.multiDiv?`<div class="panel-h" style="border-top:1px solid var(--border)"><h3>Дивизионы<span class="q" data-t="Схема этапов каждого дивизиона настраивается на шаге «Тип турнира», заявки — на шаге «Участники»">?</span></h3></div>${divTabs(w,true)}`:''}</div>
+  <div class="panel"><div class="panel-h"><h3>Корты и площадки<span class="q" data-t="Число кортов задаёт колонки расписания и адреса экранов кортов. Площадка не обязательна">?</span></h3></div><div class="panel-b"><div class="form">
+  <div class="grid2">${field('Число кортов',`<input class="in num" type="number" min="1" max="12" data-bind="wiz.courts" value="${w.courts}">`,'',{req:true})}</div>
+  ${field('Площадки',`<div class="inl"><input class="in" data-bind="wiz.vq" value="${esc(w.vq)}" placeholder="Начните вводить название клуба или города…"><button class="btn" data-act="addvenue">Добавить</button></div>`,'Клубов может быть несколько, первый стоит в шапке турнира. Если клуба нет в справочнике, введённый текст сохранится как есть')}
+  ${w.venues.map((v,i)=>`<div class="vrow"><span class="b">${esc(v.name[0])}</span><span class="t"><b>${esc(v.name)}</b><span>${esc(v.city)}</span></span><button class="btn xs ic" data-act="delvenue" data-i="${i}" title="Убрать">×</button></div>`).join('')}
+  </div></div></div>
+  ${judgesPanel(w)}
+  <div class="panel"><div class="panel-h"><h3>Описание и регламент<span class="q" data-t="Публикуются в разделе «Регламент» витрины">?</span></h3></div><div class="panel-b"><div class="form">
+  ${field('Описание',`<textarea class="ta" data-bind="wiz.desc" placeholder="Организатор, взнос, призовые, условия участия…">${esc(w.desc)}</textarea>`)}
+  ${field('Полный регламент',`<div class="inl"><input class="in" data-bind="wiz.reg" value="${esc(w.reg)}" placeholder="https://…"><button class="btn" data-act="pdf">Загрузить PDF</button></div>`,'Ссылка на страницу или PDF до 10 МБ, на витрине покажем и то, и другое')}
+  <div class="grid2">${field('Цветовая схема',`<div class="inl">${sel('wiz.color',[['green','Зелёная'],['blue','Голубая'],['red','Красная'],['dark','Тёмная']],w.color)}<button class="btn" data-act="preview-color">Как это выглядит</button></div>`,'Цвета витрины, ТВ-табло и табло жеребьёвки')}</div>
+  </div></div></div>`}
+function wizStep2(w){const c=wizCur(w),st=c.st,bp=c.bp;const s=structure(st);const al=l=>l.map(a=>`<div class="alert ${a.cls}">${esc(a.msg)}</div>`).join('');
+  const arrow=(n,off)=>`<div class="arrow ${off?'off':''}"><svg viewBox="0 0 36 16"><path d="M2 8h28m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${n}</span></div>`;
+  const tog=(bind,on,dis)=>`<button class="toggle ${on?'on':''}" data-toggle="${bind}" ${dis?'disabled':''} aria-label="Включить"></button>`;
+  const fin=st.fin,T_=TYPES[fin.type];
+  return `<div class="panel"><div class="panel-h"><h3>Настройки этапов<span class="q" data-t="Своя схема проведения у каждого дивизиона: вместимость, места, этапы и тип финала. Дивизионы задаются на шаге «Основные настройки»">?</span></h3></div>
+  ${w.divisions.length>1?divTabs(w,false):''}
+  <div class="panel-b"><div class="grid3">
+  ${field('Пар в основной сетке',sel(bp+'.N',[4,8,16,32,64],st.N),`Прямой допуск считается сам: вместимость минус места квалификации и приглашений, сейчас ${s.DA}`,{req:true})}
+  ${field('Через квалификацию Q',`<input class="in" type="number" min="0" max="${st.N/2}" data-bind="${bp}.Q" value="${st.Q}" ${st.qual?'':'disabled'}>`,st.qual?'мест под победителей квалификации':'квалификация выключена')}${field('Приглашения WC',`<input class="in" type="number" min="0" max="8" data-bind="${bp}.WC" value="${st.WC}">`,'помечаются на приёме заявок')}
+  </div>${s.errors.filter(e=>e.id==='V8').length||s.warns.filter(e=>e.id==='V3').length?`<div style="margin-top:12px">${al([...s.errors.filter(e=>e.id==='V8').map(e=>({...e,cls:'err'})),...s.warns.filter(e=>e.id==='V3').map(e=>({...e,cls:'warn'}))])}</div>`:''}
+  <div style="margin-top:16px">  <div class="panel-h" style="border:0;padding:0 0 10px"><h3>Этапы<span class="q" data-t="Выключенный этап остаётся на экране. На стрелках — сколько пар идёт дальше">?</span></h3></div>
+  <div class="stages">
+    <div class="scard ${st.qual?'on':'off'}"><div class="shead">${tog(bp+'.qual',st.qual)}<div><div class="k">Этап 1</div><div class="n">Квалификация</div></div></div><div class="sbody">
+      <div class="tview"><div class="tt"> <span><b>Мини-сетки</b> <span class="nw"><span class="code">О</span><span class="q" data-t="Проводится только при переборе заявок. Мини-сетки по олимпийской системе, победитель каждой проходит в основной турнир; число туров сервис считает по числу заявок">?</span></span></span></div><span class="anim">${typeAnim('QUAL')}</span></div>
+      <div class="prow"><span>Проходят в основной турнир</span><b>${s.Q}</b></div></div><div class="sfoot">Проходят <b>${s.Q}</b></div></div>
+    ${arrow(st.qual?s.N:s.N,!st.qual)}
+    <div class="scard ${st.groups?'on':'off'}"><div class="shead">${tog(bp+'.groups',st.groups)}<div><div class="k">Этап 2</div><div class="n">Групповой этап</div></div></div><div class="sbody">
+      <div class="tview"><div class="tt"><span><b>Круговая</b> <span class="nw"><span class="code">К</span><span class="q" data-t="Каждый с каждым внутри группы. Кто с кем встречается в финальном этапе, задаёт жеребьёвка">?</span></span></span></div><span class="anim">${typeAnim('GROUPS')}</span></div>
+      <div class="prow"><span>Число групп</span><input class="in num" type="number" min="1" max="${st.N/2}" data-bind="${bp}.G" value="${st.G}"></div>
+      <div class="prow"><span>Состав групп</span><b>${s.groups?s.groups.sizes.join(' · '):'—'}</b></div>
+      <div class="prow"><span>Выходят из группы</span><input class="in num" type="number" min="1" max="${s.groups?Math.max(...s.groups.sizes):4}" data-bind="${bp}.k" value="${st.k}"></div>
+</div><div class="sfoot">${s.groups?`Матчей <b>${s.groups.matches}</b> Туров <b>${s.groups.rounds}</b> Выходят <b>${s.groups.out}</b>`:'Выключен'}</div></div>
+    ${arrow(s.groups?s.groups.out:s.N,false)}
+    <div class="scard on"><div class="shead">${tog(bp+'.finOn',true,true)}<div><div class="k">Этап 3</div><div class="n">Финальный этап</div></div></div><div class="sbody">
+      <div class="tview"><div class="tt"><span><b>${T_.name}</b> <span class="nw"><span class="code">${T_.code}</span><span class="q" data-t="${esc(T_.desc)}">?</span></span></span><button class="btn sm" data-act="picker">Изменить</button></div><span class="anim">${typeAnim(fin.type)}</span></div>
+      ${['O','UO2','ODT'].includes(fin.type)?`<label class="trow"><input type="checkbox" data-bind="${bp}.fin.${fin.type==='ODT'?'thirdOT':'third'}" ${(fin.type==='ODT'?fin.thirdOT:fin.third)?'checked':''}> <b>Матч за 3-е место</b></label>`:''}
+      ${fin.type==='UO2'?`<label class="trow"><input type="checkbox" data-bind="${bp}.fin.grand" ${fin.grand?'checked':''}> <b>Гранд-финал</b></label>`:''}
+      ${fin.type==='ODT'?`<div class="prow"><span>В ДТ попадают</span>${sel(bp+'.fin.dt',[['r1','проигравшие 1-го тура'],['r12','1-го и 2-го туров'],['all','всех туров']],fin.dt)}</div>`:''}
+      ${al([...s.errors.filter(e=>['V4','V5','V6'].includes(e.id)).map(e=>({...e,cls:'err'})),...s.warns.filter(e=>e.id==='V1').map(e=>({...e,cls:'warn'}))])}
+    </div><div class="sfoot">Участников <b>${s.fin?s.fin.t:'—'}</b> Матчей <b>${s.fin?s.fin.matches:'—'}</b> Туров <b>${s.fin?s.fin.rounds:'—'}</b></div></div>
+  </div></div></div></div>`}
+function rulesGrid(bind,r){return `<div class="grid3">${field('Сетов для победы',sel(bind+'.sets',[1,2,3],r.sets))}${field('Геймов в сете',sel(bind+'.games',[4,6,9],r.games))}${field('Тай-брейк при равенстве',sel(bind+'.tb',[['7','включён, до 7'],['off','выключен']],r.tb))}
+  ${field('При равенстве сетов',sel(bind+'.dec',[['stb','супер-тай-брейк до 10'],['set','полный решающий сет']],r.dec))}${field('При счёте 40:40',sel(bind+'.deuce',[['star','Star Point'],['adv','больше-меньше'],['gold','золотой мяч']],r.deuce))}</div>
+  `}
+function rulesBlock(bp,obj,stages,title,extra){if(!obj.sameRules)stages.forEach(st=>{if(!obj.rulesPer[st[0]])obj.rulesPer[st[0]]={...obj.rules}});
+  return `<div class="panel"><div class="panel-h"><h3>${title}</h3><span class="r">${extra||''}<label class="trow"><span>Одинаковые для всех этапов</span><button class="toggle ${obj.sameRules?'on':''}" data-toggle="${bp}.sameRules"></button></label></span></div>
+  <div class="panel-b"><div class="form">${obj.sameRules?rulesGrid(bp+'.rules',obj.rules):stages.map(st=>`<div class="panel" style="margin:0"><div class="panel-h"><h3>${st[1]}</h3></div><div class="panel-b">${rulesGrid(bp+'.rulesPer.'+st[0],obj.rulesPer[st[0]])}</div></div>`).join('')}</div></div></div>`}
+function stagesOf(sts){return [['qual','Квалификация',sts.some(x=>x.qual)],['groups','Групповой этап',sts.some(x=>x.groups)],['fin','Финальный этап',true]].filter(x=>x[2])}
+function wizStep3(w){const multi=w.divisions.length>1;if(w.sameDivs===undefined)w.sameDivs=true;w.rulesDiv=w.rulesDiv||{};
+  const dtog=`<label class="trow" style="margin-right:14px"><span>Одинаковые для всех дивизионов</span><button class="toggle ${w.sameDivs?'on':''}" data-toggle="wiz.sameDivs"></button></label>`;
+  if(!multi||w.sameDivs)return rulesBlock('wiz',w,stagesOf(w.divisions.length?w.divisions.map(d=>d.struct):[w.struct]),'Правила матча',multi?dtog:'');
+  const head=`<div class="panel-h" style="border:0;padding:0 0 12px"><h3>Правила матча</h3><span class="r">${dtog}</span></div>`;
+  return head+w.divisions.map(d=>{if(!w.rulesDiv[d.id])w.rulesDiv[d.id]={rules:{...w.rules},sameRules:true,rulesPer:{}};return rulesBlock('wiz.rulesDiv.'+d.id,w.rulesDiv[d.id],stagesOf([d.struct]),`Правила · ${esc(d.name)}`)}).join('')}
+function wizStep4(w){const divs=w.divisions;w.pairs=w.pairs||{};
+  const block=d=>{const list=w.pairs[d.id]||[];const ecpN=list.filter(p=>!p.manual).length,manN=list.filter(p=>p.manual).length;
+    const rows=list.map((p,i)=>`<div class="row" style="grid-template-columns:28px 1fr 70px auto 34px;padding:6px 16px;min-height:40px"><span class="n">${i+1}</span><span class="nm"><b>${esc(p.a.n)}</b><small>${p.a.r}</small><span style="color:var(--faint)">/</span><b>${esc(p.b.n)}</b><small>${p.b.r}</small></span><span class="rt">${p.a.r+p.b.r}</span><span class="tag ${p.manual?'res':'q'}">${p.manual?'вручную':'ЕЦП'}</span><button class="btn xs ic" data-act="wiz-delpair" data-div="${d.id}" data-i="${i}" title="Убрать">×</button></div>`).join('');
+    return `<div class="panel flat"><div class="panel-h"><h3>Участники${w.divisions.length>1?' · '+esc(d.name):''}<span class="q" data-t="Заявки из ЕЦП и пары, добавленные вручную, живут вместе. Повторная загрузка из ЕЦП заменяет только пары из ЕЦП. Всё это можно доделать позже на стадии «Приём заявок»">?</span></h3><span class="hint">${list.length?`${list.length} ${plural(list.length,'пара','пары','пар')} · ${ecpN} из ЕЦП, ${manN} вручную`:'пар пока нет'}</span><span class="r"><button class="btn sm" data-act="wiz-addpair" data-div="${d.id}">+ Добавить пару вручную</button></span></div>
+    <div class="panel-b" style="padding:12px 16px"><div class="inl"><input class="in mono" data-bind="wiz.ecp.${d.id}" value="${esc(w.ecp[d.id]||'')}" placeholder="sb.padelrus.ru/tournaments/1411/applications — можно с https или без"><button class="btn" data-act="wiz-sync" data-div="${d.id}">Загрузить из ЕЦП</button></div></div>
+    ${rows?`<div style="border-top:1px solid var(--border)">${rows}</div>`:''}</div>`};
+  return divs.map(block).join('')+`<div class="panel"><div class="panel-h"><h3>Приём заявок<span class="q" data-t="Пока идёт приём, состав обновляется из ЕЦП каждые 10 минут. После срока синхронизация останавливается, состав проверяет организатор">?</span></h3></div><div class="panel-b"><div class="form"><div class="grid2">${field('Приём заявок до',`<input class="in mono" type="datetime-local" data-bind="wiz.deadline" value="${w.deadline}">`,'Московское время')}</div></div></div></div>`}
+function openPicker(){const w=DB.wiz;const st=wizCur(w).st;openModal(`<div class="sh" style="align-items:flex-start;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;width:100%"><h3>Тип финального этапа</h3><button class="x" data-act="close" style="margin-left:auto">×</button></div><span class="hint">Системы проведения соревнований по регламенту, п. 1.4.2–1.4.7. На схемах — сетка на 8 участников и путь одного из них</span></div>
+  <div class="sb"><div class="types">${TYPES_ORDER.map(k=>{const T_=TYPES[k];const ready=TYPES_READY.includes(k);const on=st.fin.type===k;
+    return `<button class="tcard ${on?'on':''} ${ready?'':'dis'}" data-act="settype" data-k="${k}" ${ready?'':'disabled'}><span class="codes"><span class="code">${T_.code}</span>${on?'<span class="selp">выбран</span>':''}</span><b>${T_.name}</b><span class="anim">${typeAnim(k)}</span><p>${T_.desc}</p>${ready?'':'<span class="soon">Скоро будет добавлен</span>'}</button>`}).join('')}</div></div>`);
+  document.getElementById('sheet').classList.add('wide')}
+function createTournament(){const w=DB.wiz;const divs=w.divisions;const t={id:uid(),name:w.name.trim(),cat:w.cat,gender:w.gender,venues:w.venues.map(v=>({...v})),courts:+w.courts||1,start:w.start,end:w.end||'',color:w.color,desc:w.desc,reg:w.reg,regPdf:'',
+  ...JSON.parse(JSON.stringify(divs[0].struct||w.struct)),rules:{...w.rules},sameRules:w.sameRules,rulesPer:JSON.parse(JSON.stringify(w.rulesPer)),sameDivs:w.sameDivs!==false,rulesDiv:JSON.parse(JSON.stringify(w.rulesDiv||{})),deadline:w.deadline,judgesLocal:(w.judgesLocal||[]).map(j=>({...j})),judges:[...(w.judges||[])],sponsors:{main:'',extra:'',plate:'default',tv:'corner',wm:false},slug:uid().slice(0,7),created:'2026-09-24',
+  divisions:divs.map(d=>{const dv=mkDivision(d.kind||'m',w.ecp[d.id]||'',null);dv.name=d.name;dv.code=d.id;dv.struct=JSON.parse(JSON.stringify(d.struct||w.struct));dv.pairs=(w.pairs&&w.pairs[d.id]||[]).map(p=>({...p}));if(dv.pairs.some(p=>!p.manual))dv.synced='при создании';return dv}),div:divs[0].id};
+  DB.tournaments.unshift(t);DB.cur=t.id;DB.wiz=defaultWiz();save();toast('Турнир создан');location.hash='#/t/apps'}
+
+/* =====================================================================
+   Страница турнира: шапка, дивизионы, стадии, публичные ссылки
+   ===================================================================== */
+const livePairs=dv=>dv.pairs.filter(p=>!p.off);
+const zone=(dv,z)=>livePairs(dv).filter(p=>p.zone===z);
+function hasQual(t,dv){return S_(t,dv).qual&&zone(dv,'qual').length>0}
+function divStage(t,dv){if(dv.apps!=='done')return {key:'apps'};const q=hasQual(t,dv);if(q&&!dv.drawQ.done)return {key:'drawq'};if(!dv.drawM.done)return {key:'drawm'};if(q&&!dv.qualDone)return {key:'qual'};if(!dv.mainDone)return {key:'main'};return {key:'done'}}
+function anyQual(t){return t.divisions.some(d=>hasQual(t,d))}
+function qualDivs(t){return t.divisions.filter(d=>hasQual(t,d))}
+function tDone(t){return t.divisions.every(d=>divStage(t,d).key==='done')}
+function stageDone(t,k){const qd=qualDivs(t);if(k==='apps')return t.divisions.every(d=>d.apps==='done');if(k==='drawq')return qd.length>0&&qd.every(d=>d.drawQ.done);if(k==='drawm')return t.divisions.every(d=>d.drawM.done);if(k==='qual')return qd.length>0&&qd.every(d=>d.qualDone);return t.divisions.every(d=>d.mainDone)}
+function canOpen(t,dv,key){if(key==='settings'||key==='apps')return true;if(key==='main'&&t.divisions.every(d=>d.drawM.done))return true;const seq=stageSeq(t);const i=seq.indexOf(key);if(i<0)return false;return i<=seq.indexOf(activeStage(t))}
+function inProgress(t,dv,k){const allM=t.divisions.every(d=>d.drawM.done);if(k==='qual')return anyQual(t)&&allM&&!stageDone(t,'qual');if(k==='main')return allM&&!stageDone(t,'main');return activeStage(t)===k&&!tDone(t)}
+function stageItems(t,dv,cur){const q=anyQual(t);const act=activeStage(t);const done_=tDone(t);
+  const defs=[{k:'apps',l:'Приём заявок',f:'завершён',cur:()=>t.divisions.every(d=>d.apps==='open')?'идёт':'завершён'},{k:'drawq',l:'Жеребьёвка квалификации',f:'завершена'},{k:'drawm',l:'Жеребьёвка основной сетки',f:'завершена'},{k:'qual',l:'Квалификация',f:'завершена'},{k:'main',l:'Основной турнир',f:'завершён'}];
+  const first={label:'Настройки турнира',state:cur==='settings'?'cur':'done',href:'#/t/settings',sub:'создан '+fmtD(t.created),num:'✓'};
+  return [first,...defs.map((d,i)=>{const skip=(d.k==='drawq'||d.k==='qual')&&!q;const done=skip?false:stageDone(t,d.k);const open=canOpen(t,dv,d.k);const active=act===d.k;const prog=inProgress(t,dv,d.k);
+    const sub=active?(done_?d.f:(d.cur?d.cur():'идёт')):prog?'идёт':cur===d.k?'просмотр':skip?'не нужна':done?d.f:'ожидает';return {label:d.l,sub,state:active?'cur':cur===d.k?'view':done?'done':open?'':'lock',skip,href:open?`#/t/${d.k}`:null,title:open?'':'Стадия откроется после предыдущей',num:i+1}})]}
+const STAGE_L={apps:'Приём заявок',drawq:'Жеребьёвка квалификации',drawm:'Жеребьёвка основной сетки',qual:'Квалификация',main:'Основной турнир'};
+function stageSeq(t){const q=anyQual(t);return ['apps',...(q?['drawq']:[]),'drawm',...(q?['qual']:[]),'main']}
+function activeStage(t){const seq=stageSeq(t);let best=seq.length-1;t.divisions.forEach(d=>{const k=divStage(t,d).key;const i=seq.indexOf(k==='done'?'main':k);if(i>=0&&i<best)best=i});return seq[best]}
+function prevStage(t){if(tDone(t))return 'main';const seq=stageSeq(t);const i=seq.indexOf(activeStage(t));return i>0?seq[i-1]:null}
+function appsReady(t){return t.divisions.every(d=>{const c=counts(t,d);return c.m<=c.directCap&&c.wc<=c.WC})}
+function drawReady(t,kind){return t.divisions.filter(d=>kind!=='q'||hasQual(t,d)).every(d=>{const dr=kind==='q'?d.drawQ:d.drawM;const spec=drawSpec(t,d,kind);const pool=drawPool(t,d,kind);return spec.ok&&pool.length>0&&dr.slots.filter(Boolean).length===pool.length})}
+function playReady(t,stage){return t.divisions.filter(d=>stage!=='qual'||hasQual(t,d)).every(d=>{const ms=d.matches.filter(m=>m.stage===stage&&!m.bye);return ms.length>0&&ms.every(m=>m.done)})}
+const UNDO_L={apps:'Вернуться к составу',drawq:'Отменить жеребьёвку квалификации',drawm:'Отменить жеребьёвку основной сетки',qual:'Вернуть квалификацию в работу',main:'Вернуть турнир в работу'};
+const UNDO_T={apps:'Стадия «Приём заявок» снова станет активной, состав можно будет менять.',drawq:'Расстановка квалификации и её матчи со счётом удалятся. Состав останется.',drawm:'Расстановка основной сетки и её матчи со счётом удалятся. Квалификация останется.',qual:'Квалификация вернётся в работу: победители уйдут из основной сетки, пока она не будет завершена снова. Счёт матчей останется.',main:'Турнир вернётся в работу, итоги на витрине снимутся. Счёт матчей останется.'};
+function undoStage(t,k){t.divisions.forEach(dv=>{if(k==='apps')dv.apps='closed';else if(k==='drawq')resetDraw(t,dv,'q');else if(k==='drawm')resetDraw(t,dv,'m');else if(k==='qual'){dv.qualDone=false;dv.qualWinners=[]}else if(k==='main')dv.mainDone=false})}
+let VIEW=null;
+function slugUrl(t,path){return `https://padel.select/t/${t.slug}${path}`}
+function linksAside(t){const courts=courtList(t);const order=['apps','drawq','drawm','qual','main','done'];const lvl=Math.max(...t.divisions.map(d=>order.indexOf(divStage(t,d).key)));const drawOn=lvl>=1,playOn=lvl>=3;
+  const lk=(ic,name,url,hint)=>`<div class="lkr"><span class="ic">${ic}</span><span class="t"><b>${name}</b></span><span class="a"><button class="btn sm ic" data-act="copy" data-v="${url}" title="Скопировать">${ICO.copy}</button><a class="btn sm ic" href="${url}" target="_blank" title="Открыть">${ICO.open}</a></span></div>`;
+  return `<aside class="taside"><div class="panel flat" style="margin:0"><div class="panel-h"><h3>Публичные ссылки<span class="q" data-t="Ссылки появляются по мере продвижения: витрина с приёма заявок, ТВ-табло и табло жеребьёвки с жеребьёвки, экраны кортов с первых матчей. Адреса постоянные, витрина общая на все дивизионы. Табло кортов открывают на телевизоре у корта, теле виджет вставляют источником в пульт трансляции">?</span></h3></div>
+  ${lk(ICO.globe,'Витрина',slugUrl(t,''),'')}${drawOn?lk(ICO.tv,'ТВ-табло',slugUrl(t,'/tv'),'')+lk(ICO.dice,'Табло жеребьёвки',slugUrl(t,'/draw'),''):''}
+  ${playOn?courts.map(c=>lk(ICO.tv,`Теле виджет. Корт ${c.n}`,slugUrl(t,`/court/${c.v}-${c.c}/overlay`),'')).join('')+courts.map(c=>lk(ICO.tv,`Табло. Корт ${c.n}`,slugUrl(t,`/court/${c.v}-${c.c}`),'')).join(''):''}
+  </div></aside>`}
+function pageT(stage){renderNav('t');const t=T();if(!t){location.hash='#/tournaments';return}const dv=D(t);if(!canOpen(t,dv,stage))stage=activeStage(t);
+  const st=tStatus(t);const courts=+t.courts||0;
+  const head=`<div class="ph"><div class="tt"><h1>${esc(t.name)}</h1></div></div>`;
+  const divsw=t.divisions.length>1?`<div class="divsw" style="margin:0 0 12px"><span class="seg lg">${t.divisions.map(d=>`<button class="${d.code===dv.code?'on':''}" data-act="setdiv" data-d="${d.code}">${esc(d.name)}</button>`).join('')}</span></div>`:'';
+  const bar=stepsBar(stageItems(t,dv,stage));
+  if(stage==='settings'){document.getElementById('app').innerHTML=head+bar+pageSettings(t);return}
+  VIEW={t,dv,stage,divsw,foot:''};const act=activeStage(t);const ro=stage!==act&&!inProgress(t,dv,stage);const viewNote=ro?`<div class="alert hint" style="margin-bottom:14px">Стадия завершена и закрыта для изменений. Чтобы что-то поменять, вернитесь к ней кнопкой «Отменить» на активной стадии — <a href="#/t/${act}" style="font-weight:600;margin-left:4px">${STAGE_L[act]}</a></div>`:'';VIEW.ro=ro;
+  const body=({apps:stageApps,drawq:d=>stageDraw(t,d,'q'),drawm:d=>stageDraw(t,d,'m'),qual:d=>stagePlay(t,d,'qual'),main:d=>stagePlay(t,d,'main')}[stage])(dv);
+  document.getElementById('app').innerHTML=head+`<div class="tgrid"><div class="tmain">${bar}${body}${viewNote.replace('margin-bottom:14px','margin-top:14px')}${VIEW.foot||''}</div>${linksAside(t)}</div>`;}
+
+/* =====================================================================
+   Стадия 1: приём заявок
+   ===================================================================== */
+function counts(t,dv){const st=S_(t,dv);const m=zone(dv,'main'),q=zone(dv,'qual'),r=zone(dv,'res');const wc=m.filter(p=>p.wc).length;return {m:m.length,q:q.length,r:r.length,wc,N:st.N,Q:st.qual?st.Q:0,WC:st.WC,directCap:st.N-(st.qual&&q.length?st.Q:0)}}
+function stageApps(dv){const t=S_(T(),dv);const c=counts(T(),dv);const open=dv.apps==='open';const edit=dv.apps!=='done';const ok=c.m<=c.directCap&&c.wc<=c.WC;
+  const allOk=appsReady(T());const go=open?`<button class="btn go" data-act="close-apps">Завершить приём →</button>`:`<button class="btn go" data-act="apps-done" ${allOk?'':'disabled'} title="${allOk?'':'В каком-то дивизионе в основной сетке больше пар, чем мест'}">К жеребьёвке →</button>`;
+  const hd=stageHead('Приём заявок',open?'идёт':'завершён',open||ok?'':`<span class="chip bad">в основной сетке ${c.m} из ${c.directCap}</span>`,dv.apps==='done'?'':go)+`<div class="panel"><div class="panel-b" style="padding:12px 16px"><div class="inl"><input class="in mono" data-bind="div.ecp" value="${esc(dv.ecp)}" placeholder="Ссылка на заявки ЕЦП: sb.padelrus.ru/tournaments/1411/applications — можно с https или без" ${open?'':'disabled'}>${open?`<button class="btn primary" data-act="sync">Загрузить заявки</button>`:''}</div></div></div>`;
+  const ft='';
+  const zf=DB.ui.zoneFilter||'';const chip=(z,label,cls)=>`<button class="chip ${zf===z?'on':''} ${cls||''}" data-act="zfilter" data-z="${z}">${label}</button>`;
+  const list=[...livePairs(dv).sort((a,b)=>(b.a.r+b.b.r)-(a.a.r+a.b.r)),...dv.pairs.filter(p=>p.off)].filter(p=>!zf||p.zone===zf||(zf==='wc'&&p.wc));
+  return hd+`<div class="panel flat"><div class="tb"><h3 style="margin:0;font-size:14px">Состав</h3><span class="chips">${chip('','Все · '+livePairs(dv).length)}${chip('main',`Основная ${c.m}/${c.directCap}`,c.m>c.directCap?'bad':'')}${t.qual?chip('qual',`Квалификация ${c.q} · пройдут ${c.Q}`):''}${chip('wc',`WC ${c.wc}/${c.WC}`,c.wc>c.WC?'bad':'')}${chip('res',`Резерв ${c.r}`)}</span><span class="sp"></span><input class="in search" placeholder="Найти по фамилии" data-search="pairs">${edit?`<button class="btn sm" data-act="addpair">+ Добавить пару</button>`:''}</div>
+  ${list.length?list.map((p,i)=>pairRow(T(),dv,p,i+1,edit)).join(''):'<div class="row" style="grid-template-columns:1fr;color:var(--faint);font-size:13px">пар нет</div>'}</div>`+ft}
+function pairRow(t,dv,p,n,open){t=S_(t,dv);const locked=!open;const segDis=locked||p.off;
+  return `<div class="row ${p.off?'off':''}" data-pair="${p.id}"><span class="n">${n}</span><span class="nm"><b>${esc(p.a.n)}</b><small>${p.a.r}</small><span style="color:var(--faint)">/</span><b>${esc(p.b.n)}</b><small>${p.b.r}</small>${p.wc?'<span class="tag wc">WC</span>':''}${p.manual?'<span class="tag res">вручную</span>':''}</span><span class="rt">${p.a.r+p.b.r}</span>
+  <span class="seg">${[['main','Основная'],['qual','Квал.'],['res','Резерв']].filter(z=>z[0]!=='qual'||t.qual).map(z=>`<button class="${p.zone===z[0]?'on':''}" data-act="zone" data-id="${p.id}" data-z="${z[0]}" ${segDis?'disabled':''}>${z[1]}</button>`).join('')}</span>
+  <button class="wcb ${p.wc?'on':''}" data-act="wc" data-id="${p.id}" ${segDis?'disabled':''} title="Wild card организатора">WC</button>
+  ${locked?'<span></span>':p.off?`<button class="btn sm ic" data-act="restore" data-id="${p.id}" title="Вернуть пару">↺</button>`:`<button class="btn sm ic trash" data-act="withdraw" data-id="${p.id}" title="Снять пару">${ICO.trash}</button>`}</div>`}
+function byRating(t,dv){t=S_(t,dv);const list=livePairs(dv).sort((a,b)=>(b.a.r+b.b.r)-(a.a.r+a.b.r));const wcs=list.filter(p=>p.wc);const others=list.filter(p=>!p.wc);const direct=t.N-t.WC-(t.qual?t.Q:0);
+  wcs.forEach((p,i)=>p.zone=i<t.WC?'main':'res');others.forEach((p,i)=>{p.zone=i<direct?'main':(t.qual&&i<direct+Math.max(4,pow2up(others.length-direct)))?'qual':'res'});
+  if(t.qual){const q=others.filter(p=>p.zone==='qual');const M=q.length>=2?pow2up(q.length):0;if(M&&M!==q.length){q.slice(M/2).forEach(p=>p.zone='res')}}}
+function modalPair(divId){openModal(`<div class="sh"><h3>Добавить пару вручную<span class="q" data-t="Игроки ищутся по справочнику, рейтинг подтянется">?</span></h3><button class="x" data-act="close">×</button></div><div class="sb"><div class="grid2">${field('Игрок 1',`<input class="in" id="np1" placeholder="Фамилия Имя Отчество">`)}${field('Рейтинг',`<input class="in num" id="nr1" type="number" value="500">`)}${field('Игрок 2',`<input class="in" id="np2" placeholder="Фамилия Имя Отчество">`)}${field('Рейтинг',`<input class="in num" id="nr2" type="number" value="500">`)}</div>${field('Зона',sel('',[['main','Основная сетка'],['qual','Квалификация'],['res','Резерв']],'res','id="nz"'))}</div><div class="sf"><span class="sp">Пара помечается как добавленная вручную</span><button class="btn" data-act="close">Отмена</button><button class="btn primary" data-act="addpair-ok" ${divId?`data-div="${divId}"`:''}>Добавить</button></div>`)}
+function modalReplace(p,w){const pl=p[w];openModal(`<div class="sh"><h3>Заменить игрока<span class="q" data-t="Пара остаётся той же: матчи, корт и счёт не сдвинутся">?</span></h3><button class="x" data-act="close">×</button></div><div class="sb"><div class="alert hint">Сейчас в паре: <b style="margin-left:4px">${esc(pl.n)} (${pl.r})</b></div><div class="grid2">${field('Новый игрок',`<input class="in" id="rp" placeholder="Фамилия Имя Отчество">`)}${field('Рейтинг',`<input class="in num" id="rr" type="number" value="${pl.r}">`)}</div></div><div class="sf"><span class="sp"></span><button class="btn" data-act="close">Отмена</button><button class="btn primary" data-act="replace-ok" data-id="${p.id}" data-w="${w}">Заменить</button></div>`)}
+
+/* =====================================================================
+   Стадии 2 и 3: жеребьёвка квалификации и основной сетки
+   ===================================================================== */
+function drawSpec(t,dv,kind){t=S_(t,dv);if(kind==='q'){const P=zone(dv,'qual').length;const M=P>=2?pow2up(P):2;const R=log2(M)-log2(pow2up(t.Q));return {M,title:'Квалификация',roundName:P>=2?`${P} ${plural(P,'пара','пары','пар')} · сетка ${M}${M>P?` · ${M-P} ${plural(M-P,'пропуск','пропуска','пропусков')}`:''} · ${R} ${plural(R,'тур','тура','туров')} · пройдут ${t.Q}`:'',ok:P>=2&&P>t.Q}}
+  return {M:t.N,title:'Основная сетка',roundName:`1/${t.N/2} финала · ${t.N} позиций`,ok:true}}
+function drawPool(t,dv,kind){t=S_(t,dv);if(kind==='q')return zone(dv,'qual').map(p=>({k:'pair',id:p.id}));const pool=zone(dv,'main').map(p=>({k:'pair',id:p.id}));if(hasQual(t,dv))for(let i=1;i<=t.Q;i++)pool.push({k:'q',n:i});return pool}
+function refKey(r){return r.k==='pair'?'p:'+r.id:'q:'+r.n}
+function refLabel(t,dv,r,full){if(!r)return null;if(r.k==='pair'){const p=dv.pairs.find(x=>x.id===r.id);return p?(full?pairShort(p):pairName(p)):'—'}if(r.k==='q'){const w=dv.qualWinners[r.n-1];if(w){const p=dv.pairs.find(x=>x.id===w);return p?(full?pairShort(p):pairName(p)):'—'}return `Победитель квалификации №${r.n}`}return '—'}
+function stageDraw(t,dv,kind){if(kind==='q'&&!hasQual(t,dv))return stageHead('Жеребьёвка квалификации','не нужна',`<span class="hint">в дивизионе «${esc(dv.name)}» пар в квалификации нет</span>`,`<button class="btn go" data-act="draw-fix" data-k="q" ${drawReady(T(),'q')?'':'disabled'}>Зафиксировать жеребьёвку →</button>`)+`<div class="empty">Квалификация в этом дивизионе не проводится. Зафиксируйте жеребьёвку в дивизионах, где она есть</div>`;
+  const dr=kind==='q'?dv.drawQ:dv.drawM;const spec=drawSpec(t,dv,kind);const pool=drawPool(t,dv,kind);if(dr.slots.length!==spec.M){dr.slots=Array(spec.M).fill(null);dr.done=false}
+  const placed=new Set(dr.slots.filter(Boolean).map(refKey));const wait=pool.filter(r=>!placed.has(refKey(r)));const n=dr.slots.filter(Boolean).length;const selKey=DB.ui.sel;
+  const ready=drawReady(T(),kind);const hd=stageHead(kind==='q'?'Жеребьёвка квалификации':'Жеребьёвка основной сетки',dr.done?'завершена':'идёт','',dr.done?'':`<button class="btn go" data-act="draw-fix" data-k="${kind}" ${ready?'':'disabled'} title="${ready?'':'Расставьте все пары во всех дивизионах'}">Зафиксировать жеребьёвку →</button>`);
+  const ft='';
+  const waitRows=wait.map(r=>{const key=refKey(r);const p=r.k==='pair'?dv.pairs.find(x=>x.id===r.id):null;return `<div class="wp ${key===selKey?'sel':''} ${r.k==='q'?'ph':''}" draggable="${dr.done?'false':'true'}" data-act="draw-sel" data-key="${key}">${p?`${esc(pairShort(p))}${p.wc?' <span class="tag wc">WC</span>':''}<span class="r">${p.a.r+p.b.r}</span>`:`${refLabel(t,dv,r)}<span class="tag q">Q</span>`}</div>`}).join('');
+  const slots=[];for(let i=0;i<spec.M;i+=2){slots.push(`<div class="pair">${[i,i+1].map(j=>{const r=dr.slots[j];const lbl=r?refLabel(t,dv,r,true):null;const p=r&&r.k==='pair'?dv.pairs.find(x=>x.id===r.id):null;
+    return `<div class="pos"><span class="n">${j+1}</span><span class="s ${r?'f':''} ${r&&r.k==='q'?'ph':''} ${!r&&selKey&&!dr.done?'can':''}" data-act="draw-put" data-i="${j}" data-k="${kind}"><span class="nm">${lbl||'свободно'}</span>${p&&p.wc?'<span class="tag wc">WC</span>':''}${r&&!dr.done?`<button class="x" data-act="draw-del" data-i="${j}" data-k="${kind}" title="Убрать">×</button>`:''}</span></div>`}).join('')}</div>`)}
+  return hd+`<div class="dcols"><div class="panel flat" style="margin:0"><div class="panel-h"><h3>Ждут жеребьёвки</h3><span class="hint">${wait.length} из ${pool.length}</span></div>${waitRows||'<div class="empty" style="margin:12px">Все пары расставлены</div>'}</div>
+  <div class="panel flat ${dr.done?'ro':''}" style="margin:0"><div class="panel-h"><h3>${spec.title}</h3><span class="hint">${spec.roundName}</span></div><div class="slots">${slots.join('')}</div></div></div>`+ft}
+function fixDraw(t,dv,kind){const dr=kind==='q'?dv.drawQ:dv.drawM;if(!dr.slots.length)return;dr.done=true;dv.matches=dv.matches.filter(m=>m.stage!==(kind==='q'?'qual':'main'));genMatches(t,dv,kind);DB.ui.sel=null}
+function resetDraw(t,dv,kind){const dr=kind==='q'?dv.drawQ:dv.drawM;dr.done=false;dr.slots=dr.slots.map(()=>null);dv.matches=dv.matches.filter(m=>m.stage!==(kind==='q'?'qual':'main'));if(kind==='q'){dv.qualDone=false;dv.qualWinners=[]}else dv.mainDone=false}
+
+/* =====================================================================
+   Матчи: генерация сеток, разрешение ссылок, расписание, счёт
+   ===================================================================== */
+function mkMatch(stage,br,r,i,label,a,b){return {id:uid(),stage,br,r,i,label,num:i+1,a,b,court:null,day:null,tm:'at',time:'',judge:'',sets:[],winner:null,fin:'normal',done:false}}
+function roundName(size){return size===1?'Финал':size===2?'1/2 финала':`1/${size} финала`}
+function refExists(dv,ref){if(!ref)return false;if(ref.k==='pair'||ref.k==='q')return true;const m=dv.matches.find(x=>x.id===ref.m);if(!m)return false;if(!m.bye)return true;return ref.k==='w'?!!m.winner:false}
+function settleByes(dv){let changed=true;while(changed){changed=false;dv.matches.forEach(m=>{if(m.done)return;const ea=refExists(dv,m.a),eb=refExists(dv,m.b);if(ea&&eb)return;m.bye=true;m.done=true;m.sets=[];m.fin='bye';m.winner=ea?'a':eb?'b':null;changed=true})}}
+function genMatches(t,dv,kind){t=S_(t,dv);
+  if(kind==='q'){const slots=dv.drawQ.slots;const P=slots.length;const R=log2(pow2up(P))-log2(pow2up(t.Q));let prev=[];
+    for(let r=0;r<R;r++){const cnt=P/Math.pow(2,r+1);const cur=[];const lbl=R===1?'Квалификация · решающий тур':r===R-1?`Квалификация · ${r+1}-й тур, решающий`:`Квалификация · ${r+1}-й тур`;
+      for(let i=0;i<cnt;i++){const a=r===0?slots[2*i]:{k:'w',m:prev[2*i].id},b=r===0?slots[2*i+1]:{k:'w',m:prev[2*i+1].id};cur.push(mkMatch('qual','U',r,i,lbl,a,b))}dv.matches.push(...cur);prev=cur}settleByes(dv);return}
+  const slots=dv.drawM.slots;const N=slots.length;const R=log2(N);let prev=[];const rounds=[];
+  for(let r=0;r<R;r++){const cnt=N/Math.pow(2,r+1);const cur=[];for(let i=0;i<cnt;i++){const a=r===0?slots[2*i]:{k:'w',m:prev[2*i].id},b=r===0?slots[2*i+1]:{k:'w',m:prev[2*i+1].id};cur.push(mkMatch('main','U',r,i,roundName(cnt),a,b))}dv.matches.push(...cur);rounds.push(cur);prev=cur}
+  if(t.fin.third&&R>=2){const sf=rounds[R-2];dv.matches.push(mkMatch('main','T',R-1,0,'Матч за 3-е место',{k:'l',m:sf[0].id},{k:'l',m:sf[1].id}))}
+  if(t.fin.type==='UO2'&&R>=3){let cur=rounds[0].map(m=>({k:'l',m:m.id}));let r=0;while(cur.length>=2){const cnt=cur.length/2;const lbl=cnt===1?'Матч за 5-е место':`Нижняя сетка · ${r+1}-й круг`;const ms=[];for(let i=0;i<cnt;i++)ms.push(mkMatch('main',cnt===1?'T5':'L',r,i,lbl,cur[2*i],cur[2*i+1]));dv.matches.push(...ms);cur=ms.map(m=>({k:'w',m:m.id}));r++}}
+  settleByes(dv);
+}
+function resolve(t,dv,ref){if(!ref)return {p:null,text:'—'};if(ref.k==='pair'){const p=dv.pairs.find(x=>x.id===ref.id);return {p,text:p?pairName(p):'—'}}
+  if(ref.k==='q'){const w=dv.qualWinners[ref.n-1];if(w){const p=dv.pairs.find(x=>x.id===w);return {p,text:p?pairName(p):'—'}}return {p:null,text:`победитель квалификации №${ref.n}`}}
+  const m=dv.matches.find(x=>x.id===ref.m);if(!m)return {p:null,text:'—'};if(m.done&&m.winner){const side=ref.k==='w'?m.winner:(m.winner==='a'?'b':'a');if(m.bye&&side!==m.winner)return {p:null,text:'—'};return resolve(t,dv,m[side])}if(m.bye)return {p:null,text:'—'};
+  return {p:null,text:`${ref.k==='w'?'победитель':'проигравший'}: ${m.label.toLowerCase()} · матч ${m.num}`}}
+function dayList(t){const n=daysBetween(t.start,t.end);const out=[];for(let i=0;i<n;i++)out.push({i:i+1,iso:addDays(t.start,i)});return out}
+function courtList(t){const out=[];for(let c=1;c<=(+t.courts||0);c++)out.push({n:c,v:1,c,name:`Корт ${c}`});return out}
+const SLOTS=['10:00','11:30','13:00','14:30','16:00','17:30','19:00'];
+function autoTime(t,dv,stage){const days=dayList(t),courts=courtList(t);if(!courts.length)return toast('Сначала укажите число кортов в настройках');const ms=dv.matches.filter(m=>m.stage===stage&&!m.done&&!m.bye);
+  const startDay=stage==='main'&&hasQual(t,dv)?Math.min(2,days.length):1;let cur={d:startDay,s:0,c:0};const brOrder={U:0,L:1,T:2,T5:3};
+  const groups={};ms.forEach(m=>{const k=m.r+'-'+brOrder[m.br];(groups[k]=groups[k]||[]).push(m)});
+  Object.keys(groups).sort((a,b)=>{const [ra,ba]=a.split('-').map(Number),[rb,bb]=b.split('-').map(Number);return ra-rb||ba-bb}).forEach(k=>{if(cur.c!==0){cur.c=0;cur.s++}
+    groups[k].forEach(m=>{if(cur.s>=SLOTS.length){cur.s=0;cur.d=Math.min(days.length,cur.d+1)}m.court=courts[cur.c].n;m.day=cur.d;m.time=SLOTS[cur.s];m.tm='at';cur.c++;if(cur.c>=courts.length){cur.c=0;cur.s++}})});
+  toast(`Расставлено: ${ms.length} ${plural(ms.length,'матч','матча','матчей')}`)}
+function judgeOptions(t){const all=[...JUDGES_FPR,...t.judgesLocal].filter(j=>t.judges.includes(j.id));return [['','судья —'],...all.map(j=>[j.id,j.n.split(' ').slice(0,2).join(' ')])]}
+function scoreStr(m,side){if(!m.done)return '';return m.sets.map(s=>s[side==='a'?0:1]).join(' ')}
+function matchCard(t,dv,m,opts={}){const A=resolve(t,dv,m.a),B=resolve(t,dv,m.b);const ready=A.p&&B.p;const days=dayList(t),courts=courtList(t);const locked=opts.locked;
+  const cls=s=>m.done?(m.winner===s?'w':'l'):'';const finTxt={normal:'',retire:' · отказ',wo:' · неявка',bye:' · без игры'}[m.fin]||'';
+  return `<div class="mc ${m.done?'done':''}" data-m="${m.id}"><div class="h"><span class="dr">⠿</span>${esc(m.label)} · матч ${m.num}<span class="st ${m.done?'ok':''}">${m.done?'сыгран'+finTxt:ready?'не сыгран':'ждёт соперников'}</span></div>
+  <div class="p"><span class="t ${A.p?'':'ph'} ${cls('a')}">${esc(A.text)}</span><span class="sc"><b>${scoreStr(m,'a')}</b></span><span class="t ${B.p?'':'ph'} ${cls('b')}">${esc(B.text)}</span><span class="sc"><b>${scoreStr(m,'b')}</b></span></div>
+  ${locked?`<div class="c" style="color:var(--muted);font-size:12.5px">${m.court?`Корт ${m.court}${m.day?' · день '+m.day:''}${m.time?' · '+m.time:''}`:'без расписания'}${m.judge?' · судья: '+esc((judgeOptions(t).find(j=>j[0]===m.judge)||['',''])[1]):''}</div>`:`<div class="c">${sel(`m.${m.id}.court`,[['','корт —'],...courts.map(c=>[c.n,c.name.toLowerCase()])],m.court)}${sel(`m.${m.id}.day`,[['','день —'],...days.map(d=>[d.i,`день ${d.i} · ${fmtD(d.iso)}`])],m.day)}${sel(`m.${m.id}.tm`,[['at','начало в'],['after','не ранее'],['next','затем']],m.tm)}${m.tm==='next'?'':`<input class="in time" type="time" data-bind="m.${m.id}.time" value="${m.time}">`}${sel(`m.${m.id}.judge`,judgeOptions(t),m.judge,'class="sel j"')}
+  ${m.done?`<button class="btn sm" data-act="score" data-m="${m.id}">Изменить счёт</button>`:`<button class="btn sm go" data-act="score" data-m="${m.id}" ${ready?'':'disabled'}>Ввести счёт</button>`}</div>${DB.ui.scoreOpen===m.id?scoreEditor(t,dv,m):''}`}</div>`}
+function scoreEditor(t,dv,m){const A=resolve(t,dv,m.a),B=resolve(t,dv,m.b);const rules=rulesFor(t,dv,m.stage);const maxSets=2*(+rules.sets)-1;const sets=[];for(let i=0;i<maxSets;i++)sets.push(m.sets[i]||['','']);
+  const hd=sets.map((x,i)=>`<span class="hd">${i===maxSets-1&&rules.dec==='stb'?'Супер-ТБ':'Сет '+(i+1)}</span>`).join('');
+  const row=(x,side)=>`<span class="who">${esc(x.text)}</span>${sets.map((st,i)=>`<input type="number" min="0" max="${i===maxSets-1&&rules.dec==='stb'?30:+rules.games+1}" data-set="${i}" data-side="${side}" value="${st[side]}">`).join('')}`;
+  return `<div class="sced"><div class="sets" id="sets" style="grid-template-columns:1fr repeat(${maxSets},56px)"><span></span>${hd}${row(A,0)}${row(B,1)}</div>
+  <div class="inl">${sel('',[['normal','обычное завершение'],['retire','отказ, снятие пары'],['wo','неявка']],m.fin,'id="sfin" style="width:auto"')}${sel('',[['','победитель по счёту'],['a',A.text],['b',B.text]],m.fin==='normal'?'':m.winner,'id="swin" style="width:auto;max-width:260px"')}<span class="wline" id="wline" style="flex:1"></span><button class="btn sm" data-act="score-cancel">Отмена</button><button class="btn sm primary" data-act="score-save" data-m="${m.id}">Сохранить</button></div></div>`}
+function stagePlay(t,dv,stage){if(stage==='qual'&&!hasQual(t,dv))return stageHead('Квалификация','не нужна',`<span class="hint">в дивизионе «${esc(dv.name)}» квалификации нет</span>`,`<button class="btn go" data-act="finish-stage" data-s="qual" ${playReady(T(),'qual')?'':'disabled'}>Завершить квалификацию →</button>`)+`<div class="empty">Квалификация в этом дивизионе не проводится</div>`;
+  const ms=dv.matches.filter(m=>m.stage===stage&&!m.bye);const done=ms.filter(m=>m.done).length;const all=ms.length&&done===ms.length;const finished=stage==='qual'?dv.qualDone:dv.mainDone;
+  const view=DB.ui.view[stage]||'sched';const days=dayList(t);const firstDay=(ms.filter(m=>m.day).sort((a,b)=>a.day-b.day)[0]||{}).day;const day=DB.ui.day[stage]||firstDay||1;const courts=courtList(t);const todayMs=ms.filter(m=>m.day===day).length;
+  const title=stage==='qual'?'Квалификация':'Основной турнир';
+  const ready=playReady(T(),stage);const hd=stageHead(title,finished?(stage==='qual'?'завершена':'завершён'):'идёт','',finished?'':`<button class="btn go" data-act="finish-stage" data-s="${stage}" ${ready?'':'disabled'} title="${ready?'':'Введите счёт всех матчей во всех дивизионах'}">${stage==='qual'?'Завершить квалификацию →':'Завершить турнир →'}</button>`);
+  const ft='';
+  const tb=`<div class="tb" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px"><span class="seg lg"><button class="${view==='sched'?'on':''}" data-act="view" data-s="${stage}" data-v="sched">Расписание</button><button class="${view==='brk'?'on':''}" data-act="view" data-s="${stage}" data-v="brk">Сетка</button></span>${!finished&&view==='sched'?`<button class="btn" data-act="autotime" data-s="${stage}">${ICO.bolt} Расставить время автоматом</button>`:''}
+<span class="sp"></span><input class="in search" placeholder="Найти по фамилии" data-search="mc"></div>`;
+  const daysRow=`<div class="divsw" style="margin:0 0 14px"><span class="lbl">День</span><span class="days">${days.map(d=>`<button class="${d.i===day?'on':''}" data-act="day" data-s="${stage}" data-d="${d.i}"><b>${d.i}-й</b><span>${fmtD(d.iso).toUpperCase()}</span></button>`).join('')}</span></div>`;
+  let body='';
+  if(view==='sched'){const noSched=ms.filter(m=>!m.court||!m.day);const byTime=(a,b)=>(a.time||'99').localeCompare(b.time||'99');
+    body=daysRow+`<div class="courts3" style="--nc:${Math.max(1,courts.length)}">${courts.map(c=>{const list=ms.filter(m=>m.court===c.n&&m.day===day).sort(byTime);return `<div><div class="ch">${c.name.toUpperCase()}<span>${list.length?list.length+' '+plural(list.length,'матч','матча','матчей'):''}</span></div>${list.map(m=>matchCard(t,dv,m,{locked:finished})).join('')||'<div class="emptyc">В этот день матчей на корте нет</div>'}</div>`}).join('')||'<div class="empty">Укажите число кортов в настройках турнира</div>'}</div>
+    <div class="nos">Без расписания · ${noSched.length}</div>${noSched.length?`<div class="gridm">${noSched.map(m=>matchCard(t,dv,m,{locked:finished})).join('')}</div>`:'<div class="empty">Все матчи стоят в расписании</div>'}`}
+  else body=bracketView(t,dv,stage,ms);
+  return hd+tb+body+ft}
+function bracketView(t,dv,stage,ms){ms=dv.matches.filter(m=>m.stage===stage);const H0=104;
+  const box=m=>{const A=resolve(t,dv,m.a),B=resolve(t,dv,m.b);const l=(x,side)=>`<div class="l ${x.p?'':'ph'} ${m.done&&!m.bye?(m.winner===side?'w':'lo'):''}"><span class="nm">${esc(x.text)}</span><span>${scoreStr(m,side)}</span></div>`;
+    return `<div class="bm ${m.done?'done':''} ${m.bye?'bye':''}"><div class="k">МАТЧ ${m.num}${m.bye?' · без игры':m.court?` · корт ${m.court}${m.day?', день '+m.day:''}${m.time?' '+m.time:''}`:''}</div>${l(A,'a')}${l(B,'b')}</div>`};
+  const col=(list,r)=>`<div class="bcol"><div class="rh">${esc(list[0].label)}</div>${list.map(m=>`<div class="bslot" style="height:${H0*Math.pow(2,r)}px">${box(m)}</div>`).join('')}</div>`;
+  const rows=(br)=>{const g={};ms.filter(m=>br.includes(m.br)).forEach(m=>(g[m.r]=g[m.r]||[]).push(m));return Object.keys(g).sort((a,b)=>a-b).map((r,i)=>col(g[r],i))};
+  const U=rows(['U']),Tm=ms.filter(m=>m.br==='T'),L=rows(['L','T5']);
+  return `<div class="panel"><div class="brk">${stage==='main'&&L.length?'<h4>Верхняя сетка</h4>':''}<div class="brow">${U.join('')}${Tm.length?col(Tm,U.length-1):''}</div>${L.length?`<h4>Нижняя сетка</h4><div class="brow">${L.join('')}</div>`:''}</div></div>`}
+function rulesFor(t,dv,stage){const src=(!t.sameDivs&&t.rulesDiv&&dv&&t.rulesDiv[dv.code])||t;if(src.sameRules)return src.rules;const k=stage==='qual'?'qual':'fin';return src.rulesPer[k]||src.rules}
+function setsWinner(sets,rules){let a=0,b=0;sets.forEach(s=>{if(s[0]==null||s[1]==null||(s[0]===''||s[1]===''))return;if(+s[0]>+s[1])a++;else if(+s[1]>+s[0])b++});if(a>=+rules.sets)return 'a';if(b>=+rules.sets)return 'b';return null}
+function modalScore(t,dv,m){const A=resolve(t,dv,m.a),B=resolve(t,dv,m.b);const rules=rulesFor(t,dv,m.stage);const maxSets=2*(+rules.sets)-1;const sets=[];for(let i=0;i<maxSets;i++)sets.push(m.sets[i]||['','']);
+  openModal(`<div class="sh"><h3>Счёт матча</h3><span class="hint">${esc(m.label)} · матч ${m.num} · итог по сетам</span><button class="x" data-act="close">×</button></div><div class="sb">
+  <div class="sets" id="sets"><span></span>${sets.map((s,i)=>`<span class="hd">${i===maxSets-1&&rules.dec==='stb'?'Супер-ТБ':'Сет '+(i+1)}</span>`).join('')}
+  <span class="who">${esc(A.text)}</span>${sets.map((s,i)=>`<input type="number" min="0" max="${i===maxSets-1&&rules.dec==='stb'?30:+rules.games+1}" data-set="${i}" data-side="0" value="${s[0]}">`).join('')}
+  <span class="who">${esc(B.text)}</span>${sets.map((s,i)=>`<input type="number" min="0" max="${i===maxSets-1&&rules.dec==='stb'?30:+rules.games+1}" data-set="${i}" data-side="1" value="${s[1]}">`).join('')}</div>
+  <div class="grid2">${field('Завершение',sel('',[['normal','обычное завершение'],['retire','отказ, снятие пары'],['wo','неявка']],m.fin,'id="sfin"'))}${field('Победитель',sel('',[['','по счёту'],['a',A.text],['b',B.text]],m.fin==='normal'?'':m.winner,'id="swin"'))}</div>
+  <div class="wline" id="wline"></div></div>
+  <div class="sf"><span class="sp">${esc(rulesText(rules))}</span><button class="btn" data-act="close">Отмена</button><button class="btn primary" data-act="score-save" data-m="${m.id}">Завершить матч</button></div>`);
+  updWinLine();}
+function readSets(){const inputs=[...document.querySelectorAll('#sets input')];const sets={};inputs.forEach(i=>{const k=+i.dataset.set;(sets[k]=sets[k]||['',''])[+i.dataset.side]=i.value===''?'':+i.value});return Object.keys(sets).sort().map(k=>sets[k]).filter(s=>s[0]!==''||s[1]!=='')}
+function updWinLine(){const t=T(),dv=D(t);const mid=document.querySelector('[data-act="score-save"]')?.dataset.m;const m=dv.matches.find(x=>x.id===mid);if(!m)return;const rules=rulesFor(t,dv,m.stage);const sets=readSets();const fin=document.getElementById('sfin').value;const force=document.getElementById('swin').value;
+  const w=force||setsWinner(sets,rules);const A=resolve(t,dv,m.a),B=resolve(t,dv,m.b);document.getElementById('wline').innerHTML=w?`Победитель: <b>${esc(w==='a'?A.text:B.text)}</b>${fin!=='normal'?' · '+({retire:'отказ соперника',wo:'неявка соперника'})[fin]:''}`:`Счёт не определяет победителя: нужно ${rules.sets} ${plural(+rules.sets,'выигранный сет','выигранных сета','выигранных сетов')}`;
+  document.querySelectorAll('#sets input').forEach(i=>{const s=sets[+i.dataset.set];i.classList.toggle('ok',!!(s&&s[0]!==''&&s[1]!==''&&+s[+i.dataset.side]>+s[1-i.dataset.side]))})}
+function saveScore(t,dv,m){const rules=rulesFor(t,dv,m.stage);const sets=readSets();const fin=document.getElementById('sfin').value;const force=document.getElementById('swin').value;const w=force||setsWinner(sets,rules);if(!w){toast('Счёт не определяет победителя');return false}
+  m.sets=sets;m.fin=fin;m.winner=w;m.done=true;return true}
+function finishStage(t,dv,stage){if(stage==='qual'){const last=Math.max(...dv.matches.filter(m=>m.stage==='qual').map(m=>m.r));dv.qualWinners=dv.matches.filter(m=>m.stage==='qual'&&m.r===last).sort((a,b)=>a.i-b.i).map(m=>{const r=resolve(t,dv,m[m.winner]);return r.p?r.p.id:null});dv.qualDone=true}else dv.mainDone=true}
+
+/* =====================================================================
+   Настройки турнира: те же секции, что шаги визарда
+   ===================================================================== */
+function pageSettings(t){const anyLocked=t.divisions.some(d=>d.drawQ.done||d.drawM.done);const multi=t.divisions.length>1;
+  const sec=(n,title)=>`<div class="sec-h"><b>${n}</b>${title}</div>`;
+  /* 1. основные настройки */
+  const s1=sec(1,'Основные настройки')+`<div class="panel"><div class="panel-h"><h3>О турнире</h3></div><div class="panel-b"><div class="form">
+    ${field('Название',`<input class="in" data-bind="t.name" value="${esc(t.name)}">`)}
+    <div class="grid4">${field('Категория',sel('t.cat',CATS,t.cat))}${multi?'':field('Состав',sel('t.divisions.0.kind',DIVK,t.divisions[0].kind),'От пола зависит, каким аккаунтом ЕЦП загружаются заявки')}${field('Начало',`<input class="in mono" type="date" data-bind="t.start" value="${t.start}">`)}${field('Окончание',`<input class="in mono" type="date" data-bind="t.end" value="${t.end}">`,'Правка дат потребует подтверждения: расписание уже стоит по дням')}</div>
+    ${multi?`<div class="field"><label>Дивизионы<span class="q" data-t="Название и состав дивизиона. Добавить или удалить дивизион после создания нельзя: вместе с ним удалились бы матчи">?</span></label>${t.divisions.map((d,i)=>`<div class="inl" style="margin-bottom:8px"><span class="chip" style="width:38px;justify-content:center">${DIVB[d.kind]}</span><input class="in" style="max-width:320px" data-bind="t.divisions.${i}.name" value="${esc(d.name)}">${sel(`t.divisions.${i}.kind`,DIVK,d.kind,'style="width:200px"')}<span class="hint" style="color:var(--muted);font-size:12.5px">${livePairs(d).length} ${plural(livePairs(d).length,'пара','пары','пар')}</span></div>`).join('')}</div>`:''}
+  </div></div></div>
+  <div class="panel"><div class="panel-h"><h3>Корты и площадки<span class="q" data-t="Число кортов задаёт колонки расписания и адреса экранов кортов. Площадка не обязательна">?</span></h3></div><div class="panel-b"><div class="form">
+    ${field('Число кортов',`<input class="in num" type="number" min="1" max="12" data-bind="t.courts" value="${t.courts}">`)}
+    ${field('Площадки',`<div class="inl"><input class="in" data-bind="t.vq" value="${esc(t.vq||'')}" placeholder="Начните вводить название клуба или города…"><button class="btn" data-act="addvenue-t">Добавить</button></div>`,'Первая площадка стоит в шапке турнира')}
+    ${t.venues.map((v,i)=>`<div class="vrow"><span class="b">${esc(v.name[0])}</span><span class="t"><b>${esc(v.name)}</b><span>${esc(v.city)}</span></span><button class="btn xs ic" data-act="delvenue-t" data-i="${i}">×</button></div>`).join('')}
+  </div></div></div>
+  ${judgesPanel(t)}
+  <div class="panel"><div class="panel-h"><h3>Описание и регламент<span class="q" data-t="Публикуются в разделе «Регламент» витрины">?</span></h3></div><div class="panel-b"><div class="form">
+    ${field('Описание',`<textarea class="ta" data-bind="t.desc">${esc(t.desc)}</textarea>`)}${field('Полный регламент',`<div class="inl"><input class="in" data-bind="t.reg" value="${esc(t.reg)}" placeholder="https://…">${t.regPdf?`<span class="chip x">${esc(t.regPdf)}<button data-act="delpdf">×</button></span>`:''}<button class="btn" data-act="pdf">${t.regPdf?'Другой PDF':'Загрузить PDF'}</button></div>`,'Ссылка на страницу или PDF до 10 МБ')}
+    ${field('Цветовая схема',`<div class="inl">${sel('t.color',[['green','Зелёная'],['blue','Голубая'],['red','Красная'],['dark','Тёмная']],t.color)}<button class="btn" data-act="preview-color">Как это выглядит</button></div>`,'Цвета витрины, ТВ-табло и табло жеребьёвки')}
+  </div></div></div>`;
+  /* 2. тип турнира */
+  const s2=sec(2,'Тип турнира')+t.divisions.map((d,i)=>{const st=d.struct||t;const lk=d.drawQ.done||d.drawM.done;const bp=`t.divisions.${i}.struct`;return `<div class="panel ${lk?'locked':''}"><div class="panel-h"><h3>Настройки этапов${multi?' · '+esc(d.name):''}</h3><span class="hint">${lk?'зафиксированы жеребьёвкой':esc(formula(st))}</span></div><div class="panel-b"><div class="form">
+    ${field('Тип финального этапа',`<div class="in" style="display:flex;align-items:center;gap:8px;font-weight:600;max-width:520px"><span>${TYPES[st.fin.type].name}</span><span style="font-family:var(--mono);font-size:11px;color:var(--accent-line)">${TYPES[st.fin.type].code}</span></div>`,'Тип фиксируется при создании: от него зависит вся структура',{cls:'locked'})}
+    <div class="grid3">${field('Пар в основной сетке',sel(bp+'.N',[4,8,16,32,64],st.N,lk?'disabled':''),'',{cls:lk?'locked':''})}${field('Через квалификацию Q',`<input class="in" type="number" min="0" data-bind="${bp}.Q" value="${st.Q}" ${lk||!st.qual?'disabled':''}>`,'',{cls:lk?'locked':''})}${field('Приглашения WC',`<input class="in" type="number" min="0" data-bind="${bp}.WC" value="${st.WC}" ${lk?'disabled':''}>`,'',{cls:lk?'locked':''})}</div>
+    <div class="grid2">${field('Квалификация',sel(bp+'.qual',[['true','разрешена'],['false','нет']],String(st.qual),lk?'disabled':''),'Проводится только при переборе заявок',{cls:lk?'locked':''})}${field('Матч за 3-е место',sel(bp+'.fin.third',[['true','разыгрывается'],['false','не разыгрывается']],String(st.fin.third),lk?'disabled':''),'',{cls:lk?'locked':''})}</div>
+    ${structure(st).errors.map(e=>`<div class="alert err">${esc(e.msg)}</div>`).join('')}</div></div></div>`}).join('');
+  /* 3. настройки матчей */
+  const rl=(t.sameDivs===false&&multi?t.divisions.map(d=>({name:d.name,r:t.rulesDiv&&t.rulesDiv[d.code]||t})):[{name:'',r:t}]);
+  const s3=sec(3,'Настройки матчей')+`<div class="panel"><div class="panel-h"><h3>Правила счёта</h3></div><div class="panel-b"><div class="form">${rl.map(x=>field('Правила'+(x.name?' · '+esc(x.name):''),`<div class="inl"><div class="in" style="display:flex;align-items:center;font-weight:500;color:var(--muted);font-size:13px;max-width:640px">${esc(rulesText(x.r.rules))}${x.r.sameRules?'':' · свои по этапам'}</div><button class="btn" data-act="rules-edit">Изменить…</button></div>`,'Правка потребует подтверждения, если матчи уже сыграны')).join('')}</div></div></div>`;
+  /* 4. участники */
+  const s4=sec(4,'Участники')+`<div class="panel"><div class="panel-h"><h3>Приём заявок<span class="q" data-t="Пока идёт приём, состав обновляется из ЕЦП каждые 10 минут. Ручные пары и распределение — на стадии «Приём заявок»">?</span></h3></div><div class="panel-b"><div class="form">
+    ${t.divisions.map((d,i)=>field(`Заявки ЕЦП${multi?' · '+esc(d.name):''}`,`<input class="in mono" data-bind="t.divisions.${i}.ecp" value="${esc(d.ecp)}" placeholder="sb.padelrus.ru/tournaments/…/applications">`)).join('')}
+    ${field('Приём заявок до',`<input class="in mono" type="datetime-local" data-bind="t.deadline" value="${t.deadline||''}">`,'Московское время')}</div></div></div>`;
+  /* дополнительно */
+  const s5=sec('•','Дополнительно')+`  <div class="panel"><div class="panel-h"><h3>Спонсоры<span class="q" data-t="Брендирование витрины, ТВ-табло и табло жеребьёвки">?</span></h3></div><div class="panel-b"><div class="form">
+    <div class="grid2">${field('Главный спонсор',sel('t.sponsors.main',[['','Отсутствует'],['fonbet','Fonbet'],['vvf','V.V Финанс']],t.sponsors.main))}${field('Подложка главного спонсора',sel('t.sponsors.plate',[['default','Плашка · по умолчанию'],['white','Белая'],['brand','Цвет спонсора']],t.sponsors.plate))}${field('Вывод на ТВ-табло',sel('t.sponsors.tv',[['corner','Угловая плашка'],['footer','Футер'],['break','Заставка в перерыве']],t.sponsors.tv))}</div>
+    <label class="trow"><button class="toggle ${t.sponsors.wm?'on':''}" data-toggle="t.sponsors.wm"></button><b>Водяной знак на ТВ-табло</b></label>
+  </div></div></div>
+  <div class="panel"><div class="panel-h"><h3>Удаление турнира<span class="q" data-t="Пары, сетка и результаты удаляются безвозвратно, публичные ссылки перестанут работать">?</span></h3><span class="r"><button class="btn danger sm" data-act="delete-t">Удалить турнир…</button></span></div></div>`;
+  return `<div class="tgrid"><div class="tmain settings-col">${s1}${s2}${s3}${s4}${s5}<div class="savebar"><span class="sp">${anyLocked?'Поля с замком заблокированы после жеребьёвки. ':''}Правка дат, мест и правил при сыгранных матчах запросит подтверждение</span><a class="btn" href="#/t">Отмена</a><button class="btn primary" data-act="save-settings">Сохранить изменения</button></div></div>${linksAside(t)}</div>`}
+function modalRules(t){openModal(`<div class="sh"><h3>Правила счёта</h3><button class="x" data-act="close">×</button></div><div class="sb"><label class="trow"><button class="toggle ${t.sameRules?'on':''}" data-toggle="t.sameRules"></button><b>Одинаковые для всех этапов</b></label>${rulesGrid('t.rules',t.rules)}</div><div class="sf"><span class="sp">Изменения применятся к несыгранным матчам</span><button class="btn primary" data-act="close">Готово</button></div>`)}
+function modalJudge(){openModal(`<div class="sh"><h3>Завести судью турнира<span class="q" data-t="Локальный судья: виден только вам. Аккредитованных судей ФПР добавляет администратор">?</span></h3><button class="x" data-act="close">×</button></div><div class="sb">${field('ФИО',`<input class="in" id="jn" placeholder="Фамилия Имя Отчество">`)}<div class="grid2">${field('Почта',`<input class="in" id="je" type="email" placeholder="judge@club.ru">`)}${field('Пароль',`<input class="in" id="jp" type="password" placeholder="для входа в судейский экран">`)}</div><div class="alert hint">Судья войдёт в судейский экран по почте и паролю. Аккредитованных судей ФПР добавляет администратор, они видны всем организаторам.</div></div><div class="sf"><span class="sp"></span><button class="btn" data-act="close">Отмена</button><button class="btn primary" data-act="judge-new-ok">Завести и закрепить</button></div>`)}
+
+/* =====================================================================
+   События и маршрутизация
+   ===================================================================== */
+function bindTarget(path){if(path.startsWith('wiz.'))return [DB.wiz,path.slice(4)];if(path.startsWith('t.'))return [T(),path.slice(2)];if(path.startsWith('div.'))return [D(),path.slice(4)];if(path.startsWith('m.')){const [,id,...rest]=path.split('.');return [D().matches.find(m=>m.id===id),rest.join('.')]}return [null,null]}
+function rerender(){route(true)}
+document.addEventListener('input',e=>{const el=e.target;if(el.closest('#sets')){updWinLine();return}if(el.dataset.search){const q=el.value.trim().toLowerCase();const sel_=el.dataset.search==='pairs'?'.row[data-pair]':'.mc';document.querySelectorAll(sel_).forEach(r=>r.hidden=q&&!r.textContent.toLowerCase().includes(q));return}
+  const b=el.dataset.bind;if(!b)return;const [o,p]=bindTarget(b);if(!o)return;let v=el.type==='checkbox'?el.checked:el.type==='number'?(el.value===''?'':+el.value):el.value;if(v==='true')v=true;if(v==='false')v=false;if(el.tagName==='SELECT'&&/^\d+$/.test(el.value))v=+el.value;setPath(o,p,v);save();
+  if(el.tagName==='SELECT'||el.type==='checkbox'||el.type==='number'||el.type==='date'||el.type==='datetime-local'||el.type==='time'){if(!el.closest('.modal'))rerender()}});
+document.addEventListener('change',e=>{const el=e.target;if(el.dataset.actChange==='judge-attach'&&el.value){judgeCtx().judges.push(el.value);save();rerender()}if(el.id==='sfin'||el.id==='swin')updWinLine()});
+document.addEventListener('click',e=>{const tg=e.target.closest('[data-toggle]');if(tg){const [o,p]=bindTarget(tg.dataset.toggle);if(o){setPath(o,p,!getPath(o,p));if(tg.dataset.toggle==='wiz.multiDiv'&&!DB.wiz.multiDiv){DB.wiz.divisions=DB.wiz.divisions.slice(0,1);DB.wiz.divSel=DB.wiz.divisions[0].id}save();if(tg.closest('.modal')){tg.classList.toggle('on')}else rerender()}return}
+  if(!e.target.closest('.menu'))document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open'));
+  const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act;const t=T(),dv=t?D(t):null;const w=DB.wiz;
+  const A={
+    reset(){e.preventDefault();confirmModal('Сбросить прототип?','Демо-турнир вернётся к стадии приёма заявок, созданные турниры удалятся.','Сбросить','reset-ok',true)},
+    'reset-ok'(){localStorage.removeItem(KEY);DB=seedDemo();save();closeModal();location.hash='#/tournaments';rerender()},
+    open(){e.preventDefault();DB.cur=el.dataset.id;save();location.hash='#/t'},
+    newwiz(){DB.wiz=defaultWiz();save()},
+    close(){closeModal()},
+    addvenue(){const q=(w.vq||'').trim();if(!q)return toast('Введите название клуба');w.venues.push({name:q,city:'Новосибирск'});w.vq='';save();rerender()},
+    delvenue(){w.venues.splice(+el.dataset.i,1);save();rerender()},
+    'addvenue-t'(){const q=(t.vq||'').trim();if(!q)return toast('Введите название клуба');t.venues.push({name:q,city:'Новосибирск'});t.vq='';save();rerender()},
+    'delvenue-t'(){t.venues.splice(+el.dataset.i,1);save();rerender()},
+    pdf(){if(t&&location.hash.includes('settings')){t.regPdf='РЕГЛАМЕНТ.pdf';save();rerender()}toast('В прототипе загрузка файла условная')},
+    delpdf(){t.regPdf='';save();rerender()},
+    'preview-color'(){toast('Откроется витрина в выбранной схеме')},
+    adddiv(){const src=wizCur(w).st;const id='d'+uid();w.divisions.push({id,kind:'m',name:'Дивизион '+(w.divisions.length+1),struct:JSON.parse(JSON.stringify(src))});w.divSel=id;save();rerender()},
+    deldiv(){if(w.divisions.length<=1)return;w.divisions=w.divisions.filter(d=>d.id!==el.dataset.d);w.divSel=w.divisions[0].id;save();rerender()},
+    picker(){openPicker()},
+    settype(){wizCur(w).st.fin.type=el.dataset.k;save();closeModal();rerender()},
+    seldiv(){w.divSel=el.dataset.d;save();rerender()},
+    copystruct(){const src=w.divisions.find(d=>d.id===el.dataset.d).struct;w.divisions.forEach(d=>{d.struct=JSON.parse(JSON.stringify(src))});save();rerender();toast('Настройки этапов скопированы во все дивизионы')},
+    create(){createTournament()},
+        copy(){copy(el.dataset.v)},
+    setdiv(){t.div=el.dataset.d;DB.ui.sel=null;save();rerender()},
+    sync(){if(!dv.ecp.trim())return toast('Укажите ссылку ЕЦП');if(!dv.pairs.length){dv.pairs=mkPairs(dv.kind==='w'?WOMEN:dv.kind==='x'?MIX:MEN)}dv.synced='только что';save();rerender();toast(`Загружено из ЕЦП: ${livePairs(dv).length} ${plural(livePairs(dv).length,'пара','пары','пар')}`)},
+    'close-apps'(){t.divisions.forEach(d=>d.apps='closed');save();rerender()},
+    'apps-done'(){t.divisions.forEach(d=>d.apps='done');save();location.hash='#/t/'+activeStage(t);rerender()},
+    'reopen-apps'(){t.divisions.forEach(d=>d.apps='open');save();rerender()},
+    zone(){const p=dv.pairs.find(x=>x.id===el.dataset.id);p.zone=el.dataset.z;save();rerender()},
+    wc(){const p=dv.pairs.find(x=>x.id===el.dataset.id);p.wc=!p.wc;save();rerender()},
+    menu(){el.closest('.menu').classList.toggle('open')},
+    replace(){modalReplace(dv.pairs.find(x=>x.id===el.dataset.id),el.dataset.w)},
+    'replace-ok'(){const p=dv.pairs.find(x=>x.id===el.dataset.id);const n=document.getElementById('rp').value.trim();if(!n)return toast('Введите ФИО');p[el.dataset.w]={n,r:+document.getElementById('rr').value||0};save();closeModal();rerender();toast('Игрок заменён, пара осталась в сетке')},
+    withdraw(){const p=dv.pairs.find(x=>x.id===el.dataset.id);p.off=true;save();rerender();toast('Пара снята: её следующий матч засчитается сопернику')},
+    restore(){const p=dv.pairs.find(x=>x.id===el.dataset.id);p.off=false;save();rerender()},
+    zfilter(){DB.ui.zoneFilter=el.dataset.z;save();rerender()},
+    byrating(){byRating(t,dv);save();rerender();toast('Состав распределён по сумме рейтинга')},
+    addpair(){modalPair()},
+    'addpair-ok'(){const n1=document.getElementById('np1').value.trim(),n2=document.getElementById('np2').value.trim();if(!n1||!n2)return toast('Введите обоих игроков');const target=el.dataset.div?((w.pairs=w.pairs||{}),(w.pairs[el.dataset.div]=w.pairs[el.dataset.div]||[])):dv.pairs;target.push({id:uid(),a:{n:n1,r:+document.getElementById('nr1').value||0},b:{n:n2,r:+document.getElementById('nr2').value||0},zone:document.getElementById('nz').value,wc:false,off:false,manual:true});save();closeModal();rerender()},
+    'wiz-addpair'(){modalPair(el.dataset.div)},
+    'wiz-delpair'(){w.pairs[el.dataset.div].splice(+el.dataset.i,1);save();rerender()},
+    'wiz-sync'(){const id=el.dataset.div;if(!(w.ecp[id]||'').trim())return toast('Укажите ссылку ЕЦП');const d=w.divisions.find(x=>x.id===id)||{kind:'m'};w.pairs=w.pairs||{};const manual=(w.pairs[id]||[]).filter(p=>p.manual);w.pairs[id]=[...mkPairs(d.kind==='w'?WOMEN:d.kind==='x'?MIX:MEN),...manual];save();rerender();toast(`Загружено из ЕЦП: ${w.pairs[id].length-manual.length} ${plural(w.pairs[id].length-manual.length,'пара','пары','пар')}`)},
+    'draw-sel'(){DB.ui.sel=DB.ui.sel===el.dataset.key?null:el.dataset.key;rerender()},
+    'draw-put'(){const kind=el.dataset.k;const dr=kind==='q'?dv.drawQ:dv.drawM;if(dr.done)return;const i=+el.dataset.i;if(dr.slots[i])return;const key=DB.ui.sel;if(!key)return toast('Сначала выберите пару слева');dr.slots[i]=key.startsWith('p:')?{k:'pair',id:key.slice(2)}:{k:'q',n:+key.slice(2)};DB.ui.sel=null;save();rerender()},
+    'draw-del'(){e.stopPropagation();const dr=el.dataset.k==='q'?dv.drawQ:dv.drawM;dr.slots[+el.dataset.i]=null;save();rerender()},
+    'draw-random'(){const kind=el.dataset.k;const dr=kind==='q'?dv.drawQ:dv.drawM;const placed=new Set(dr.slots.filter(Boolean).map(refKey));const wait=drawPool(t,dv,kind).filter(r=>!placed.has(refKey(r))).sort(()=>Math.random()-.5);dr.slots=dr.slots.map(s=>s||wait.shift()||null);DB.ui.sel=null;save();rerender()},
+    'draw-clear'(){const dr=el.dataset.k==='q'?dv.drawQ:dv.drawM;dr.slots=dr.slots.map(()=>null);save();rerender()},
+    'draw-fix'(){const k=el.dataset.k;t.divisions.filter(d=>k!=='q'||hasQual(t,d)).forEach(d=>fixDraw(t,d,k));save();location.hash='#/t/'+activeStage(t);rerender();toast('Жеребьёвка зафиксирована во всех дивизионах, матчи созданы')},
+    undo(){const k=el.dataset.s;confirmModal(UNDO_L[k]+'?',UNDO_T[k]+(t.divisions.length>1?' Действует сразу для всех дивизионов.':''),UNDO_L[k],'undo-ok',k!=='apps'&&k!=='main');document.querySelector('[data-act="undo-ok"]').dataset.s=k},
+    'undo-ok'(){const k=el.dataset.s;undoStage(t,k);save();closeModal();location.hash='#/t/'+k;rerender()},
+    'draw-reset'(){confirmModal('Сбросить жеребьёвку?','Матчи этой сетки удалятся вместе со счётом. Расстановку придётся сделать заново.','Сбросить','draw-reset-ok',true);document.querySelector('[data-act="draw-reset-ok"]').dataset.k=el.dataset.k},
+    'draw-reset-ok'(){resetDraw(t,dv,el.dataset.k);save();closeModal();rerender()},
+    view(){DB.ui.view[el.dataset.s]=el.dataset.v;save();rerender()},
+    day(){DB.ui.day[el.dataset.s]=+el.dataset.d;save();rerender()},
+    autotime(){autoTime(t,dv,el.dataset.s);save();rerender()},
+    score(){DB.ui.scoreOpen=el.dataset.m;save();rerender();updWinLine()},
+    'score-cancel'(){DB.ui.scoreOpen=null;save();rerender()},
+    'score-save'(){const m=dv.matches.find(x=>x.id===el.dataset.m);if(saveScore(t,dv,m)){DB.ui.scoreOpen=null;save();rerender();toast('Счёт сохранён: витрина и табло обновятся за 5 секунд')}},
+    'finish-stage'(){const st=el.dataset.s;t.divisions.filter(d=>st!=='qual'||hasQual(t,d)).forEach(d=>finishStage(t,d,st));save();location.hash='#/t/'+activeStage(t);rerender()},
+    'reopen-stage'(){if(el.dataset.s==='qual'){dv.qualDone=false;dv.qualWinners=[]}else dv.mainDone=false;save();rerender()},
+    'judge-detach'(){const o=judgeCtx();o.judges=o.judges.filter(j=>j!==el.dataset.id);save();rerender()},
+    'judge-new'(){modalJudge()},
+    'judge-new-ok'(){const n=document.getElementById('jn').value.trim();if(!n)return toast('Введите ФИО');const j={id:uid(),n,e:document.getElementById('je').value.trim(),kind:'local'};const o=judgeCtx();o.judgesLocal.push(j);o.judges.push(j.id);save();closeModal();rerender();toast('Судья заведён и закреплён за турниром')},
+    'rules-edit'(){modalRules(t)},
+    'save-settings'(){save();toast('Изменения сохранены');const st=divStage(t,D(t)).key;location.hash='#/t/'+(st==='done'?'main':st)},
+    'delete-t'(){confirmModal('Удалить турнир?','Пары, сетка и результаты удалятся безвозвратно, публичные ссылки перестанут работать.','Удалить турнир','delete-ok',true)},
+    'delete-ok'(){DB.tournaments=DB.tournaments.filter(x=>x.id!==t.id);DB.cur=DB.tournaments[0]?.id||null;save();closeModal();location.hash='#/tournaments'}
+  };
+  if(A[a]){if(el.tagName==='A'&&!el.getAttribute('href')?.startsWith('#'))e.preventDefault();A[a]()}});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+/* перетаскивание пары в позицию */
+let dragKey=null;
+document.addEventListener('dragstart',e=>{const el=e.target.closest('.wp');if(el){dragKey=el.dataset.key;e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{if(dragKey&&e.target.closest('.pos .s:not(.f)'))e.preventDefault()});
+document.addEventListener('drop',e=>{const s=e.target.closest('.pos .s:not(.f)');if(!s||!dragKey)return;e.preventDefault();DB.ui.sel=dragKey;dragKey=null;s.click()});
+function route(keepScroll){const h=location.hash||'#/tournaments';const y=keepScroll?window.scrollY:0;
+  if(h.startsWith('#/new/')){pageWiz(Math.min(4,Math.max(1,+h.split('/')[2]||1)))}
+  else if(h==='#/t'||h.startsWith('#/t/')){const t=T();if(!t){location.hash='#/tournaments';return}let st=h.split('/')[2];if(!st){const k=divStage(t,D(t)).key;st=k==='done'?'main':k;location.hash='#/t/'+st;return}pageT(st)}
+  else pageList();
+  window.scrollTo(0,y)}
+window.addEventListener('hashchange',()=>route(false));
+load();
+/* быстрая перемотка демо для показа и скриншотов: ?state=closed|drawq|drawm|qual|main|done */
+function randScore(m){const a=Math.random()<.5;const set=()=>{const l=Math.floor(Math.random()*5);return Math.random()<.5?[6,l]:[l,6]};const s1=set(),s2=set();const w1=s1[0]>s1[1]?'a':'b',w2=s2[0]>s2[1]?'a':'b';const sets=[s1,s2];let w=w1===w2?w1:null;if(!w){const st=Math.random()<.5?[10,Math.floor(Math.random()*9)]:[Math.floor(Math.random()*9),10];sets.push(st);w=st[0]>st[1]?'a':'b'}m.sets=sets;m.winner=w;m.done=true;m.fin='normal'}
+function fastForward(t,dv,state){const order=['closed','drawq','drawm','qual','main','done'];const i=order.indexOf(state);if(state==='apps'){dv.apps='open';dv.synced='сегодня 12:40';return}if(i<0)return;
+  dv.apps='done';if(i<1)return;
+  if(hasQual(t,dv)){const pool=drawPool(t,dv,'q').sort(()=>Math.random()-.5);dv.drawQ.slots=pool;fixDraw(t,dv,'q')}if(i<2)return;
+  {const pool=drawPool(t,dv,'m').sort(()=>Math.random()-.5);dv.drawM.slots=pool;fixDraw(t,dv,'m')}if(i<3)return;
+  if(hasQual(t,dv)){autoTime(t,dv,'qual');const qs=dv.matches.filter(m=>m.stage==='qual');const half=i===3?Math.ceil(qs.length/2):qs.length;qs.sort((a,b)=>a.r-b.r).slice(0,half).forEach(m=>randScore(m));if(i>3)finishStage(t,dv,'qual')}if(i<4)return;
+  autoTime(t,dv,'main');const ms=dv.matches.filter(m=>m.stage==='main').sort((a,b)=>a.r-b.r||({U:0,L:1,T:2,T5:3})[a.br]-({U:0,L:1,T:2,T5:3})[b.br]);const n=i===4?Math.floor(ms.length*0.4):ms.length;ms.slice(0,n).forEach(m=>{if(resolve(t,dv,m.a).p&&resolve(t,dv,m.b).p)randScore(m)});if(i>=5)dv.mainDone=true}
+const QS=new URLSearchParams(location.search);if(QS.get('wiz')==='demo'){DB.wiz={...defaultWiz(),name:'Осенний кубок клуба',cat:'ФПР 250',gender:'',venues:[{name:'Padel Tennis Club Станционная',city:'Новосибирск'}],courts:3,start:'2026-10-10',end:'2026-10-11',desc:'Организатор — клуб. Взнос 4 000 ₽ с пары.',divisions:[{id:'d1',kind:'m',name:'Мужской',struct:defaultStruct()},{id:'d2',kind:'w',name:'Женский',struct:{...defaultStruct(),fin:{type:'O',third:true,grand:false,dt:'r1',thirdOT:true,thirdDT:false}}}],divSel:'d1',multiDiv:true,ecp:{d1:'https://sb.padelrus.ru/tournaments/1701/applications'},deadline:'2026-10-08T19:00'};save()}
+if(QS.get('state')){DB=seedDemo();DB.tournaments[0].divisions.forEach(dv=>fastForward(DB.tournaments[0],dv,QS.get('state')));if(!location.hash)location.hash='#/t';save()}
+if(QS.get('view')){DB.ui.view={main:QS.get('view'),qual:QS.get('view')};save()}
+route(false);
+</script></body></html>

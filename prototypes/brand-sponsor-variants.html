@@ -1,0 +1,106 @@
+<title>Логотипы спонсоров на табло · варианты</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@600;700;800&display=swap">
+<style>
+:root{--bg:#0d1416;--panel:#ffffff;--line:#e2e6e8;--ink:#12181b;--muted:#6b7a80;--dim:#9aa8ad;
+ --brand:#e11b22;--display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:#fff;font-family:var(--sans);overflow:hidden;padding:26px 30px 22px;display:flex;flex-direction:column;gap:16px}
+.head{display:flex;align-items:baseline;gap:16px}
+.head h1{font-family:var(--display);font-weight:800;font-style:italic;font-size:30px;text-transform:uppercase;margin:0}
+.head span{color:#8ba0a4;font-size:16px;font-weight:600}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+.v{display:flex;flex-direction:column;gap:8px;min-height:0}
+.v .cap{display:flex;align-items:baseline;gap:10px}
+.v .cap b{font-size:15px;font-weight:800;letter-spacing:.02em}
+.v .cap i{font-style:normal;background:var(--brand);color:#fff;border-radius:5px;padding:2px 9px;font-size:12px;font-weight:800}
+.v .cap span{color:#8ba0a4;font-size:13px;font-weight:600}
+.tv{flex:1;min-height:0;background:var(--panel);color:var(--ink);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+
+.bar{display:flex;align-items:center;gap:10px;background:var(--brand);color:#fff;padding:8px 14px;flex:none}
+.bar .cat{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.42);border-radius:5px;padding:3px 9px;font-family:var(--display);font-weight:800;font-style:italic;font-size:13px}
+.bar b{font-family:var(--display);font-weight:800;font-style:italic;font-size:16px;text-transform:uppercase}
+.bar .r{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:.08em}
+.chip{background:#fff;color:var(--brand);border-radius:5px;padding:4px 11px;font-family:var(--display);font-weight:900;font-style:italic;font-size:14px}
+.score{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:7px;padding:10px 14px}
+.rw{display:grid;grid-template-columns:1fr 34px 34px 46px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.rw.s{border-color:var(--brand);box-shadow:inset 4px 0 0 var(--brand)}
+.rw .n{font-family:var(--display);font-weight:800;font-style:italic;font-size:19px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw .d{text-align:center;font-family:var(--display);font-weight:800;font-size:19px;color:var(--dim)}
+.rw .p{text-align:center;font-family:var(--display);font-weight:900;font-size:26px}
+.rw.s .p{color:var(--brand)}
+.foot{flex:none;display:flex;align-items:center;gap:9px;border-top:1px solid var(--line);padding:8px 14px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.foot .ps{margin-left:auto;display:flex;gap:7px}
+.foot .ps i{font-style:normal;border:1px solid var(--line);border-radius:5px;padding:4px 10px;color:var(--muted)}
+
+/* А: подвал партнёров */
+.v.a .foot .ps i.title{background:var(--brand);color:#fff;border-color:var(--brand);font-family:var(--display);font-style:italic;font-weight:900;font-size:13px;letter-spacing:0}
+
+/* Б: угловая плашка */
+.corner{position:absolute;right:12px;bottom:44px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 13px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.corner small{font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.corner b{font-family:var(--display);font-weight:900;font-style:italic;font-size:20px;color:var(--brand)}
+
+/* В: водяной знак и фирменный цвет */
+.wmk{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.wmk span{font-family:var(--display);font-weight:900;font-style:italic;font-size:96px;color:rgba(225,27,34,.09);letter-spacing:.02em}
+
+/* Г: заставка между геймами */
+.break{position:absolute;inset:0;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.break .lbl{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+.break .big{background:#fff;color:var(--brand);border-radius:12px;padding:14px 34px;font-family:var(--display);font-weight:900;font-style:italic;font-size:44px}
+.break .sub{font-size:13px;font-weight:700;opacity:.9}
+</style>
+
+<div class="head"><h1>Логотипы спонсоров на табло</h1><span>четыре варианта размещения · показаны на бело-красной схеме турнира</span></div>
+
+<div class="grid">
+  <div class="v a">
+    <div class="cap"><i>А</i><b>Постоянный подвал</b><span>титульный спонсор и партнёры видны весь матч</span></div>
+    <div class="tv">
+      <div class="bar"><span class="cat">ФПР 250</span><b>Региональный турнир</b><span class="r">1/8 · КОРТ 1</span></div>
+      <div class="score">
+        <div class="rw s"><span class="n">Кутузова / Чиркова</span><span class="d">6</span><span class="d">5</span><span class="p">40</span></div>
+        <div class="rw"><span class="n">Петрова / Мехтиева</span><span class="d">3</span><span class="d">5</span><span class="p">30</span></div>
+      </div>
+      <div class="foot"><span>Партнёры турнира</span><span class="ps"><i class="title">FONBET</i><i>партнёр</i><i>клуб</i></span></div>
+    </div>
+  </div>
+
+  <div class="v">
+    <div class="cap"><i>Б</i><b>Угловая плашка</b><span>титульный спонсор крупно, партнёры в подвале</span></div>
+    <div class="tv">
+      <div class="bar"><span class="cat">ФПР 250</span><b>Региональный турнир</b><span class="r">1/8 · КОРТ 1</span></div>
+      <div class="score">
+        <div class="rw s"><span class="n">Кутузова / Чиркова</span><span class="d">6</span><span class="d">5</span><span class="p">40</span></div>
+        <div class="rw"><span class="n">Петрова / Мехтиева</span><span class="d">3</span><span class="d">5</span><span class="p">30</span></div>
+      </div>
+      <div class="corner"><small>Титульный спонсор</small><b>FONBET</b></div>
+      <div class="foot"><span>Следующий матч · 12:30</span><span class="ps"><i>партнёр</i><i>клуб</i></span></div>
+    </div>
+  </div>
+
+  <div class="v">
+    <div class="cap"><i>В</i><b>Фирменный цвет и водяной знак</b><span>бренд в оформлении, без отдельной плашки</span></div>
+    <div class="tv">
+      <div class="bar"><span class="cat">ФПР 250</span><b>Региональный турнир</b><span class="r"><span class="chip">FONBET</span></span></div>
+      <div class="wmk"><span>FONBET</span></div>
+      <div class="score">
+        <div class="rw s"><span class="n">Кутузова / Чиркова</span><span class="d">6</span><span class="d">5</span><span class="p">40</span></div>
+        <div class="rw"><span class="n">Петрова / Мехтиева</span><span class="d">3</span><span class="d">5</span><span class="p">30</span></div>
+      </div>
+      <div class="foot"><span>Следующий матч · 12:30</span><span class="ps"><i>партнёр</i><i>клуб</i></span></div>
+    </div>
+  </div>
+
+  <div class="v">
+    <div class="cap"><i>Г</i><b>Заставка в перерыве</b><span>полный экран между геймами и сетами</span></div>
+    <div class="tv">
+      <div class="break">
+        <span class="lbl">Смена сторон · 90 секунд</span>
+        <span class="big">FONBET</span>
+        <span class="sub">Титульный спонсор Регионального турнира</span>
+      </div>
+    </div>
+  </div>
+</div>
