@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="ru" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PADEL.SELECT для ФПР</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,700;0,800;1,800;1,900&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Дек для ФПР, структура v9 (01_structure.md). Светлая тема; T — тёмная, для проверки. */
+:root{
+  --bg:#f0f5f6;--surface:#fff;--surface-2:#f6f9f9;--line:#dde6e8;--line-2:#c9d5d8;
+  --ink:#142c31;--ink-2:#213d43;--muted:#5f7478;--faint:#909ea1;
+  --lime:#82eb00;--lime-soft:rgba(130,235,0,.16);--lime-ink:#0b1b06;--lime-line:#5fae00;
+  --now:#b4c0c2;--bad:#dc2626;--bad-bg:#fef2f2;--bad-line:#fecaca;--bad-ink:#7f1d1d;--stripe:rgba(130,235,0,.07);--shadow:0 1.6em 4em rgba(20,44,49,.14);
+  --tv:#0c1719;--tv-2:#132326;--tv-line:#22363a;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#0c1719;--surface:#132326;--surface-2:#0f1d20;--line:#22363a;--line-2:#2d4448;
+  --ink:#fff;--ink-2:#dfe7e8;--muted:#8a9ea0;--faint:#5f7478;
+  --lime-soft:rgba(130,235,0,.12);--lime-line:#82eb00;--now:#3a5054;--bad:#ef4444;--bad-bg:rgba(239,68,68,.1);--bad-line:rgba(239,68,68,.35);--bad-ink:#fecaca;--stripe:rgba(130,235,0,.05);--shadow:0 1.6em 4em rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#05090a;color:var(--ink);font-family:var(--sans);overflow:hidden}
+.deck{position:relative;width:100vw;height:100vh;display:grid;place-items:center}
+.slide{position:absolute;width:min(100vw,calc(100vh*16/9));height:min(100vh,calc(100vw*9/16));font-size:calc(min(100vw,100vh*16/9)/100);
+  background:var(--bg);overflow:hidden;opacity:0;transition:opacity .5s ease;pointer-events:none;padding:3.6em 4.4em 3.4em;display:flex;flex-direction:column}
+.slide::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 6em,var(--stripe) 6em 6.6em);pointer-events:none}
+.slide.on{opacity:1;pointer-events:auto}
+.slide>*{position:relative}
+
+/* шапка слайда */
+.top{display:flex;align-items:center;justify-content:space-between;flex:none;margin-bottom:1.6em}
+.top .logo{font-size:1.25em}
+.pgn{font-size:1.05em;font-weight:600;color:var(--faint);font-variant-numeric:tabular-nums}
+/* шапка: заголовок отделён от контента линией */
+.hdr{flex:none;border-bottom:1px solid var(--line-2);padding-bottom:1.5em;margin-bottom:2.4em}
+.tag{display:inline-flex;align-items:center;gap:.7em;font-size:1.05em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tag b{display:inline-grid;place-items:center;min-width:2.2em;height:2.2em;padding:0 .6em;border-radius:99em;background:var(--ink);color:var(--bg);letter-spacing:0;font-size:.95em}
+.logo{font-family:var(--display);font-weight:800;font-style:italic;font-size:1.5em;letter-spacing:.02em;display:inline-flex;align-items:center;gap:.15em}
+.logo span{background:var(--lime);color:var(--lime-ink);padding:.05em .3em;border-radius:.2em}
+.pg{position:absolute;right:4.4em;bottom:2em;font-size:1.05em;color:var(--faint);font-variant-numeric:tabular-nums}
+
+h1,h2{font-family:var(--display);font-weight:800;font-style:italic;letter-spacing:-.015em;margin:0}
+mark{background:var(--lime);color:var(--lime-ink);padding:0 .18em;border-radius:.12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* шаблон «до / после» */
+.ba h2{font-size:2.9em;line-height:1.1}
+.ba .body{flex:1;min-height:0;display:grid;grid-template-columns:30em 1fr;gap:3.4em}
+.ba .txt{display:flex;flex-direction:column;gap:1.4em;justify-content:center}
+.blk{border-radius:1em;padding:1.6em 1.8em;position:relative}
+.blk .lb{display:inline-flex;align-items:center;gap:.5em;font-size:1em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8em}
+.blk p{margin:0;font-size:1.7em;line-height:1.38}
+.blk.now{background:var(--bad-bg);border:1px solid var(--bad-line);color:var(--bad-ink)}
+.blk.now::before{content:"";position:absolute;left:0;top:1.4em;bottom:1.4em;width:.32em;border-radius:0 .3em .3em 0;background:var(--bad)}
+.blk.now .lb{color:#fff;background:var(--bad);padding:.3em .7em .3em .5em;border-radius:.4em}
+.blk.now .lb i{width:1.3em;height:1.3em;border-radius:50%;background:rgba(255,255,255,.25);display:inline-grid;place-items:center;font-style:normal;color:#fff;font-size:.85em}
+.blk.new{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink)}
+.blk.new::before{content:"";position:absolute;left:0;top:1.4em;bottom:1.4em;width:.32em;border-radius:0 .3em .3em 0;background:var(--lime)}
+.blk.new .lb{color:var(--lime-ink);background:var(--lime);padding:.3em .7em;border-radius:.4em}
+.blk.new p{font-weight:600}
+.ba .now,.ba .new{opacity:0;transform:translateY(1em);transition:opacity .6s ease,transform .6s ease}
+.slide.on.ba .now{opacity:1;transform:none;transition-delay:.25s}
+.slide.on.ba .new{opacity:1;transform:none;transition-delay:1.1s}
+.ba .arrow{align-self:center;color:var(--lime-line);font-size:1.6em;line-height:1;margin:-.5em 0;opacity:0;transition:opacity .4s .8s}
+.slide.on.ba .arrow{opacity:1}
+
+/* окно браузера со сценой */
+.win{background:var(--surface);border:1px solid var(--line);border-radius:1.2em;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.win .bar{flex:none;display:flex;align-items:center;gap:.5em;padding:.9em 1.2em;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.win .bar i{width:.8em;height:.8em;border-radius:50%;background:var(--line-2)}
+.win .bar .u{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:1em;flex:1;max-width:28em;background:var(--surface);border:1px solid var(--line);border-radius:.5em;padding:.35em .9em;font-size:1em;color:var(--muted)}
+.scene{flex:1;min-height:0;padding:1.6em 2em;font-size:.92em;color:var(--ink);overflow:hidden;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+
+/* сцена: заявки с портала ФПР */
+.ap-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2em}
+.ap-h b{font-family:var(--display);font-style:italic;font-weight:800;font-size:1.9em}
+.chip{display:inline-flex;align-items:center;gap:.4em;font-size:1em;font-weight:700;padding:.35em .8em;border-radius:99em;background:var(--lime-soft);color:var(--ink)}
+.chip.live::before{content:"";width:.55em;height:.55em;border-radius:50%;background:var(--lime-line)}
+.ap-in{display:flex;gap:.8em;margin-bottom:1.1em}
+.ap-in .f{flex:1;border:1.5px solid var(--line-2);border-radius:.6em;padding:.8em 1em;font-size:1.25em;font-family:ui-monospace,Menlo,monospace;color:var(--ink);min-height:2.6em;white-space:nowrap;overflow:hidden}
+.ap-in .f.focus{border-color:var(--lime-line);box-shadow:0 0 0 .25em var(--lime-soft)}
+.ap-in .f .cur{display:inline-block;width:.08em;height:1em;background:var(--ink);vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.btn{border:0;border-radius:.6em;padding:0 1.6em;font:inherit;font-size:1.2em;font-weight:700;background:var(--ink);color:var(--bg);transition:transform .15s,background .2s}
+.btn.press{transform:scale(.94);background:var(--lime);color:var(--lime-ink)}
+.ap-st{display:flex;gap:1em;align-items:center;margin-bottom:1em;min-height:2.4em}
+.ap-st .ok{display:inline-flex;align-items:center;gap:.5em;font-weight:700;font-size:1.15em;opacity:0;transform:translateY(.4em);transition:.4s}
+.ap-st .ok.show{opacity:1;transform:none}
+.ap-st .ok em{font-style:normal;display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--lime);color:var(--lime-ink);font-size:.9em}
+.ap-st .nw{background:var(--ink);color:var(--bg);border-radius:99em;padding:.3em .8em;font-size:.95em;font-weight:700;opacity:0;transform:scale(.6);transition:.35s cubic-bezier(.3,1.6,.5,1)}
+.ap-st .nw.show{opacity:1;transform:none}
+.ap-st .rf{margin-left:auto;color:var(--muted);font-size:1em;opacity:0;transition:.4s}
+.ap-st .rf.show{opacity:1}
+.tbl{border:1px solid var(--line);border-radius:.8em;overflow:hidden}
+.tr{display:grid;grid-template-columns:3em 1fr 7em 8.5em;align-items:center;padding:.62em 1.1em;border-top:1px solid var(--line);font-size:1.15em}
+.tr.hd{border-top:0;background:var(--surface-2);font-size:.9em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tr.row{opacity:0;transform:translateX(-1.2em);transition:opacity .35s,transform .35s,background 1.2s}
+.tr.row.show{opacity:1;transform:none}
+.tr.row.fresh{background:var(--lime-soft)}
+.tr .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.tr .r{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;padding-right:1.4em}
+.tr .s{justify-self:start;font-size:.85em;font-weight:700;padding:.3em .7em;border-radius:.4em;background:var(--lime-soft)}
+.tr .s.new{background:var(--lime);color:var(--lime-ink)}
+
+/* обложка */
+.cover{padding:0;display:grid;grid-template-columns:47% 1fr}
+.cover .l{padding:4.4em 0 4em 5.2em;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+.cover h1{font-size:5.3em;line-height:1.08;margin:.5em 0 .45em}
+.cover .lead{font-size:1.9em;line-height:1.4;color:var(--muted);max-width:19em;margin:0}
+.cover .proof{display:flex;flex-wrap:wrap;gap:.7em;align-items:center}
+.cover .proof span{font-size:1.15em;color:var(--muted);margin-right:.4em}
+.cover .proof b{font-size:1.15em;font-weight:800;padding:.45em .9em;border-radius:99em;background:var(--surface);border:1px solid var(--line)}
+.cover .r{position:relative}
+.cover .r .cv{position:absolute;border-radius:1em;box-shadow:0 2em 5em rgba(0,0,0,.35);border:1px solid var(--tv-line);overflow:hidden;background:#0c1719}
+.cv iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none}
+.cover .tvx{width:62em;aspect-ratio:16/9;left:4em;top:9em;transform:rotate(-4deg)}
+.cover .ph1{width:17em;aspect-ratio:412/860;left:1em;top:19em;transform:rotate(-8deg);border-radius:1.6em}
+.cover .ph2{width:15em;aspect-ratio:430/880;left:36em;top:15em;transform:rotate(6deg);border-radius:1.6em}
+.slide.on.cover .r .cv{animation:float 7s ease-in-out infinite}
+.slide.on.cover .r .ph1{animation-delay:-2s}.slide.on.cover .r .ph2{animation-delay:-4s}
+@keyframes float{50%{translate:0 -1.2em}}
+.cover .l>*{opacity:0;transform:translateY(1em);transition:.7s}
+.slide.on.cover .l>*{opacity:1;transform:none}
+.slide.on.cover .l>*:nth-child(2){transition-delay:.15s}.slide.on.cover .l>*:nth-child(3){transition-delay:.4s}
+
+/* разделитель */
+.div .hdr h2{font-size:3.6em;line-height:1.05;margin-bottom:.4em}
+.div .sub{font-size:1.6em;color:var(--muted);margin:0}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4em;flex:1;align-content:start}
+.cd{background:var(--surface);border:1px solid var(--line);border-radius:1em;padding:1.5em 1.6em 1.7em;box-shadow:var(--shadow);opacity:0;transform:translateY(1.2em);transition:.55s}
+.slide.on .cd{opacity:1;transform:none}
+.cd .k{display:flex;align-items:center;justify-content:space-between;margin-bottom:1em}
+.cd .k b{font-family:var(--display);font-style:italic;font-weight:800;font-size:2.2em;color:var(--lime-line)}
+.cd .k span{font-size:.9em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cd .k span.op{color:var(--lime-ink);background:var(--lime);padding:.25em .6em;border-radius:.35em}
+.cd h3{margin:0 0 .5em;font-size:1.65em;line-height:1.2;font-weight:800}
+.cd p{margin:0;font-size:1.25em;line-height:1.4;color:var(--muted)}
+
+/* схема «все в выигрыше» */
+.win-h h2{font-size:2.9em;line-height:1.1}
+.win-h p{font-size:1.7em;color:var(--muted);margin:0}
+.map{position:relative;flex:1;min-height:0}
+.map svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.map line{stroke:var(--lime-line);stroke-width:2;stroke-dasharray:5 6;vector-effect:non-scaling-stroke;opacity:0;transition:opacity .6s}
+.slide.on .map line{opacity:.7}
+.hub{position:absolute;left:50%;top:40%;translate:-50% -50%;width:16em;height:16em;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;text-align:center;box-shadow:0 0 0 1.2em var(--lime-soft),0 0 0 2.6em color-mix(in srgb,var(--lime) 7%,transparent);transform:scale(.6);opacity:0;transition:.6s cubic-bezier(.3,1.4,.5,1)}
+.slide.on .hub{transform:none;opacity:1}
+.hub .logo{font-size:1.6em;justify-content:center}
+.hub>div{width:100%;display:flex;flex-direction:column;align-items:center}
+.hub small{display:block;font-size:1.1em;opacity:.7;margin-top:.5em}
+.nd{position:absolute;width:27.5em;z-index:1;background:var(--surface);border:1px solid var(--line);border-radius:1em;padding:1.3em 1.5em;box-shadow:var(--shadow);opacity:0;transform:scale(.85);transition:.5s}
+.slide.on .nd{opacity:1;transform:none}
+.nd h3{margin:0 0 .5em;font-size:1.7em;font-weight:800;display:flex;align-items:center;gap:.5em}
+.nd h3 i{width:.7em;height:.7em;border-radius:50%;background:var(--lime);font-style:normal}
+.nd ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.35em}
+.nd li{font-size:1.25em;line-height:1.35;color:var(--muted);padding-left:1.1em;position:relative}
+.nd li::before{content:"+";position:absolute;left:0;color:var(--lime-line);font-weight:800}
+
+/* заглушка неготового слайда */
+.tbd h2{font-size:2.9em;line-height:1.1}
+.tbdp{font-size:1.6em;color:var(--faint);border:1px dashed var(--line-2);border-radius:1em;padding:2em;margin:0;flex:1;display:grid;place-items:center}
+
+/* сцена: конструктор формата */
+.cs-steps{display:flex;gap:.6em;margin-bottom:2em}
+.cs-steps span{font-size:1.05em;font-weight:600;padding:.45em 1em;border-radius:99em;border:1px solid var(--line);color:var(--muted)}
+.cs-steps .done{color:var(--ink)}
+.cs-steps .done::before{content:"✓ ";color:var(--lime-line);font-weight:800}
+.cs-steps .cur{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.cs-row{display:grid;grid-template-columns:1fr 4.4em 1fr 4.4em 1fr;align-items:stretch}
+.stg{border:1.5px solid var(--line);border-radius:.9em;padding:1.1em 1.2em 1.2em;background:var(--surface-2);opacity:.55;transition:opacity .4s,border-color .4s,background .4s,box-shadow .4s;position:relative;display:flex;flex-direction:column}
+.stg.on{opacity:1;border-color:var(--lime-line);background:var(--surface);box-shadow:0 0 0 .3em var(--lime-soft)}
+.stg .sh{display:flex;align-items:center;gap:.8em;margin-bottom:1em}
+.stg small{display:block;font-size:.85em;color:var(--muted);font-weight:600}
+.stg b{font-size:1.25em;font-weight:800}
+.tg{flex:none;width:2.6em;height:1.5em;border-radius:99em;background:var(--line-2);position:relative;transition:background .3s}
+.tg::after{content:"";position:absolute;left:.2em;top:.2em;width:1.1em;height:1.1em;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .3s}
+.stg.on .tg{background:var(--lime-line)}
+.stg.on .tg::after{transform:translateX(1.1em)}
+.sys{position:relative;border:1px solid var(--line-2);border-radius:.5em;padding:.55em .8em;font-size:1em;font-weight:600;background:var(--surface);margin-bottom:1em;display:flex;justify-content:space-between;gap:.5em;white-space:nowrap;overflow:visible}
+.sys::after{content:"▾";color:var(--muted)}
+.sys.ph{color:var(--faint)}
+.sys.open{border-color:var(--lime-line);box-shadow:0 0 0 .25em var(--lime-soft)}
+.dd{position:absolute;left:-1px;right:-1px;top:calc(100% + .3em);background:var(--surface);border:1px solid var(--line-2);border-radius:.6em;box-shadow:var(--shadow);padding:.35em;z-index:3;opacity:0;transform:translateY(-.4em);transition:.25s;pointer-events:none}
+.sys.open .dd{opacity:1;transform:none}
+.dd div{padding:.5em .6em;border-radius:.4em;font-weight:500;white-space:normal;line-height:1.2}
+.dd div.hl{background:var(--lime-soft);font-weight:700}
+.mini{flex:1;min-height:11em;display:grid;place-items:center}
+.mini svg{width:100%;height:10em}
+.mini svg path,.mini svg line{stroke:var(--muted);stroke-width:1.4;fill:none}
+.stg.on .mini svg path,.stg.on .mini svg line{stroke:var(--ink-2)}
+.mini .grp{display:grid;grid-template-columns:repeat(2,1fr);gap:.7em;width:100%}
+.mini .grp div{border:1px solid var(--line-2);border-radius:.4em;padding:.5em;display:grid;gap:.35em}
+.mini .grp i{height:.45em;border-radius:.2em;background:var(--line-2)}
+.stg.on .mini .grp i{background:var(--ink-2);opacity:.75}
+.con{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3em;color:var(--lime-line);opacity:0;transform:translateX(-.6em);transition:.4s}
+.con.on{opacity:1;transform:none}
+.con span{font-size:2em;font-weight:800;line-height:1}
+.con small{font-size:.9em;font-weight:700;color:var(--ink)}
+.cs-sum{display:flex;gap:.8em;align-items:center;margin-top:2em;opacity:0;transform:translateY(.6em);transition:.45s}
+.cs-sum.on{opacity:1;transform:none}
+.cs-sum span{font-size:1.1em;font-weight:700;padding:.5em 1em;border-radius:.6em;background:var(--surface-2);border:1px solid var(--line)}
+.cs-sum .ok{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+.cs-sum .ru{margin-left:auto}
+
+/* сцена: ссылка из поста открывает страницу турнира */
+.lk{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2.4em;position:relative}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:1.2em;box-shadow:var(--shadow);padding:1.6em 1.8em;max-width:30em;justify-self:end;position:relative}
+.post .ph{display:flex;align-items:center;gap:.9em;margin-bottom:1.1em}
+.post .av{width:3.2em;height:3.2em;border-radius:50%;background:var(--tv);color:var(--lime);display:grid;place-items:center;font-weight:800;font-size:1.05em}
+.post .ph b{display:block;font-size:1.25em}
+.post .ph small{font-size:1em;color:var(--muted)}
+.post p{margin:0 0 1em;font-size:1.3em;line-height:1.45}
+.post .url{color:#2563eb;font-weight:600;border-radius:.3em;transition:background .2s}
+.post .url.tap{background:rgba(37,99,235,.15)}
+.post .pv{border-left:.25em solid var(--lime-line);background:var(--surface-2);border-radius:0 .6em .6em 0;padding:.8em 1em}
+.post .pv small{display:block;font-size:.95em;color:#2563eb;font-weight:700;margin-bottom:.2em}
+.post .pv b{display:block;font-size:1.15em;margin-bottom:.2em}
+.post .pv span{font-size:1em;color:var(--muted)}
+.post .ft{margin-top:1em;font-size:.95em;color:var(--faint)}
+.cur2{position:absolute;width:2.2em;height:2.2em;border-radius:50%;background:rgba(20,44,49,.25);border:2px solid rgba(20,44,49,.55);pointer-events:none;opacity:0;transition:left .7s cubic-bezier(.4,0,.2,1),top .7s cubic-bezier(.4,0,.2,1),opacity .3s,transform .15s;transform:translate(-50%,-50%)}
+.cur2.on{opacity:1}
+.cur2.tap{transform:translate(-50%,-50%) scale(.75)}
+.phone{height:39em;aspect-ratio:440/860;background:#0b0f10;border-radius:2.6em;padding:.9em;box-shadow:0 2em 5em rgba(20,44,49,.3);position:relative;opacity:0;transform:translateY(2em) scale(.96);transition:opacity .6s,transform .6s cubic-bezier(.3,1.2,.5,1)}
+.phone.on{opacity:1;transform:none}
+.phone::before{content:"";position:absolute;left:50%;top:1.4em;width:5em;height:1.2em;border-radius:99em;background:#0b0f10;transform:translateX(-50%);z-index:2}
+.phone .scr{width:100%;height:100%;border-radius:1.9em;overflow:hidden;position:relative;background:#0c1719}
+.phone iframe{position:absolute;left:0;top:0;width:360px;height:760px;border:0;transform-origin:0 0;pointer-events:none}
+
+/* общие рамки: ТВ, плеер, телефон; iframe.fit масштабируется под рамку */
+.tvw{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4em}
+.tv{width:100%;max-height:100%;aspect-ratio:16/9;background:#05090a;border-radius:1em;padding:.7em;box-shadow:0 2em 4em rgba(20,44,49,.28);position:relative}
+.tv .scr{position:relative;width:100%;height:100%;overflow:hidden;border-radius:.35em;background:#0c1719}
+.tv .scr iframe,.fr iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;transition:opacity .7s}
+.tv .scr iframe.off,.fr iframe.off{opacity:0}
+.chips{display:flex;gap:.6em;flex-wrap:wrap;justify-content:center}
+.chips span{font-size:1.15em;font-weight:700;padding:.5em 1.1em;border-radius:99em;background:var(--surface);border:1px solid var(--line);color:var(--muted);transition:.3s}
+.chips span.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chips span.lm{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+.fr{position:relative;overflow:hidden}
+
+/* сцена 6: чат против живой страницы */
+.duo{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto;gap:2.4em;align-items:center}
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:1.2em;box-shadow:var(--shadow);padding:1.1em 1.3em;display:flex;flex-direction:column;gap:.6em;max-width:30em;justify-self:end;width:100%}
+.chat .ch{display:flex;align-items:center;gap:.8em;padding-bottom:.8em;border-bottom:1px solid var(--line)}
+.chat .ch .av{width:2.8em;height:2.8em;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-size:1.2em}
+.chat .ch b{display:block;font-size:1.15em}.chat .ch small{color:var(--muted);font-size:.95em}
+.msg{max-width:85%;background:var(--surface-2);border-radius:.9em .9em .9em .2em;padding:.5em .8em;font-size:1em;line-height:1.35;position:relative;opacity:0;transform:translateY(.5em);transition:.35s}
+.msg.on{opacity:1;transform:none}
+.msg.me{align-self:flex-end;background:#e7f0ff;border-radius:.9em .9em .2em .9em}
+.msg small{display:block;font-size:.8em;color:var(--faint);margin-top:.2em;text-align:right}
+.msg .who{display:block;font-size:.85em;font-weight:700;color:#2563eb;margin-bottom:.15em}
+.pic{width:13em;height:6em;border-radius:.5em;background:repeating-linear-gradient(0deg,#d9e2e4 0 1px,transparent 1px 1.1em),repeating-linear-gradient(90deg,#d9e2e4 0 1px,transparent 1px 3.6em),#f4f7f7;position:relative;overflow:hidden;filter:blur(.4px)}
+.pic::after{content:"результаты_v3.jpg";position:absolute;left:.5em;bottom:.4em;font-size:.8em;color:var(--muted);background:#fff;padding:.1em .4em;border-radius:.3em}
+.stamp{position:absolute;right:-.6em;top:1.2em;transform:rotate(-12deg) scale(1.6);border:.18em solid var(--bad);color:var(--bad);font-weight:800;letter-spacing:.08em;font-size:1em;padding:.15em .5em;border-radius:.3em;background:rgba(255,255,255,.85);opacity:0;transition:.35s cubic-bezier(.3,1.6,.5,1)}
+.stamp.on{opacity:1;transform:rotate(-12deg) scale(1)}
+.mob{height:37em;aspect-ratio:440/860;background:#0b0f10;border-radius:2.6em;padding:.9em;box-shadow:0 2em 5em rgba(20,44,49,.3);position:relative}
+.mob::before{content:"";position:absolute;left:50%;top:1.4em;width:5em;height:1.2em;border-radius:99em;background:#0b0f10;transform:translateX(-50%);z-index:2}
+.mob .scr{width:100%;height:100%;border-radius:1.9em;overflow:hidden;background:#0c1719;color:#fff;padding:3em 1em 1em;display:flex;flex-direction:column;gap:.7em;font-size:.95em;position:relative}
+.mob .scr iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none}
+.mh{text-align:center}
+.mh small{display:inline-block;font-size:.75em;font-weight:800;letter-spacing:.1em;border:1px solid #2d4448;border-radius:.3em;padding:.2em .5em;color:#cfd9da}
+.mh b{display:block;font-family:var(--display);font-style:italic;font-weight:800;font-size:1.2em;line-height:1.05;margin:.35em 0 .2em;text-transform:uppercase}
+.mh span{font-size:.85em;color:#8a9ea0}
+.mtabs{display:flex;gap:.35em}
+.mtabs i{font-style:normal;font-size:.85em;font-weight:700;padding:.5em .7em;border-radius:.5em;background:#132326;color:#cfd9da}
+.mtabs i.on{background:var(--lime);color:var(--lime-ink)}
+.mc{background:#132326;border:1px solid #22363a;border-radius:.8em;padding:.8em .9em;transition:border-color .4s,box-shadow .4s}
+.mc.live{border-color:var(--lime);box-shadow:0 0 0 .2em rgba(130,235,0,.15)}
+.mc .mt{display:flex;justify-content:space-between;align-items:center;font-size:.75em;font-weight:700;letter-spacing:.06em;color:#8a9ea0;text-transform:uppercase;margin-bottom:.5em}
+.mc .st{font-size:.95em;padding:.15em .5em;border-radius:.3em;border:1px solid #2d4448;color:#8a9ea0;letter-spacing:.04em}
+.mc .st.lv{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+.mr{display:grid;grid-template-columns:1fr repeat(3,1.3em);align-items:center;gap:.2em;padding:.3em 0 .3em .6em;font-size:1.05em;border-left:.2em solid transparent;transition:.3s}
+.mr .nm{font-weight:600;line-height:1.2}
+.mr b{text-align:center;font-variant-numeric:tabular-nums;color:#8a9ea0;font-weight:700}
+.mr b.pt{color:var(--lime);transition:transform .2s}
+.mr b.pt.bump{transform:scale(1.35)}
+.mr.mw{border-left-color:var(--lime)}
+.mr.mw .nm,.mr.mw b{color:#fff;font-weight:800}
+.mr.ml{opacity:.55}
+.pod{background:#132326;border:1px solid #22363a;border-radius:.8em;padding:.7em .9em;display:flex;flex-direction:column;gap:.35em;opacity:0;transform:translateY(.6em);transition:.45s}
+.pod.on{opacity:1;transform:none}
+.pod small{font-size:.75em;font-weight:800;letter-spacing:.08em;color:#8a9ea0}
+.pod div{display:flex;gap:.5em;align-items:center;font-size:.85em;white-space:nowrap}
+.pod i{font-style:normal;width:1.5em;height:1.5em;border-radius:50%;display:grid;place-items:center;font-size:.8em;font-weight:800;color:#1b1b1b}
+.upd{font-size:.8em;color:var(--lime);text-align:center;opacity:0;transition:.3s}
+.upd.on{opacity:1}
+
+/* сцена 7–9: подписи под ТВ */
+.urlc{font-family:ui-monospace,Menlo,monospace;font-size:1.05em;color:var(--muted)}
+
+/* сцена 11: регламент */
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:1.8em;height:100%}
+.rg h4{margin:0 0 .9em;font-size:1.15em;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.rg h4 span{font-size:.8em;font-weight:700;color:var(--lime-ink);background:var(--lime-soft);padding:.3em .6em;border-radius:.4em}
+.sysl{display:flex;flex-direction:column;gap:.55em}
+.sysl div{display:flex;align-items:center;gap:.7em;border:1px solid var(--line);border-radius:.6em;padding:.65em .9em;font-size:1.1em;font-weight:600;opacity:0;transform:translateX(-.8em);transition:.35s}
+.sysl div.on{opacity:1;transform:none}
+.sysl div em{font-style:normal;width:1.5em;height:1.5em;border-radius:50%;background:var(--lime);color:var(--lime-ink);display:grid;place-items:center;font-size:.8em;font-weight:800}
+.sysl div.no{border-style:dashed;color:var(--faint)}
+.sysl div.no em{background:var(--line);color:var(--faint)}
+.sysl div.no s{margin-left:auto;font-size:.8em;text-decoration:none;font-weight:700;color:var(--bad)}
+.rules{display:flex;flex-direction:column;gap:.55em}
+.rules div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:.55em .2em;font-size:1.1em;color:var(--muted)}
+.rules div b{color:var(--ink);font-weight:700;opacity:0;transition:.3s;background:var(--lime-soft);padding:.15em .5em;border-radius:.35em}
+.rules div b.on{opacity:1}
+.rg .ok{grid-column:1/3;align-self:end;justify-self:start;font-size:1.15em;font-weight:800;padding:.6em 1.1em;border-radius:.6em;background:var(--lime);color:var(--lime-ink);opacity:0;transform:translateY(.5em);transition:.4s}
+.rg .ok.on{opacity:1;transform:none}
+
+/* сцена 12: отчёт в ФПР */
+.rp{flex:1;min-height:0;display:grid;grid-template-columns:16em 3em 1fr 3em 10em;align-items:center}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:1em;box-shadow:var(--shadow);padding:1.3em 1.4em}
+.rc h4{margin:0 0 .25em;font-size:1.3em;font-weight:800}
+.rc .sub{font-size:1em;color:var(--muted);margin-bottom:1em}
+.rc .tg2{display:inline-block;font-size:.85em;font-weight:800;padding:.25em .6em;border-radius:.35em;background:var(--ink);color:var(--bg);margin-bottom:.7em}
+.it{display:flex;justify-content:space-between;padding:.5em 0;border-top:1px solid var(--line);font-size:1.1em}
+.it b{font-variant-numeric:tabular-nums}
+.it.fly{background:var(--lime-soft)}
+.pipe{position:relative;height:.25em;background:repeating-linear-gradient(90deg,var(--line-2) 0 .5em,transparent .5em 1em);margin:0 .6em}
+.pipe i{position:absolute;top:50%;width:1em;height:1em;border-radius:50%;background:var(--lime);box-shadow:0 0 0 .3em var(--lime-soft);transform:translate(-50%,-50%);left:0;opacity:0}
+.pipe i.go{animation:pp .5s linear}
+@keyframes pp{0%{left:0;opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
+.doc{background:var(--surface);border:1px solid var(--line);border-radius:.8em;box-shadow:var(--shadow);padding:1.3em 1.4em;position:relative}
+.doc::before{content:"";position:absolute;right:0;top:0;width:2.2em;height:2.2em;background:linear-gradient(225deg,var(--bg) 50%,var(--line-2) 50%);border-radius:0 .8em 0 .4em}
+.doc h4{margin:0 0 .9em;font-size:1.15em;font-weight:800}
+.doc .dr{display:grid;grid-template-columns:6.5em 1fr;gap:.6em;padding:.45em 0;border-top:1px solid var(--line);font-size:1em;opacity:0;transition:.3s}
+.doc .dr.on{opacity:1}
+.doc .dr span{color:var(--muted)}
+.doc .dr b{font-weight:600}
+.fpr{background:var(--ink);color:var(--bg);border-radius:1em;padding:1.5em 1.3em;text-align:center;box-shadow:var(--shadow)}
+.fpr b{display:block;font-family:var(--display);font-style:italic;font-size:2.3em;font-weight:800}
+.fpr small{display:block;font-size:1em;opacity:.7;margin-top:.2em}
+.fpr .st{margin-top:1em;font-size:1em;font-weight:800;padding:.5em .6em;border-radius:.5em;background:rgba(255,255,255,.1);transition:.3s}
+.fpr .st.on{background:var(--lime);color:var(--lime-ink)}
+
+/* сцена 13: судья и синхронные экраны */
+.ref{flex:1;min-height:0;display:grid;grid-template-columns:auto 1fr;gap:3em;align-items:center}
+.rph{height:38em;aspect-ratio:430/880;border-radius:2.2em;overflow:hidden;box-shadow:0 2em 5em rgba(20,44,49,.3);position:relative;background:#0b0f10}
+.rph iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0}
+.tap{position:absolute;width:3em;height:3em;border-radius:50%;border:.2em solid var(--lime);background:rgba(130,235,0,.25);transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none}
+.tap.go{animation:tp .6s ease-out}
+@keyframes tp{0%{opacity:1;transform:translate(-50%,-50%) scale(.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+.mir{display:flex;flex-direction:column;gap:1.2em}
+.mi{background:var(--surface);border:1px solid var(--line);border-radius:1em;box-shadow:var(--shadow);padding:1em 1.2em;transition:box-shadow .3s}
+.mi.fl{box-shadow:0 0 0 .3em var(--lime-soft),var(--shadow)}
+.mi h5{margin:0 0 .6em;font-size:1em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.6em}
+.mi h5 i{font-style:normal;font-size:.85em;padding:.15em .5em;border-radius:.3em;background:var(--lime);color:var(--lime-ink);letter-spacing:.04em}
+.sb{border-radius:.6em;padding:.6em .9em;display:grid;gap:.3em}
+.sb.dk{background:#0c1719;color:#fff}
+.sb.lt{background:var(--surface-2)}
+.sb.ov{background:rgba(12,23,25,.88);color:#fff;width:max-content;min-width:22em;border-left:.3em solid var(--lime)}
+.sr{display:grid;grid-template-columns:1fr repeat(4,1.8em);align-items:center;font-size:1.1em}
+.sr span{font-weight:700;font-style:italic;text-transform:uppercase;font-family:var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb.lt .sr span{text-transform:none;font-style:normal;font-family:var(--sans)}
+.sr b{text-align:center;font-variant-numeric:tabular-nums;color:inherit;opacity:.65}
+.sr b.p{opacity:1;color:var(--lime);font-weight:800}
+.sb.lt .sr b.p{color:var(--lime-ink);background:var(--lime);border-radius:.25em}
+.sr b.p.bump{animation:bm .4s}
+@keyframes bm{40%{transform:scale(1.4)}}
+
+/* сцена 14: медиа */
+.md{flex:1;min-height:0;display:grid;grid-template-columns:auto 1fr;gap:3em;align-items:center}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:.45em}
+.gph{aspect-ratio:1;border-radius:.5em;position:relative;overflow:hidden;opacity:0;transform:scale(.85);transition:.4s}
+.gph.on{opacity:1;transform:none}
+.gph svg{width:100%;height:100%;display:block}
+.gph .pr{position:absolute;left:.4em;right:.4em;bottom:.4em;height:.3em;border-radius:99em;background:rgba(255,255,255,.3);overflow:hidden}
+.gph .pr i{display:block;height:100%;width:0;background:var(--lime);transition:width .8s}
+.gph.sel{outline:.2em solid var(--lime);outline-offset:-.2em}
+.fp{background:var(--surface);border:1px solid var(--line);border-radius:1.2em;box-shadow:var(--shadow);padding:1.4em 1.6em;max-width:30em;opacity:0;transform:translateX(1em);transition:.5s}
+.fp.on{opacity:1;transform:none}
+.fp .ph{display:flex;align-items:center;gap:.8em;margin-bottom:1em}
+.fp .av{width:3em;height:3em;border-radius:50%;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-weight:800;font-size:.95em}
+.fp .ph b{display:block;font-size:1.2em}.fp .ph small{color:var(--muted)}
+.fp .im{aspect-ratio:16/10;border-radius:.6em;overflow:hidden;margin-bottom:.9em}
+.fp .im svg{width:100%;height:100%;display:block}
+.fp p{margin:0 0 .9em;font-size:1.2em;line-height:1.4}
+.fp .src{font-size:.95em;color:var(--muted)}
+
+/* разделитель ФПР: 4 карточки в ряд */
+.cards.c4{grid-template-columns:repeat(3,1fr);align-content:center}
+.cards.c4 .cd{min-height:12em;padding:1.6em 1.8em}
+.cards.c4 .cd h3{font-size:1.75em}
+.cards.c4 .cd p{font-size:1.3em}
+.hdr h2{font-size:2.9em;line-height:1.1}
+
+/* финал */
+.fin{flex:1;min-height:0;display:grid;grid-template-columns:1.15fr 1fr;gap:2.6em}
+.trn{display:flex;flex-direction:column;gap:1.1em;justify-content:center}
+.tc{background:var(--surface);border:1px solid var(--line);border-radius:1em;box-shadow:var(--shadow);padding:1.2em 1.4em;display:grid;grid-template-columns:8.6em 1fr;gap:1.2em;align-items:center;opacity:0;transform:translateY(.8em);transition:.5s}
+.slide.on .tc{opacity:1;transform:none}
+.tc .cat{white-space:nowrap;font-family:var(--display);font-style:italic;font-weight:800;font-size:1.45em;text-align:center;padding:.5em .2em;border-radius:.5em;background:var(--ink);color:var(--lime)}
+.tc b{display:block;font-size:1.35em;margin-bottom:.25em}
+.tc span{font-size:1.1em;color:var(--muted)}
+.ask{background:var(--ink);color:var(--bg);border-radius:1.4em;padding:2.4em 2.6em;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;opacity:0;transform:scale(.97);transition:.6s .5s}
+.slide.on .ask{opacity:1;transform:none}
+.ask::after{content:"";position:absolute;right:-6em;bottom:-6em;width:18em;height:18em;border-radius:50%;background:radial-gradient(var(--lime) 0,transparent 70%);opacity:.25}
+.ask small{font-size:1.05em;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);margin-bottom:1em}
+.ask h3{margin:0 0 1.2em;font-family:var(--display);font-style:italic;font-weight:800;font-size:2.6em;line-height:1.1}
+.ask h3 mark{font-style:italic}
+.ask ul{margin:0 0 1.6em;padding:0;list-style:none;display:flex;flex-direction:column;gap:.5em}
+.ask li{font-size:1.25em;line-height:1.35;padding-left:1.3em;position:relative;opacity:.9}
+.ask li::before{content:"✓";position:absolute;left:0;color:var(--lime);font-weight:800}
+.ct{border:1px dashed rgba(255,255,255,.35);border-radius:.8em;padding:1em 1.2em;font-size:1.2em;line-height:1.5}
+.ct span{opacity:.6}
+
+/* доход ФПР */
+.inc{flex:1;min-height:0;display:grid;grid-template-columns:1fr 7em 17em;align-items:center}
+.incl{display:flex;flex-direction:column;gap:1.4em}
+.tgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:.6em}
+.tgrid div{aspect-ratio:1.25;border-radius:.8em;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3em;opacity:.25;transition:.35s}
+.tgrid div b{font-family:var(--display);font-style:italic;font-weight:800;font-size:1.05em;white-space:nowrap}
+.tgrid div span{font-size:.85em;color:var(--muted);font-weight:600}
+.tgrid div.on{opacity:1}
+.tgrid div.pay{border-color:var(--lime-line);box-shadow:0 0 0 .25em var(--lime-soft),var(--shadow)}
+.flow{position:relative;height:.25em;margin:0 .8em;background:repeating-linear-gradient(90deg,var(--line-2) 0 .5em,transparent .5em 1em)}
+.flow i{position:absolute;top:50%;left:0;width:2.2em;height:2.2em;border-radius:50%;background:var(--lime);color:var(--lime-ink);font-style:normal;font-weight:800;display:grid;place-items:center;transform:translate(-50%,-50%);opacity:0}
+.flow i.go{animation:cn .7s ease-in}
+@keyframes cn{0%{left:0;opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
+.fbox{background:var(--ink);color:var(--bg);border-radius:1.2em;padding:1.8em 1.6em;text-align:center;box-shadow:var(--shadow)}
+.fbox small{display:block;font-size:.95em;opacity:.7;margin-bottom:.6em}
+.fbox b{display:block;font-family:var(--display);font-style:italic;font-weight:800;font-size:4.2em;white-space:nowrap;line-height:1;color:var(--lime);font-variant-numeric:tabular-nums}
+.fbox b.bump{animation:bm .4s}
+.fbox span{display:block;font-size:1.1em;margin-top:.3em}
+.fbox .share{margin-top:1.2em;font-size:1em;font-weight:800;padding:.5em .8em;border-radius:.5em;background:var(--lime);color:var(--lime-ink)}
+
+/* инструменты организаторам */
+.kit{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1.4em}
+.kh{display:flex;align-items:center;gap:1em}
+.kh .fb{font-family:var(--display);font-style:italic;font-weight:800;font-size:1.8em;padding:.25em .7em;border-radius:.4em;background:var(--ink);color:var(--lime)}
+.kh .ar{font-size:2em;color:var(--lime-line);font-weight:800}
+.kh .ob{font-size:1.4em;font-weight:800;padding:.5em 1em;border-radius:.6em;border:1.5px solid var(--line-2);background:var(--surface)}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:.9em}
+.kg div{background:var(--surface);border:1px solid var(--line);border-radius:.9em;box-shadow:var(--shadow);padding:1.1em 1.2em;min-height:7.5em;display:flex;flex-direction:column;justify-content:space-between;opacity:0;transform:translateY(.8em);transition:.4s}
+.kg div.on{opacity:1;transform:none}
+.kg div b{font-size:1.3em;line-height:1.2}
+.kg div b::before{content:"✓ ";color:var(--lime-line)}
+.kg div s{font-size:1em;color:var(--bad);text-decoration-thickness:.08em}
+.next{align-self:flex-start;font-size:1.25em;font-weight:800;padding:.6em 1.1em;border-radius:.6em;background:var(--lime);color:var(--lime-ink);opacity:0;transform:translateX(-.6em);transition:.4s}
+.next.on{opacity:1;transform:none}
+
+/* слайд 3: регламентные блоки + гибкая настройка */
+.scene.fx{display:flex;flex-direction:column;gap:1.3em}
+.lg2{display:flex;gap:.7em}
+.lg2 span{font-size:1em;font-weight:800;padding:.4em .8em;border-radius:.5em}
+.lg2 .lk{background:var(--ink);color:var(--bg)}
+.lg2 .cf{background:var(--lime-soft);color:var(--ink);border:1.5px dashed var(--lime-line)}
+.st3{display:grid;grid-template-columns:1fr 6.5em 1fr 6.5em 1fr;align-items:center}
+.sb3{border:1.5px solid var(--line-2);border-radius:.9em;padding:1em 1.1em;background:var(--surface);opacity:0;transform:translateY(.6em);transition:.4s}
+.sb3.on{opacity:1;transform:none}
+.sb3 small{display:block;font-size:.85em;color:var(--muted);font-weight:600}
+.sb3 b{display:block;font-size:1.25em;font-weight:800;margin-bottom:.7em}
+.sy{display:flex;justify-content:space-between;align-items:center;gap:.4em;font-size:.95em;font-weight:700;padding:.5em .7em;border-radius:.5em;background:var(--ink);color:var(--bg)}
+.sy i{font-style:normal;font-size:.9em}
+.cn3{display:flex;flex-direction:column;align-items:center;gap:.3em;text-align:center}
+.cn3 span{font-size:1.6em;font-weight:800;line-height:1}
+.cn3 small{font-size:.85em;font-weight:700;line-height:1.2}
+.cn3.fixd{color:var(--muted)}
+.cn3.flex{color:var(--ink);border:1.5px dashed var(--lime-line);background:var(--lime-soft);border-radius:.7em;padding:.6em .3em;margin:0 .5em;transition:box-shadow .3s}
+.cn3.flex span{color:var(--lime-line)}
+.cn3.flex.ping{box-shadow:0 0 0 .35em var(--lime-soft)}
+.mr3{border:1.5px dashed var(--lime-line);border-radius:.9em;background:var(--lime-soft);padding:1em 1.2em}
+.mrh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8em}
+.mrh b{font-size:1.15em;font-weight:800}
+.tb3{display:flex;gap:.3em}
+.tb3 i{font-style:normal;font-size:.9em;font-weight:700;padding:.35em .8em;border-radius:99em;background:var(--surface);border:1px solid var(--line);color:var(--muted);transition:.25s}
+.tb3 i.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mrg{display:grid;grid-template-columns:repeat(5,1fr);gap:.6em}
+.mrg div{background:var(--surface);border:1px solid var(--line);border-radius:.6em;padding:.6em .7em;display:flex;flex-direction:column;gap:.35em}
+.mrg span{font-size:.85em;color:var(--muted);line-height:1.2}
+.mrg em{font-style:normal;font-weight:800;font-size:1.1em;transition:background .3s}
+.mrg em.ch{background:var(--lime);border-radius:.3em;padding:0 .3em;align-self:flex-start}
+
+.chips.rx{justify-content:flex-start}
+/* мини-график прогноза ФПР: одна серия, выделен 2027 */
+.fc{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:.9em;padding:1em 1.2em .8em;box-shadow:var(--shadow)}
+.fc figcaption{font-size:1em;font-weight:700;color:var(--muted);margin-bottom:.8em}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:.6em;align-items:end;height:9em;padding-top:1.4em}
+.bars div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:.3em;position:relative}
+.bars .tk{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.25em;font-style:normal}
+.bars i{display:block;width:62%;background:var(--line-2);border-radius:.25em .25em 0 0;height:0;transition:height .7s cubic-bezier(.3,1,.5,1)}
+.bars div.hi i{background:var(--lime-line)}
+.bars span{font-size:.85em;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars div.hi span{color:var(--ink);font-weight:800}
+.bars i{position:relative}
+.bars b{font-style:normal;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);padding-bottom:.25em;white-space:nowrap;font-size:.95em;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;opacity:0;transition:opacity .4s}
+.bars div.hi b{opacity:1}
+.bars div:hover b{opacity:1}
+
+/* слайд 14: мокап клуба — ТВ на стене, игроки смотрят на экран */
+.club{position:relative;width:100%;flex:1;min-height:0;border-radius:1.2em;overflow:hidden;box-shadow:var(--shadow)}
+.club .bg{position:absolute;inset:0;width:100%;height:100%}
+.club .tvm{position:absolute;left:19%;top:9%;width:62%}
+.club .tvm .tv{box-shadow:0 1.6em 3em rgba(0,0,0,.55),0 0 4em rgba(130,235,0,.18)}
+.club .ppl{position:absolute;left:0;right:0;bottom:-2%;width:100%;height:62%}
+
+/* финал: опыт проведения — фото с турниров */
+.exp{display:flex;flex-direction:column;gap:1em;min-height:0}
+.mos{flex:1;min-height:0;display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;gap:.8em}
+.pf{margin:0;position:relative;border-radius:1em;overflow:hidden;background:var(--surface-2);border:1.5px dashed var(--line-2);display:grid;place-items:center;opacity:0;transform:scale(.97);transition:.5s}
+.slide.on .pf{opacity:1;transform:none}
+.slide.on .pf:nth-child(2){transition-delay:.15s}.slide.on .pf:nth-child(3){transition-delay:.3s}
+.pf.big{grid-row:1/3}
+.pf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pf:has(img){border:0;box-shadow:var(--shadow)}
+.pf .ph-e{font-size:1.1em;font-weight:700;color:var(--faint)}
+.pf:has(img) .ph-e{display:none}
+.pf figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.4em 1.2em 1em;background:linear-gradient(transparent,rgba(12,23,25,.85));color:#fff;font-size:1.1em;font-weight:600;line-height:1.35}
+.pf figcaption b{display:inline-block;margin-right:.6em;font-family:var(--display);font-style:italic;font-weight:800;padding:.1em .5em;border-radius:.3em;background:var(--lime);color:var(--lime-ink)}
+.stx{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:.8em}
+.stx div{background:var(--surface);border:1px solid var(--line);border-radius:.8em;padding:.8em 1em;box-shadow:var(--shadow)}
+.stx b{display:block;font-family:var(--display);font-style:italic;font-weight:800;font-size:1.4em}
+.stx span{font-size:1em;color:var(--muted)}
+
+/* слайд 3: конструктор из блоков регламента + гибкие правила */
+.scene.r3{display:flex;flex-direction:column;gap:1.1em}
+.r3 .mini{min-height:6em}
+.r3 .mini svg{height:5.6em}
+.r3 .stg{padding:.9em 1em 1em}
+.r3 .stg .sh{margin-bottom:.7em}
+.r3 .sys{margin-bottom:.6em}
+.sys.lkd{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sys.lkd::after{content:none}
+.sys.lkd em{font-style:normal;font-size:.9em}
+.con.fl{border:1.5px dashed var(--lime-line);background:var(--lime-soft);border-radius:.7em;margin:0 .35em;padding:.5em .2em;align-self:center;transition:box-shadow .3s}
+.con.fl small{color:var(--ink)}
+.con.fl.ping{box-shadow:0 0 0 .35em var(--lime-soft)}
+
+.hint{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);color:#5f7478;font:12px var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.theme{position:fixed;left:14px;bottom:10px;z-index:10;font:600 13px var(--sans);border:1px solid #2d4448;background:#132326;color:#fff;border-radius:99px;padding:8px 14px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="deck" id="deck">
+
+<!-- 1. Обложка -->
+<section class="slide cover">
+  <div class="l">
+    <div class="logo">PADEL.<span>SELECT</span></div>
+    <div>
+      <h1>Турниры и лиги<br>по паделу<br><mark>под ключ</mark></h1>
+      <p class="lead">Сервис проведения и судейства турниров любого уровня сложности по регламентам ФПР</p>
+    </div>
+    <div></div>
+  </div>
+  <div class="r">
+    <div class="cv tvx"><iframe class="fit" data-w="1920" data-h="1080" data-src="../prototypes/tv-draw.html" title="ТВ-табло жеребьёвки"></iframe></div>
+    <div class="cv ph1"><iframe class="fit" data-w="412" data-h="860" data-src="../prototypes/public-tournament-mobile.html?t=4daf356d" title="Страница турнира в телефоне"></iframe></div>
+    <div class="cv ph2 refc"><iframe class="crop" data-src="../prototypes/referee-scoring-mix.html?t=dark" title="Приложение для судей"></iframe></div>
+  </div>
+</section>
+
+<!-- 2. ФПР: разделитель -->
+<section class="slide div">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Что получает <mark>ФПР</mark></h2></div>
+  <div class="cards c4">
+    <div class="cd" style="transition-delay:.2s"><div class="k"><b>01</b></div><h3>Конструктор из блоков регламента</h3><p>Любой турнир собирается из готовых блоков по регламенту ФПР</p></div>
+    <div class="cd" style="transition-delay:.3s"><div class="k"><b>02</b></div><h3>Полные данные о турнирах</h3><p>Матчи, счёт, судьи и места сами приходят в систему ФПР</p></div>
+    <div class="cd" style="transition-delay:.4s"><div class="k"><b>03</b></div><h3>Приложение для судей</h3><p>Судья ведёт счёт с телефона, результат сразу в турнире</p></div>
+    <div class="cd" style="transition-delay:.5s"><div class="k"><b>04</b></div><h3>Медиа каждого турнира</h3><p>У каждого турнира раздел «Медиа» — понятно, где брать фото для постов</p></div>
+    <div class="cd" style="transition-delay:.6s"><div class="k"><b>05</b></div><h3>Дополнительный доход</h3><p>Процент с каждого турнира, проведённого в сервисе</p></div>
+    <div class="cd" style="transition-delay:.7s"><div class="k"><b>06</b></div><h3>Инструменты для организаторов</h3><p>Готовый набор под задачи регионов — от федерации</p></div>
+  </div>
+</section>
+
+<!-- 3. ФПР: регламент + гибкая настройка -->
+<section class="slide ba" data-scene="reg">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>По регламенту ФПР — <mark>и гибко под свой турнир</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>В каждом регионе турнир проводят по-своему, требования соблюдаются не всегда</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Этапы и системы проведения — готовые блоки по регламенту ФПР. Правила матчей и переход из групп в финал организатор настраивает сам</p></div>
+    </div>
+    <div class="win">
+      <div class="bar"><i></i><i></i><i></i><div class="u">padel.select/tournaments/new · тип турнира</div></div>
+      <div class="scene r3">
+        <div class="lg2"><span class="lk">🔒 Блоки по регламенту ФПР</span><span class="cf">⚙ Настраивает организатор</span></div>
+        <div class="cs-row">
+          <div class="stg" id="rQ"><div class="sh"><i class="tg"></i><div><small>Этап 1</small><b>Квалификация</b></div></div>
+            <div class="sys lkd">Олимпийская<em>🔒</em></div><div class="mini"><svg viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M5 6H30V18H5M5 30H30V42H5M30 12H55V36H30M55 24H80"/></svg></div></div>
+          <div class="con" id="rC1"><span>→</span><small>8 пар</small></div>
+          <div class="stg" id="rG"><div class="sh"><i class="tg"></i><div><small>Этап 2</small><b>Групповой этап</b></div></div>
+            <div class="sys lkd">4 группы по 4<em>🔒</em></div><div class="mini"><div class="grp"><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div></div></div></div>
+          <div class="con fl" id="rC2"><span>⇄</span><small id="rCT">Вручную</small></div>
+          <div class="stg on" id="rF"><div class="sh"><i class="tg"></i><div><small>Этап 3</small><b>Финальный этап</b></div></div>
+            <div class="sys ph" id="rSys"><span id="rSysT">Выберите систему</span>
+              <div class="dd" id="rDD"><div>Олимпийская</div><div>Олимпийская с доп. турниром</div><div>Олимпийская усовершенствованная</div><div>До двух поражений</div><div>Круговая</div><div>Финальная группа</div></div></div>
+            <div class="mini"><svg viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M5 4H25V12H5M5 16H25V24H5M25 8H45V20H25M45 14H65"/><path d="M5 30H25V38H5M5 42H25V48H5M25 34H45V45H25M45 39H65M65 14V39M65 27H90"/></svg></div></div>
+        </div>
+        <div class="mr3">
+          <div class="mrh"><b>Правила матчей</b><span class="tb3" id="xt"><i class="on">Квалификация</i><i>Группы</i><i>Финал</i></span></div>
+          <div class="mrg">
+            <div><span>Сетов для победы</span><em id="v0">1</em></div>
+            <div><span>Геймов в сете</span><em id="v1">6</em></div>
+            <div><span>Тай-брейк при равенстве</span><em id="v2">до 7</em></div>
+            <div><span>Решающий сет</span><em id="v3">—</em></div>
+            <div><span>При счёте 40:40</span><em id="v4">Золотой мяч</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. ФПР: отчёт в систему ФПР -->
+<section class="slide ba" data-scene="report">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Вся информация о турнире — <mark>в систему ФПР</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>После турнира данные запрашивают у организаторов, доходят только итоговые места</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Матчи, счёт, пары, судьи и места уходят в систему ФПР по форме отчётности федерации</p></div>
+    </div>
+    <div class="rp">
+      <div class="rc"><span class="tg2">ТУРНИР ЗАВЕРШЁН</span><h4>Кубок Светлой стороны V.V Финанс</h4><div class="sub">ФПР 500 · 24–27 сентября · Новосибирск</div>
+        <div class="it" id="i12a"><span>Пары</span><b>23</b></div><div class="it" id="i12b"><span>Матчи со счётом по сетам</span><b>33</b></div>
+        <div class="it" id="i12c"><span>Судьи матчей</span><b>✓</b></div><div class="it" id="i12d"><span>Итоговые места</span><b>23</b></div></div>
+      <div class="pipe" id="p12a"><i></i></div>
+      <div class="doc"><h4>Отчёт по форме ФПР</h4>
+        <div class="dr"><span>Турнир</span><b>ФПР 500 · 24–27 сентября · Новосибирск</b></div>
+        <div class="dr"><span>Участники</span><b>23 пары, 46 игроков</b></div>
+        <div class="dr"><span>Матчи</span><b>33 матча: счёт, корт, время</b></div>
+        <div class="dr"><span>Судейство</span><b>судья каждого матча</b></div>
+        <div class="dr"><span>Места</span><b>все 23 пары и призёры</b></div></div>
+      <div class="pipe" id="p12b"><i></i></div>
+      <div class="fpr"><b>ФПР</b><small>система федерации</small><div class="st" id="s12">ожидает отчёт</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. ФПР: судья -->
+<section class="slide ba" data-scene="ref">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Приложение для судей — <mark>на русском и внутри турнира</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Судьи ведут счёт в испанском приложении: без русского языка и без связи с турниром, результаты переносят вручную</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Судья ведёт счёт с телефона в привычном интерфейсе на русском, результат сразу в сетке, на табло и в эфире</p></div>
+    </div>
+    <div class="ref">
+      <div class="rph" id="rph"><iframe id="refF" class="crop" title="Приложение для судей" data-src="../prototypes/referee-scoring-mix.html?t=dark"></iframe><div class="tap" id="rTap"></div></div>
+      <div class="mir">
+        <div class="mi" id="mA"><h5>Табло у корта <i>сразу</i></h5><div class="sb dk" id="sbA"></div></div>
+        <div class="mi" id="mB"><h5>Страница турнира <i>сразу</i></h5><div class="sb lt" id="sbB"></div></div>
+        <div class="mi" id="mC"><h5>Виджет трансляции <i>сразу</i></h5><div class="sb ov" id="sbC"></div></div>
+        <div class="chips rx"><span class="lm">На русском языке</span><span>Ход гейма по очкам</span><span>Таймеры: пауза, медпомощь 3′ · 5′ · 15′</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. ФПР: медиа -->
+<section class="slide ba" data-scene="media">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Раздел «Медиа» <mark>у каждого турнира</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Фото и видео с турниров приходится каждый раз запрашивать</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Организаторы выкладывают фото в раздел «Медиа» страницы турнира, ФПР берёт контент для постов</p></div>
+    </div>
+    <div class="md">
+      <div class="mob"><div class="scr">
+        <div class="mh"><small>ФПР 500</small><b>Кубок Светлой стороны V.V Финанс</b><span>24–27 сентября 2026</span></div>
+        <div class="mtabs"><i>Расписание</i><i>Сетка</i><i class="on">Медиа</i></div>
+        <div class="gal" id="g14"><div class="gph" data-k="0"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fd6"/><stop offset="1" stop-color="#1b3f86"/></linearGradient></defs><rect width="100" height="100" fill="url(#g0)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="74" cy="54" r="3.2" fill="#fff" opacity=".9"/><rect x="68" y="56" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="22" cy="46" r="3.2" fill="#fff" opacity=".9"/><rect x="52" y="61" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div><div class="gph" data-k="1"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a86d8"/><stop offset="1" stop-color="#22508f"/></linearGradient></defs><rect width="100" height="100" fill="url(#g1)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="28" cy="66" r="3.2" fill="#fff" opacity=".9"/><rect x="74" y="34" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="36" cy="37" r="3.2" fill="#fff" opacity=".9"/><rect x="51" y="58" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div><div class="gph" data-k="2"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a9d8f"/><stop offset="1" stop-color="#1d5d55"/></linearGradient></defs><rect width="100" height="100" fill="url(#g2)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="75" cy="33" r="3.2" fill="#fff" opacity=".9"/><rect x="25" y="35" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="43" cy="40" r="3.2" fill="#fff" opacity=".9"/><rect x="67" y="49" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div><div class="gph" data-k="3"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a69bd"/><stop offset="1" stop-color="#2c3e7a"/></linearGradient></defs><rect width="100" height="100" fill="url(#g3)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="35" cy="67" r="3.2" fill="#fff" opacity=".9"/><rect x="54" y="38" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="43" cy="68" r="3.2" fill="#fff" opacity=".9"/><rect x="50" y="70" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div><div class="gph" data-k="4"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3d8bfd"/><stop offset="1" stop-color="#1e4fa8"/></linearGradient></defs><rect width="100" height="100" fill="url(#g4)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="35" cy="49" r="3.2" fill="#fff" opacity=".9"/><rect x="26" y="55" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="50" cy="39" r="3.2" fill="#fff" opacity=".9"/><rect x="25" y="34" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div><div class="gph" data-k="5"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2e7d6b"/><stop offset="1" stop-color="#173f37"/></linearGradient></defs><rect width="100" height="100" fill="url(#g5)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="59" cy="46" r="3.2" fill="#fff" opacity=".9"/><rect x="67" y="52" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="70" cy="74" r="3.2" fill="#fff" opacity=".9"/><rect x="80" y="63" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg><div class="pr"><i></i></div></div></div>
+      </div></div>
+      <div class="fp" id="fp14"><div class="ph"><div class="av">ФПР</div><div><b>Федерация падела России</b><small>публикация · черновик</small></div></div>
+        <div class="im"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a9d8f"/><stop offset="1" stop-color="#1d5d55"/></linearGradient></defs><rect width="100" height="100" fill="url(#g2)"/><rect x="0" y="0" width="100" height="22" fill="#0c1719" opacity=".35"/><path d="M10 88 L30 30 L70 30 L90 88 Z" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/><path d="M50 30 V88 M20 60 H80" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M14 52 H86" stroke="#fff" stroke-width="1.6" opacity=".85"/><circle cx="75" cy="33" r="3.2" fill="#fff" opacity=".9"/><rect x="25" y="35" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="43" cy="40" r="3.2" fill="#fff" opacity=".9"/><rect x="67" y="49" width="3" height="9" rx="1.5" fill="#0b1b06" opacity=".7"/><circle cx="82" cy="12" r="6" fill="#fff" opacity=".18"/></svg></div>
+        <p>Итоги Кубка Светлой стороны V.V Финанс (ФПР 500) в Новосибирске: победители — Богданов М. и Василюк А.</p>
+        <div class="src">Фото: раздел «Медиа» страницы турнира · padel.select/t/4daf356d</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ФПР: доход -->
+<section class="slide ba" data-scene="income">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Дополнительный доход <mark>с каждого турнира</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Сервисы, на которых проводят турниры, не приносят федерации дохода</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Процент с каждого турнира в сервисе получает федерация</p></div>
+    </div>
+    <div class="inc">
+      <div class="incl">
+        <div class="tgrid" id="incG"></div>
+        <figure class="fc" aria-label="Количество соревнований под эгидой ФПР по годам, прогноз ФПР">
+          <figcaption>Соревнований под эгидой ФПР · прогноз ФПР</figcaption>
+          <div class="bars" id="incB"></div>
+        </figure>
+      </div>
+      <div class="flow"><i id="incC">%</i></div>
+      <div class="fbox"><small>Федерация падела России</small><b id="incN">0</b><span>турниров в 2027 году — с каждого доход ФПР</span><div class="share">% с каждого турнира</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. ФПР: инструменты организаторам -->
+<section class="slide ba" data-scene="tools">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>ФПР даёт организаторам <mark>инструменты под их задачи</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Каждый организатор в регионе сам решает, как провести турнир: таблицы, чаты, ручной перенос</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Федерация даёт организаторам готовый набор инструментов, созданных под их боли</p></div>
+    </div>
+    <div class="kit">
+      <div class="kh"><span class="fb">ФПР</span><span class="ar">→</span><span class="ob">Организатор турнира</span></div>
+      <div class="kg" id="kitG">
+        <div><b>Конструктор турнира</b><s>таблицы и листочки</s></div>
+        <div><b>Страница турнира</b><s>нечего анонсировать</s></div>
+        <div><b>Автозагрузка заявок</b><s>ручной перенос</s></div>
+        <div><b>Онлайн-расписание и результаты</b><s>рассылки по чатам</s></div>
+        <div><b>ТВ-режимы для экранов</b><s>пустые экраны</s></div>
+        <div><b>Телевиджет для трансляций</b><s>нет счёта в эфире</s></div>
+        <div><b>Рекламные места для спонсоров</b><s>нечего предложить</s></div>
+        <div><b>Турнир в цветах клуба</b><s>безликое оформление</s></div>
+      </div>
+      <div class="next" id="kitN">Дальше — как каждый инструмент решает боль организатора →</div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Организаторы: разделитель -->
+<section class="slide div">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Что получают <mark>организаторы</mark></h2></div>
+  <div class="cards">
+    <div class="cd" style="transition-delay:0.2s"><div class="k"><b>01</b></div><h3>Турнир по регламенту за минуты</h3><p>Все системы ФПР уже в конструкторе, данные хранятся в России</p></div>
+    <div class="cd" style="transition-delay:0.3s"><div class="k"><b>02</b></div><h3>Страница турнира</h3><p>Одна ссылка для анонса в соцсетях и для зрителей</p></div>
+    <div class="cd" style="transition-delay:0.4s"><div class="k"><b>03</b></div><h3>Заявки подгружаются автоматически</h3><p>С портала ФПР без ручного ввода, состав обновляется сам</p></div>
+    <div class="cd" style="transition-delay:0.5s"><div class="k"><b>04</b></div><h3>Расписание и результаты онлайн</h3><p>Для участников и зрителей: итоги сыгранных и live-счёт идущих матчей</p></div>
+    <div class="cd" style="transition-delay:0.6s"><div class="k"><b>05</b></div><h3>Несколько ТВ-режимов</h3><p>Табло у корта и экраны в других зонах клуба</p></div>
+    <div class="cd" style="transition-delay:0.7s"><div class="k"><b>06</b></div><h3>Телевиджет для трансляций</h3><p>Live-счёт матча прямо в кадре прямой трансляции</p></div>
+    <div class="cd" style="transition-delay:0.8s"><div class="k"><b>07</b></div><h3>Рекламные места для спонсоров</h3><p>Логотипы спонсоров на табло, странице турнира и в эфире</p></div>
+    <div class="cd" style="transition-delay:0.9s"><div class="k"><b>08</b></div><h3>Турнир в цветах клуба и спонсора</h3><p>Свои цвета на странице, табло и в трансляции</p></div>
+  </div>
+</section>
+
+<!-- 10. Организаторы: конструктор -->
+<section class="slide ba" data-scene="cons">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Турнир по регламенту ФПР <mark>за несколько минут</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Сетки ведут в Google-таблицах и на листочках. Зарубежные сервисы вроде Rankedin не знают регламент ФПР и нарушают 152-ФЗ</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Все системы регламента ФПР уже в конструкторе. Данные хранятся в России по 152-ФЗ</p></div>
+    </div>
+    <div class="win">
+      <div class="bar"><i></i><i></i><i></i><div class="u">padel.select/tournaments/new</div></div>
+      <div class="scene">
+        <div class="cs-steps"><span class="done">Основные</span><span class="cur">2 · Тип турнира</span><span>3 · Матчи</span><span>4 · Участники</span></div>
+        <div class="cs-row">
+          <div class="stg" id="csQ"><div class="sh"><i class="tg"></i><div><small>Этап 1</small><b>Квалификация</b></div></div>
+            <div class="sys">Олимпийская</div>
+            <div class="mini"><svg viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M5 6H30V18H5M5 30H30V42H5M30 12H55V36H30M55 24H80"/></svg></div></div>
+          <div class="con" id="csC1"><span>→</span><small>8 пар</small></div>
+          <div class="stg" id="csG"><div class="sh"><i class="tg"></i><div><small>Этап 2</small><b>Групповой этап</b></div></div>
+            <div class="sys">4 группы по 4</div>
+            <div class="mini"><div class="grp"><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div><div><i></i><i></i><i></i><i></i></div></div></div></div>
+          <div class="con" id="csC2"><span>→</span><small>8 пар</small></div>
+          <div class="stg on" id="csF"><div class="sh"><i class="tg"></i><div><small>Этап 3</small><b>Финальный этап</b></div></div>
+            <div class="sys ph" id="csSys"><span id="csSysT">Выберите систему</span>
+              <div class="dd" id="csDD"><div>Олимпийская</div><div>Олимпийская с доп. турниром</div><div>Олимпийская усовершенствованная</div><div>До двух поражений</div><div>Круговая</div><div>Финальная группа</div></div></div>
+            <div class="mini" id="csFM"><svg viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M5 4H25V12H5M5 16H25V24H5M25 8H45V20H25M45 14H65"/><path d="M5 30H25V38H5M5 42H25V48H5M25 34H45V45H25M45 39H65M65 14V39M65 27H90"/></svg></div></div>
+        </div>
+        <div class="cs-sum" id="csS"><span class="ok">✓ По регламенту ФПР</span><span>24 пары · 3 этапа · 46 матчей</span><span class="ru">Данные в РФ · 152-ФЗ</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. Организаторы: ссылка на турнир -->
+<section class="slide ba" data-scene="link">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Одна ссылка на турнир <mark>для анонса и зрителей</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Нет единой страницы турнира, которую можно анонсировать в соцсетях</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Страница турнира по одной ссылке, всегда с актуальной информацией</p></div>
+    </div>
+    <div class="lk" id="lkBox">
+      <div class="post">
+        <div class="ph"><div class="av">PT</div><div><b>Padel Tennis Club Станционная</b><small>канал клуба</small></div></div>
+        <p>Кубок Светлой стороны V.V Финанс, ФПР 500 — 24–27 сентября! Заявки, расписание, сетка и результаты — по ссылке 👇<br><span class="url" id="lkUrl">padel.select/t/4daf356d</span></p>
+        <div class="pv"><small>padel.select</small><b>Кубок Светлой стороны V.V Финанс</b><span>ФПР 500 · Padel Tennis Club Станционная</span></div>
+        <div class="ft">👁 1,4K · 12:04</div>
+      </div>
+      <div class="phone" id="lkPh"><div class="scr" id="lkScr"><iframe id="lkF" title="Страница турнира в телефоне" data-src="../prototypes/public-tournament-mobile.html?t=4daf356d"></iframe></div></div>
+      <div class="cur2" id="lkCur"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. Организаторы: заявки с портала ФПР -->
+<section class="slide ba" data-scene="apps">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Заявки с портала ФПР <mark>подтягиваются сами</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Каждую заявку и каждое изменение организатор вносит вручную</p></div>
+            <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Вставили ссылку с портала ФПР — пары и рейтинг загружаются и обновляются сами</p></div>
+    </div>
+    <div class="win">
+      <div class="bar"><i></i><i></i><i></i><div class="u">padel.select/tournaments/kubok-svetloy-storony/applications</div></div>
+      <div class="scene">
+        <div class="ap-h"><b>Приём заявок</b><span class="chip live">Идёт приём</span></div>
+        <div class="ap-in"><div class="f" id="apF"></div><button class="btn" id="apB">Загрузить</button></div>
+        <div class="ap-st"><span class="ok" id="apOk"><em>✓</em>Загружено заявок:&nbsp;<span id="apN">0</span></span><span class="nw" id="apNw">+2 новых</span><span class="rf" id="apRf">↻ обновление каждые 10 минут</span></div>
+        <div class="tbl" id="apT">
+          <div class="tr hd"><span>#</span><span>Пара</span><span class="r">Рейтинг</span><span>Статус</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. Организаторы: онлайн-результаты -->
+<section class="slide ba" data-scene="live">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Расписание и результаты <mark>онлайн</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Результаты рассылают по чатам, через 10 минут они уже устарели</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Счёт от судьи сразу обновляет расписание и сетку у всех в телефонах</p></div>
+    </div>
+    <div class="duo">
+      <div class="chat">
+        <div class="ch"><div class="av">💬</div><div><b>Турнир ФПР 500 · участники</b><small>46 участников</small></div></div>
+        <div class="msg" id="c6a"><span class="who">Организатор</span><div class="pic"></div><div class="stamp" id="c6s">УСТАРЕЛО</div><small>14:02</small></div>
+        <div class="msg me" id="c6b">Кто следующий на 2 корте??<small>14:09</small></div>
+        <div class="msg" id="c6c"><span class="who">Организатор</span>Смотрите фото выше ☝️<small>14:11</small></div>
+        <div class="msg me" id="c6d">Там старый счёт, полуфинал уже сыграли<small>14:15</small></div>
+      </div>
+      <div class="mob"><div class="scr">
+        <div class="mh"><small>ФПР 500</small><b>Кубок Светлой стороны V.V Финанс</b><span>27 сентября · Корт 1</span></div>
+        <div class="mtabs"><i class="on">Расписание</i><i>Сетка</i><i>Игроки</i></div>
+        <div class="mc live" id="m6"><div class="mt"><span>16:00 · Финал</span><span class="st lv" id="m6s">● LIVE</span></div>
+          <div class="mr" id="m6a"><span class="nm">Богданов М.<br>Василюк А.</span><b>6</b><b id="m6ag">5</b><b class="pt" id="m6ap">30</b></div>
+          <div class="mr" id="m6b"><span class="nm">Курмаев М.<br>Татарников П.</span><b>4</b><b id="m6bg">1</b><b class="pt" id="m6bp">15</b></div></div>
+        <div class="upd" id="m6u">● обновлено только что</div>
+        <div class="pod" id="m6p"><small>ПРИЗЁРЫ ТУРНИРА</small>
+          <div><i style="background:#e8c35a">1</i>Богданов М. / Василюк А.</div>
+          <div><i style="background:#cfd6d8">2</i>Курмаев М. / Татарников П.</div>
+          <div><i style="background:#d39a6a">3</i>Митрофанов Н. / Холодов Д.</div></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. Организаторы: экраны клуба -->
+<section class="slide ba" data-scene="tv">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Турнир <mark>на всех экранах</mark> клуба</h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Экраны и табло клуба во время турнира не используются</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Табло корта, общее табло и жеребьёвка открываются ссылкой в браузере ТВ</p></div>
+    </div>
+    <div class="tvw">
+<div class="club">
+      <svg class="bg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="cw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#132326"/><stop offset="1" stop-color="#0c1719"/></linearGradient>
+          <linearGradient id="cf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fd6"/><stop offset="1" stop-color="#1b3f86"/></linearGradient>
+          <radialGradient id="gl" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#82eb00" stop-opacity=".18"/><stop offset="1" stop-color="#82eb00" stop-opacity="0"/></radialGradient></defs>
+        <rect width="1000" height="620" fill="url(#cw)"/>
+        <rect width="1000" height="420" fill="url(#gl)"/>
+        <rect x="0" y="26" width="1000" height="5" fill="#82eb00" opacity=".55"/>
+        <path d="M0 470 L1000 470 L1000 620 L0 620 Z" fill="url(#cf)"/>
+        <path d="M120 470 L60 620 M500 470 V620 M880 470 L940 620 M0 540 H1000" stroke="#fff" stroke-width="3" opacity=".7"/>
+        <rect x="0" y="420" width="1000" height="50" fill="#0c1719" opacity=".55"/>
+        <path d="M0 444 H1000" stroke="#e9eef0" stroke-width="4"/><path d="M0 444 V470 M1000 444 V470" stroke="#e9eef0" stroke-width="6"/>
+        <g opacity=".5" stroke="#cfe3e6" stroke-width="2"><path d="M0 330 H1000"/><path d="M200 330 V470 M400 330 V470 M600 330 V470 M800 330 V470"/></g>
+        <rect x="0" y="330" width="1000" height="140" fill="#cfe3e6" opacity=".06"/>
+      </svg>
+      <div class="tvm"><div class="tv"><div class="scr" id="tv7">
+        <iframe class="fit" data-w="1920" data-h="1080" data-src="../prototypes/tv-draw.html" title="Жеребьёвка на ТВ"></iframe>
+        <iframe class="fit off" data-w="1600" data-h="900" data-src="../prototypes/tv-schedule.html" title="Расписание на ТВ"></iframe>
+        <iframe class="fit off" data-w="1600" data-h="900" data-src="../prototypes/tv-live-score.html" title="Табло корта"></iframe>
+      </div></div></div>
+      <svg class="ppl" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><g transform="translate(150 56.0) scale(0.86)"><rect x="-30" y="285" width="24" height="98" rx="10" fill="#e0a98a"/><rect x="6" y="285" width="24" height="98" rx="10" fill="#e0a98a"/><rect x="-31" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><rect x="5" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><ellipse cx="-18" cy="388" rx="20" ry="9" fill="#e9eef0"/><ellipse cx="18" cy="388" rx="20" ry="9" fill="#e9eef0"/><path d="M-38 390h40M-2 390h40" stroke="#82eb00" stroke-width="4"/><path d="M-42 250h84l4 58h-38l-6-20-6 20h-38z" fill="#0c1719"/><rect x="-66" y="150" width="22" height="118" rx="11" fill="#e0a98a"/><rect x="44" y="150" width="22" height="118" rx="11" fill="#e0a98a"/><path d="M-48 142 Q0 128 48 142 L70 150 L72 196 L50 200 L46 258 L-46 258 L-50 200 L-72 196 L-70 150 Z" fill="#2563eb"/><text x="0" y="222" text-anchor="middle" font-family="Inter Tight,Inter,sans-serif" font-weight="800" font-style="italic" font-size="54" fill="#fff" opacity=".9">7</text><path d="M-46 180 L46 180" stroke="#fff" stroke-width="3" opacity=".25"/><rect x="-10" y="116" width="20" height="24" rx="6" fill="#e0a98a"/><circle cx="0" cy="96" r="28" fill="#3b2a20"/><path d="M-28 100 Q0 128 28 100 L28 110 Q0 132 -28 110 Z" fill="#e0a98a" opacity=".35"/><path d="M-27 86 Q0 74 27 86" stroke="#82eb00" stroke-width="6" fill="none" opacity=".9"/><g transform="translate(62 262) rotate(-12)"><rect x="-5" y="0" width="10" height="34" rx="4" fill="#1b1b1b"/><ellipse cx="0" cy="66" rx="30" ry="36" fill="#0c1719" stroke="#82eb00" stroke-width="4"/><circle cx="-14" cy="50" r="2.6" fill="#5f7478"/><circle cx="-14" cy="64" r="2.6" fill="#5f7478"/><circle cx="-14" cy="78" r="2.6" fill="#5f7478"/><circle cx="0" cy="50" r="2.6" fill="#5f7478"/><circle cx="0" cy="64" r="2.6" fill="#5f7478"/><circle cx="0" cy="78" r="2.6" fill="#5f7478"/><circle cx="14" cy="50" r="2.6" fill="#5f7478"/><circle cx="14" cy="64" r="2.6" fill="#5f7478"/><circle cx="14" cy="78" r="2.6" fill="#5f7478"/></g></g><g transform="translate(330 40.0) scale(0.9)"><rect x="-30" y="285" width="24" height="98" rx="10" fill="#c98b6b"/><rect x="6" y="285" width="24" height="98" rx="10" fill="#c98b6b"/><rect x="-31" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><rect x="5" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><ellipse cx="-18" cy="388" rx="20" ry="9" fill="#e9eef0"/><ellipse cx="18" cy="388" rx="20" ry="9" fill="#e9eef0"/><path d="M-38 390h40M-2 390h40" stroke="#82eb00" stroke-width="4"/><path d="M-42 250h84l4 58h-38l-6-20-6 20h-38z" fill="#0c1719"/><rect x="-66" y="150" width="22" height="118" rx="11" fill="#c98b6b"/><rect x="44" y="150" width="22" height="118" rx="11" fill="#c98b6b"/><path d="M-48 142 Q0 128 48 142 L70 150 L72 196 L50 200 L46 258 L-46 258 L-50 200 L-72 196 L-70 150 Z" fill="#0c1719"/><text x="0" y="222" text-anchor="middle" font-family="Inter Tight,Inter,sans-serif" font-weight="800" font-style="italic" font-size="54" fill="#fff" opacity=".9">11</text><path d="M-46 180 L46 180" stroke="#fff" stroke-width="3" opacity=".25"/><rect x="-10" y="116" width="20" height="24" rx="6" fill="#c98b6b"/><circle cx="0" cy="96" r="28" fill="#1b1b1b"/><path d="M-28 100 Q0 128 28 100 L28 110 Q0 132 -28 110 Z" fill="#c98b6b" opacity=".35"/><path d="M-27 86 Q0 74 27 86" stroke="#82eb00" stroke-width="6" fill="none" opacity=".9"/><g transform="translate(62 262) rotate(-12)"><rect x="-5" y="0" width="10" height="34" rx="4" fill="#1b1b1b"/><ellipse cx="0" cy="66" rx="30" ry="36" fill="#0c1719" stroke="#82eb00" stroke-width="4"/><circle cx="-14" cy="50" r="2.6" fill="#5f7478"/><circle cx="-14" cy="64" r="2.6" fill="#5f7478"/><circle cx="-14" cy="78" r="2.6" fill="#5f7478"/><circle cx="0" cy="50" r="2.6" fill="#5f7478"/><circle cx="0" cy="64" r="2.6" fill="#5f7478"/><circle cx="0" cy="78" r="2.6" fill="#5f7478"/><circle cx="14" cy="50" r="2.6" fill="#5f7478"/><circle cx="14" cy="64" r="2.6" fill="#5f7478"/><circle cx="14" cy="78" r="2.6" fill="#5f7478"/></g></g><g transform="translate(600 32.0) scale(0.92)"><rect x="-30" y="285" width="24" height="98" rx="10" fill="#f1c3a5"/><rect x="6" y="285" width="24" height="98" rx="10" fill="#f1c3a5"/><rect x="-31" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><rect x="5" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><ellipse cx="-18" cy="388" rx="20" ry="9" fill="#e9eef0"/><ellipse cx="18" cy="388" rx="20" ry="9" fill="#e9eef0"/><path d="M-38 390h40M-2 390h40" stroke="#82eb00" stroke-width="4"/><path d="M-44 250h88l12 62h-112z" fill="#ffffff"/><rect x="-66" y="150" width="22" height="118" rx="11" fill="#f1c3a5"/><rect x="44" y="150" width="22" height="118" rx="11" fill="#f1c3a5"/><path d="M-48 142 Q0 128 48 142 L70 150 L72 196 L50 200 L46 258 L-46 258 L-50 200 L-72 196 L-70 150 Z" fill="#82eb00"/><text x="0" y="222" text-anchor="middle" font-family="Inter Tight,Inter,sans-serif" font-weight="800" font-style="italic" font-size="54" fill="#fff" opacity=".9">3</text><path d="M-46 180 L46 180" stroke="#fff" stroke-width="3" opacity=".25"/><rect x="-10" y="116" width="20" height="24" rx="6" fill="#f1c3a5"/><circle cx="0" cy="96" r="28" fill="#6b3f22"/><path d="M-28 100 Q0 128 28 100 L28 110 Q0 132 -28 110 Z" fill="#f1c3a5" opacity=".35"/><path d="M6 92 q22 12 12 52 q-8 6 -12 -4 q8 -26 -10 -40z" fill="#6b3f22"/><path d="M-27 86 Q0 74 27 86" stroke="#82eb00" stroke-width="6" fill="none" opacity=".9"/><g transform="translate(62 262) rotate(-12)"><rect x="-5" y="0" width="10" height="34" rx="4" fill="#1b1b1b"/><ellipse cx="0" cy="66" rx="30" ry="36" fill="#0c1719" stroke="#82eb00" stroke-width="4"/><circle cx="-14" cy="50" r="2.6" fill="#5f7478"/><circle cx="-14" cy="64" r="2.6" fill="#5f7478"/><circle cx="-14" cy="78" r="2.6" fill="#5f7478"/><circle cx="0" cy="50" r="2.6" fill="#5f7478"/><circle cx="0" cy="64" r="2.6" fill="#5f7478"/><circle cx="0" cy="78" r="2.6" fill="#5f7478"/><circle cx="14" cy="50" r="2.6" fill="#5f7478"/><circle cx="14" cy="64" r="2.6" fill="#5f7478"/><circle cx="14" cy="78" r="2.6" fill="#5f7478"/></g></g><g transform="translate(800 64.0) scale(0.84)"><rect x="-30" y="285" width="24" height="98" rx="10" fill="#d79c7c"/><rect x="6" y="285" width="24" height="98" rx="10" fill="#d79c7c"/><rect x="-31" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><rect x="5" y="360" width="26" height="18" rx="4" fill="#f4f7f7"/><ellipse cx="-18" cy="388" rx="20" ry="9" fill="#e9eef0"/><ellipse cx="18" cy="388" rx="20" ry="9" fill="#e9eef0"/><path d="M-38 390h40M-2 390h40" stroke="#82eb00" stroke-width="4"/><path d="M-42 250h84l4 58h-38l-6-20-6 20h-38z" fill="#2563eb"/><rect x="-66" y="150" width="22" height="118" rx="11" fill="#d79c7c"/><rect x="44" y="150" width="22" height="118" rx="11" fill="#d79c7c"/><path d="M-48 142 Q0 128 48 142 L70 150 L72 196 L50 200 L46 258 L-46 258 L-50 200 L-72 196 L-70 150 Z" fill="#f4f7f7"/><text x="0" y="222" text-anchor="middle" font-family="Inter Tight,Inter,sans-serif" font-weight="800" font-style="italic" font-size="54" fill="#fff" opacity=".9">9</text><path d="M-46 180 L46 180" stroke="#fff" stroke-width="3" opacity=".25"/><rect x="-10" y="116" width="20" height="24" rx="6" fill="#d79c7c"/><circle cx="0" cy="96" r="28" fill="#2b2b2b"/><path d="M-28 100 Q0 128 28 100 L28 110 Q0 132 -28 110 Z" fill="#d79c7c" opacity=".35"/><path d="M-27 86 Q0 74 27 86" stroke="#82eb00" stroke-width="6" fill="none" opacity=".9"/><g transform="translate(62 262) rotate(-12)"><rect x="-5" y="0" width="10" height="34" rx="4" fill="#1b1b1b"/><ellipse cx="0" cy="66" rx="30" ry="36" fill="#0c1719" stroke="#82eb00" stroke-width="4"/><circle cx="-14" cy="50" r="2.6" fill="#5f7478"/><circle cx="-14" cy="64" r="2.6" fill="#5f7478"/><circle cx="-14" cy="78" r="2.6" fill="#5f7478"/><circle cx="0" cy="50" r="2.6" fill="#5f7478"/><circle cx="0" cy="64" r="2.6" fill="#5f7478"/><circle cx="0" cy="78" r="2.6" fill="#5f7478"/><circle cx="14" cy="50" r="2.6" fill="#5f7478"/><circle cx="14" cy="64" r="2.6" fill="#5f7478"/><circle cx="14" cy="78" r="2.6" fill="#5f7478"/></g></g></svg>
+    </div>
+      <div class="chips" id="ch7"><span class="on">Жеребьёвка</span><span>Расписание</span><span>Табло корта</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. Организаторы: трансляция -->
+<section class="slide ba" data-scene="cast">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Телевиджет <mark>для live-трансляций</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Трансляцию с живым счётом без оператора графики не провести</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Удобный телевиджет для прямых трансляций: live-счёт от судьи сам появляется в кадре</p></div>
+    </div>
+    <div class="tvw">
+      <div class="tv" style="padding:0;border-radius:.8em;overflow:hidden"><div class="scr" style="border-radius:0">
+        <iframe class="fit" data-w="1600" data-h="900" data-src="../prototypes/broadcast-overlay.html" title="Виджет счёта в трансляции"></iframe>
+      </div></div>
+      <div class="chips"><span class="lm">Счёт приходит от судьи</span><span>Без оператора графики</span><span>Подключается одной ссылкой</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. Организаторы: спонсоры -->
+<section class="slide ba" data-scene="brand">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="hdr"><h2>Новые рекламные площади <mark>для спонсоров</mark></h2></div>
+  <div class="body">
+    <div class="txt">
+      <div class="blk now"><div class="lb"><i>✕</i>Сейчас</div><p>Турниру нечего предложить спонсору, кроме баннера у корта</p></div>
+      <div class="blk new"><div class="lb">С PADEL.SELECT</div><p>Табло, страница турнира и эфир становятся рекламными местами</p></div>
+    </div>
+    <div class="tvw">
+      <div class="tv"><div class="scr" id="tv9">
+        <iframe class="fit" data-w="1600" data-h="900" data-src="../prototypes/tv-live-score.html?s=1" title="Табло без брендирования"></iframe>
+        <iframe class="fit off" data-w="1600" data-h="900" data-src="../prototypes/brand-tv-svetlaya.html" title="Табло в цветах спонсора"></iframe>
+        <iframe class="fit off" data-w="1600" data-h="900" data-src="../prototypes/brand-tv-schedule-svetlaya.html" title="ТВ-расписание в цветах спонсора"></iframe>
+        <iframe class="fit off" data-w="1600" data-h="900" data-src="../prototypes/brand-showcase-svetlaya.html" title="Витрина в цветах спонсора"></iframe>
+      </div></div>
+      <div class="chips" id="ch9"><span class="on">Без брендирования</span><span>Табло корта</span><span>ТВ-расписание</span><span>Страница турнира</span><span class="urlc">спонсор: «Светлая сторона»</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 17. Все в выигрыше -->
+<section class="slide">
+  <div class="top"><div class="logo">PADEL.<span>SELECT</span></div><span class="pgn"></span></div>
+  <div class="win-h hdr"><h2>После интеграции <mark>в выигрыше все</mark></h2></div>
+  <div class="map">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line x1="50" y1="40" x2="20" y2="12"/><line x1="50" y1="40" x2="80" y2="12"/>
+      <line x1="50" y1="40" x2="16" y2="80"/><line x1="50" y1="40" x2="84" y2="80"/><line x1="50" y1="40" x2="50" y2="88"/>
+    </svg>
+    <div class="hub"><div><div class="logo">PADEL.<span>SELECT</span></div><small>один сервис</small></div></div>
+    <div class="nd" style="left:2%;top:0;transition-delay:.5s"><h3><i></i>ФПР</h3><ul><li>Турниры из блоков регламента</li><li>Полные данные о турнирах</li><li>Доход с каждого турнира</li></ul></div>
+    <div class="nd" style="right:2%;top:0;transition-delay:.65s"><h3><i></i>Организаторы</h3><ul><li>Удобное проведение турнира</li><li>Без таблиц и ручной работы</li><li>Доп. доход от спонсоров</li></ul></div>
+    <div class="nd" style="left:0;bottom:0;transition-delay:.8s"><h3><i></i>Судьи</h3><ul><li>Счёт с телефона на вышке</li><li>Результат сам попадает в сетку</li></ul></div>
+    <div class="nd" style="left:50%;bottom:0;margin-left:-13.75em;transition-delay:.95s"><h3><i></i>Игроки и зрители</h3><ul><li>Расписание и счёт онлайн</li><li>Одна ссылка на турнир</li></ul></div>
+    <div class="nd" style="right:0;bottom:0;transition-delay:1.1s"><h3><i></i>Спонсоры и клубы</h3><ul><li>Логотипы на табло и в эфире</li><li>Турнир в цветах клуба</li><li>Доход клуба от рекламных мест</li></ul></div>
+  </div>
+</section>
+
+</div>
+<div class="hint">← → листать</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=Math.max(0,Math.min(slides.length-1,+location.hash.slice(1)-1||0));
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+slides.forEach((s,k)=>{const p=s.querySelector('.pgn');if(p)p.textContent=String(k+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');});
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('on',k===i));[slides[i],slides[i+1]].forEach(load);fit();try{history.replaceState(null,'','#'+(i+1))}catch(e){}scenes.run(slides[i].dataset.scene);}
+document.addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();show(i+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(i-1)}if(e.key==='t'||e.key==='T'||e.key==='е'||e.key==='Е')toggle();});
+document.addEventListener('click',e=>{if(e.target.closest('button'))return;show(e.clientX>innerWidth/3?i+1:i-1)});
+let tx=null;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)show(dx<0?i+1:i-1);tx=null});
+function toggle(){const d=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=d;}
+
+/* Сцены: каждая — бесконечный цикл, перезапускается при входе на слайд */
+/* iframe грузятся при показе слайда (и следующего), масштаб — под рамку */
+function load(sl){if(!sl)return;sl.querySelectorAll('iframe[data-src]').forEach(f=>{if(!f.getAttribute('src')){f.addEventListener('load',()=>{fpr(f);setTimeout(()=>fpr(f),400)});f.src=f.dataset.src}})}
+function fit(){document.querySelectorAll('iframe.fit').forEach(f=>{const w=+f.dataset.w,h=+f.dataset.h,sc=f.parentElement.clientWidth/w;f.style.width=w+'px';f.style.height=h+'px';f.style.transform='scale('+sc+')'});
+  document.querySelectorAll('iframe.crop').forEach(cropFit)}
+addEventListener('resize',fit);
+
+/* Все встроенные экраны показывают турнир ФПР 500 «Кубок Светлой стороны V.V Финанс» (padel.select/t/4daf356d).
+   Живой матч — 1/4 финала №2, корт 2: Богданов / Василюк — Парыгин / Карпушкин (6:7, 6:2, 7:5), момент 5:5 в третьем сете. */
+const LIVE=[['1/8 финала · Корт 1','1/4 финала · Корт 2'],['1/8 финала · Матч 1','1/4 финала · Матч 2'],
+  ['Корт 1 · Региональный турнир','Корт 2 · Кубок Светлой стороны'],
+  ['Кутузова / Чиркова','Богданов / Василюк'],['Петрова / Мехтиева','Парыгин / Карпушкин'],
+  ['Загрядский / Семьянинов','Богданов / Василюк'],['Курмаев / Татарников','Парыгин / Карпушкин'],
+  ['Кутузова В.','Богданов М.'],['Чиркова П.','Василюк А.'],['Петрова В.','Парыгин М.'],['Мехтиева З.','Карпушкин П.'],
+  ['Кутузова','Богданов'],['Чиркова','Василюк'],['Петрова','Парыгин'],['Мехтиева','Карпушкин'],
+  ['1/8 финала · ','1/2 финала · '],['Виленкин / Смит','Таргоня / Елисеев'],['Горбунов / Бородин','победитель 1/4 №2'],['FONBET','Светлая сторона']];
+const COMMON=[['ФПР 250','ФПР 500'],['Региональный турнир','Кубок Светлой стороны V.V Финанс'],['Скоро · старт 9 сентября','Скоро · старт 24 сентября'],
+  ['Скоро · 9 сентября','Скоро · 25 сентября'],['9–10 сентября 2026','24–27 сентября 2026']];
+const R16=['Бондаренко Р. / Матус А.','Глушко Д. / Ахременко Н.','Таргоня Ю. / Елисеев Н.','Дорогой Т. / Тулупов С.','Богданов М. / Василюк А.','Борисов Е. / Оверченко М.','Филичев И. / Денисов И.','Парыгин М. / Карпушкин П.','Дьяконов И. / Бобров Б.','Козлов Д. / Рыльский И.','Шутов А. / Никитин А.','Митрофанов Н. / Холодов Д.','Курмаев М. / Татарников П.','Талапин Е. / Коломбо С.','Сычев И. / Богомолов М.','Яшков П. / Томайдис Э.'];
+/* расписание 25 сентября по кортам 1 и 2 */
+const SCHED=[[['1/8 финала','Начало в 12:00','Таргоня Ю. / Елисеев Н.','Дорогой Т. / Тулупов С.'],['1/8 финала','Затем','Бондаренко Р. / Матус А.','Глушко Д. / Ахременко Н.'],['1/8 финала','Затем','Курмаев М. / Татарников П.','Талапин Е. / Коломбо С.'],['1/4 финала','Затем','*победитель 1/8 №5','*победитель 1/8 №6'],['1/4 финала','Затем','*победитель 1/8 №1','*победитель 1/8 №2']],
+  [['1/8 финала','Начало в 12:00','Дьяконов И. / Бобров Б.','Козлов Д. / Рыльский И.'],['1/8 финала','Затем','Филичев И. / Денисов И.','Парыгин М. / Карпушкин П.'],['1/8 финала','Затем','Сычев И. / Богомолов М.','Яшков П. / Томайдис Э.'],['Нижняя сетка · 1-й круг','Затем','*проигравший 1/8 №5','*проигравший 1/8 №6'],['1/4 финала','Затем','*победитель 1/8 №3','*победитель 1/8 №4']]];
+function swapText(d,map){const w=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){let t=n.nodeValue,o=t;
+  for(const [a,b] of map){if(t.includes(a))t=t.split(a).join(b);const A=a.toUpperCase();if(A!==a&&t.includes(A))t=t.split(A).join(b.toUpperCase())}if(t!==o)n.nodeValue=t}}
+function setRow(cells,vals,wonCls,won){cells.forEach((c,j)=>{c.textContent=vals[j];if(wonCls)c.classList.toggle(wonCls,won[j])})}
+function fpr(f){const d=f.contentDocument;if(!d||!d.body)return;const u=f.getAttribute('src')||'';
+  try{
+  swapText(d,COMMON);
+  if(/tv-live-score|brand-tv-svetlaya|broadcast-overlay|referee/.test(u))swapText(d,LIVE);
+  if(/tv-live-score|brand-tv-svetlaya/.test(u)){const rows=[...d.querySelectorAll('.board .row')];const wc=d.querySelector('.sd.won')?'won':'w';
+    if(rows[0]){setRow([...rows[0].querySelectorAll('.sd')],['6','6','5'],wc,[0,1,0]);setRow([...rows[1].querySelectorAll('.sd')],['7','2','5'],wc,[1,0,0])}}
+  if(/broadcast-overlay/.test(u)){const rows=[...d.querySelectorAll('.bug .r')];if(rows[0]){setRow([...rows[0].querySelectorAll('.s')],['6','6','5'],'won',[0,1,0]);setRow([...rows[1].querySelectorAll('.s')],['7','2','5'],'won',[1,0,0])}}
+  if(/referee/.test(u)){const cols=[...d.querySelectorAll('.board .col')];[[['6','6']],[['7','2']]].forEach(([v],i)=>{const bx=cols[i]?[...cols[i].querySelectorAll('.rw.dim .bx')]:[];bx.forEach((b,j)=>b.textContent=v[j])});
+    try{f.contentWindow.eval("PAIR.a='Богданов / Василюк';PAIR.b='Парыгин / Карпушкин';RCV[0]='Парыгин';RCV[1]='Карпушкин';render()")}catch(e){}swapText(d,LIVE)}
+  if(/tv-schedule/.test(u)){d.querySelectorAll('.cc').forEach((cc,ci)=>{[...cc.querySelectorAll('.mc')].forEach((mc,k)=>{const m=SCHED[ci]&&SCHED[ci][k];if(!m)return;
+    const sp=mc.querySelectorAll('.mh span');sp[0].textContent=(m[0]+' · 25 сентября').toUpperCase();sp[1].textContent=m[1].toUpperCase();
+    [...mc.querySelectorAll('.pl')].forEach((p,j)=>{const v=m[2+j];p.classList.toggle('ph',v.startsWith('*'));p.textContent=v.replace('*','')})})});
+    const ck=d.querySelector('.clock');if(ck)ck.textContent='11:45'}
+  if(/showcase/.test(u)){const cells=[...d.querySelectorAll('.br .col')][0];if(cells)[...cells.querySelectorAll('.cell')].forEach((c,j)=>{if(R16[j]){c.classList.remove('wc');c.textContent=R16[j].replace(' / ',' | ').toUpperCase()}})}
+  if(/tv-draw/.test(u)){const b=d.querySelector('.ttl b');if(b)b.textContent='Кубок Светлой стороны V.V Финанс';
+    if(f.closest('.cover'))[...d.querySelectorAll('.row')].forEach((r,j)=>{r.textContent=R16[j].replace(' / ',' | ').toUpperCase();r.classList.add('f')})}
+  }catch(e){}
+  if(f.classList.contains('crop'))cropFit(f)}
+/* iframe.crop показывает только рамку телефона прототипа (.phone), масштабом под контейнер */
+function cropFit(f){const d=f.contentDocument,ph=d&&d.querySelector('.phone');if(!ph){return}
+  if(!f.style.width){f.style.width='520px';f.style.height='1000px'}
+  const r=ph.getBoundingClientRect(),sc=f.parentElement.clientWidth/r.width;f._crop={x:r.left,y:r.top,sc};
+  f.style.transform='scale('+sc+') translate('+(-r.left)+'px,'+(-r.top)+'px)'}
+const W=ms=>new Promise(r=>setTimeout(r,ms));
+const loaded=f=>new Promise(r=>{if(f.contentDocument&&f.contentDocument.readyState==='complete'&&f.getAttribute('src')&&f.contentDocument.URL!=='about:blank')return r();f.addEventListener('load',()=>r(),{once:true})});
+/* перекрёстная смена iframe в рамке с подсветкой подписи */
+function cycle(t,box,chips,durs,onEnter){const fr=[...document.getElementById(box).querySelectorAll('iframe')],ch=chips?[...document.getElementById(chips).querySelectorAll('span:not(.urlc)')]:[];
+  const alive=()=>t===scenes.token;let k=0;
+  const set=n=>{fr.forEach((f,j)=>f.classList.toggle('off',j!==n));ch.forEach((c,j)=>c.classList.toggle('on',j===n))};
+  if(reduce){set(0);onEnter&&onEnter(0,t);return}
+  (async()=>{while(alive()){set(k);onEnter&&onEnter(k,t);await W(durs[k]);k=(k+1)%fr.length}})()}
+const scenes={token:0,
+  run(name){this.token++;if(name&&this[name])this[name](this.token)},
+  income(t){
+    const alive=()=>t===scenes.token,G=document.getElementById('incG'),C=document.getElementById('incC'),N=document.getElementById('incN'),B=document.getElementById('incB');
+    const CAT=['40','100','250','500','750','1000'],Y=[[2024,38],[2025,225],[2026,608],[2027,1106],[2028,1548],[2029,2292],[2030,2818]],TOTAL=1106;
+    if(!G.children.length)for(let k=0;k<12;k++){const d=document.createElement('div');d.innerHTML='<b>ФПР '+CAT[k%6]+'</b><span>турнир</span>';G.appendChild(d)}
+    if(!B.children.length)Y.forEach(([y,v])=>{const d=document.createElement('div');if(y===2027)d.className='hi';d.title=y+': '+v.toLocaleString('ru-RU')+' соревнований';d.innerHTML='<em class="tk"><i data-h="'+Math.max(1.5,v/2818*100)+'"><b>'+v.toLocaleString('ru-RU')+'</b></i></em><span>'+y+'</span>';B.appendChild(d)});
+    const T=[...G.children],bars=[...B.querySelectorAll('i')],fmt=v=>v.toLocaleString('ru-RU');
+    const grow=on=>bars.forEach(i=>i.style.height=on?i.dataset.h+'%':'0');
+    if(reduce){T.forEach(x=>x.classList.add('on'));grow(1);N.textContent=fmt(TOTAL);return}
+    (async()=>{while(alive()){
+      T.forEach(x=>x.classList.remove('on','pay'));N.textContent='0';grow(0);await W(700);grow(1);await W(500);
+      for(let k=0;k<T.length;k++){if(!alive())return;T[k].classList.add('on','pay');C.classList.remove('go');void C.offsetWidth;C.classList.add('go');
+        await W(560);N.textContent=fmt(Math.round(TOTAL*(k+1)/T.length));N.classList.remove('bump');void N.offsetWidth;N.classList.add('bump');T[k].classList.remove('pay')}
+      await W(4500);
+    }})();
+  },
+  tools(t){
+    const alive=()=>t===scenes.token,K=[...document.querySelectorAll('#kitG div')],N=document.getElementById('kitN');
+    if(reduce){K.forEach(x=>x.classList.add('on'));N.classList.add('on');return}
+    (async()=>{while(alive()){
+      K.forEach(x=>x.classList.remove('on'));N.classList.remove('on');await W(900);
+      for(const x of K){if(!alive())return;x.classList.add('on');await W(380)}
+      await W(500);N.classList.add('on');await W(5000);
+    }})();
+  },
+  live(t){
+    const alive=()=>t===scenes.token,$=id=>document.getElementById(id);
+    const msgs=['c6a','c6b','c6c','c6d'].map($),st=$('c6s'),card=$('m6'),sts=$('m6s'),A=$('m6a'),B=$('m6b'),ag=$('m6ag'),bg=$('m6bg'),ap=$('m6ap'),bp=$('m6bp'),u=$('m6u'),pod=$('m6p');
+    const bump=e=>{e.classList.add('bump');setTimeout(()=>e.classList.remove('bump'),220)};
+    const reset=()=>{msgs.forEach(m=>m.classList.remove('on'));st.classList.remove('on');card.classList.add('live');sts.className='st lv';sts.textContent='● LIVE';[A,B].forEach(r=>r.classList.remove('mw','ml'));ag.textContent=5;bg.textContent=1;ap.textContent=30;bp.textContent=15;ap.style.display=bp.style.display='';u.classList.remove('on');pod.classList.remove('on')};
+    const done=()=>{ag.textContent=6;ap.style.display=bp.style.display='none';card.classList.remove('live');sts.className='st';sts.textContent='Завершён';A.classList.add('mw');B.classList.add('ml');pod.classList.add('on');u.classList.add('on')};
+    if(reduce){msgs.forEach(m=>m.classList.add('on'));st.classList.add('on');done();return}
+    (async()=>{while(alive()){
+      reset();
+      for(const m of msgs){await W(550);if(!alive())return;m.classList.add('on')}
+      await W(500);st.classList.add('on');
+      await W(900);if(!alive())return;
+      ap.textContent=40;bump(ap);u.classList.add('on');await W(1300);if(!alive())return;
+      bp.textContent=30;bump(bp);await W(1300);if(!alive())return;
+      done();
+      await W(4200);
+    }})();
+  },
+  tv(t){
+    const names=['БОНДАРЕНКО Р. | МАТУС А.','ГЛУШКО Д. | АХРЕМЕНКО Н.','ТАРГОНЯ Ю. | ЕЛИСЕЕВ Н.','ДОРОГОЙ Т. | ТУЛУПОВ С.','БОГДАНОВ М. | ВАСИЛЮК А.','БОРИСОВ Е. | ОВЕРЧЕНКО М.','ФИЛИЧЕВ И. | ДЕНИСОВ И.','ПАРЫГИН М. | КАРПУШКИН П.','ДЬЯКОНОВ И. | БОБРОВ Б.','КОЗЛОВ Д. | РЫЛЬСКИЙ И.','ШУТОВ А. | НИКИТИН А.','МИТРОФАНОВ Н. | ХОЛОДОВ Д.','КУРМАЕВ М. | ТАТАРНИКОВ П.','ТАЛАПИН Е. | КОЛОМБО С.','СЫЧЕВ И. | БОГОМОЛОВ М.','ЯШКОВ П. | ТОМАЙДИС Э.'];
+    const draw=document.querySelector('#tv7 iframe');
+    cycle(t,'tv7','ch7',[7600,5000,6000],async(k,tk)=>{if(k!==0)return;await loaded(draw);const d=draw.contentDocument;if(!d)return;
+      
+      const rows=[...d.querySelectorAll('.row')];rows.forEach(r=>{r.classList.remove('f');r.innerHTML='&nbsp;'});
+      if(reduce){rows.forEach((r,j)=>{r.textContent=names[j];r.classList.add('f')});return}
+      await W(700);for(let j=0;j<rows.length;j++){if(tk!==scenes.token)return;rows[j].textContent=names[j];rows[j].classList.add('f');await W(380)}});
+  },
+  cast(t){},
+  brand(t){cycle(t,'tv9','ch9',[3200,4200,4200,4200])},
+  reg(t){
+    const alive=()=>t===scenes.token,$=id=>document.getElementById(id);
+    const Q=$('rQ'),G=$('rG'),C1=$('rC1'),C2=$('rC2'),CT=$('rCT'),Y=$('rSys'),YT=$('rSysT'),DD=[...document.querySelectorAll('#rDD div')],pick=3;
+    const T=[...document.querySelectorAll('#xt i')],V=[0,1,2,3,4].map(k=>$('v'+k));
+    /* правила матчей по этапам — пример настройки организатора */
+    const R=[['1','6','до 7','—','Золотой мяч'],['1','9','до 7','—','Больше-меньше'],['2','6','до 7','супер-тай-брейк до 10','Star Point']];
+    const setR=k=>{T.forEach((x,j)=>x.classList.toggle('on',j===k));V.forEach((v,j)=>{if(v.textContent!==R[k][j]){v.textContent=R[k][j];v.classList.add('ch');setTimeout(()=>v.classList.remove('ch'),700)}})};
+    const ping=()=>{C2.classList.add('ping');setTimeout(()=>C2.classList.remove('ping'),400)};
+    const reset=()=>{[Q,G,C1,C2].forEach(e=>e.classList.remove('on'));Y.classList.add('ph');Y.classList.remove('open');YT.textContent='Выберите систему';DD.forEach(d=>d.classList.remove('hl'));CT.textContent='Вручную';T.forEach((x,j)=>x.classList.toggle('on',j===0));V.forEach((v,j)=>v.textContent=R[0][j])};
+    if(reduce){[Q,G,C1,C2].forEach(e=>e.classList.add('on'));Y.classList.remove('ph');YT.textContent=DD[pick].textContent;CT.textContent='Кросс';setR(2);return}
+    (async()=>{while(alive()){
+      reset();await W(1000);if(!alive())return;
+      Q.classList.add('on');await W(450);C1.classList.add('on');await W(600);if(!alive())return;
+      G.classList.add('on');await W(450);C2.classList.add('on');await W(700);if(!alive())return;
+      Y.classList.add('open');await W(450);
+      for(let k=0;k<=pick;k++){DD.forEach(d=>d.classList.remove('hl'));DD[k].classList.add('hl');await W(330);if(!alive())return}
+      await W(250);Y.classList.remove('open','ph');YT.textContent=DD[pick].textContent;await W(700);
+      for(const p of ['Кросс','Стыковые','Кросс']){if(!alive())return;CT.textContent=p;ping();await W(850)}
+      for(const k of [1,2]){await W(1000);if(!alive())return;setR(k)}
+      await W(4000);
+    }})();
+  },
+  report(t){
+    const alive=()=>t===scenes.token,its=['i12a','i12b','i12c','i12d'].map(x=>document.getElementById(x)),D=[...document.querySelectorAll('.doc .dr')],pa=document.querySelector('#p12a i'),pb=document.querySelector('#p12b i'),st=document.getElementById('s12');
+    const shoot=p=>{p.classList.remove('go');void p.offsetWidth;p.classList.add('go')};
+    if(reduce){D.forEach(d=>d.classList.add('on'));st.classList.add('on');st.textContent='✓ отчёт получен';return}
+    (async()=>{while(alive()){
+      D.forEach(d=>d.classList.remove('on'));its.forEach(x=>x.classList.remove('fly'));st.classList.remove('on');st.textContent='ожидает отчёт';
+      await W(500);
+      for(let k=0;k<D.length;k++){if(!alive())return;const it=its[Math.min(k,its.length-1)];its.forEach(x=>x.classList.remove('fly'));it.classList.add('fly');shoot(pa);await W(380);D[k].classList.add('on');await W(100)}
+      its.forEach(x=>x.classList.remove('fly'));await W(200);shoot(pb);await W(500);st.classList.add('on');st.textContent='✓ отчёт получен';
+      await W(4200);
+    }})();
+  },
+  ref(t){
+    const alive=()=>t===scenes.token,F=document.getElementById('refF'),tap=document.getElementById('rTap'),ph=document.getElementById('rph');
+    const boxes=['A','B','C'].map(x=>document.getElementById('sb'+x)),cards=['A','B','C'].map(x=>document.getElementById('m'+x));
+    const read=()=>{const d=F.contentDocument;if(!d)return null;return [...d.querySelectorAll('.board .col')].map((c,i)=>({nm:(d.querySelectorAll('.nm')[i]?.innerText||'').split('\n').filter(x=>x.trim()).slice(0,2).map(x=>x.trim().split(' ')[0]).join(' / '),v:[...c.querySelectorAll('.rw:not(.game) .bx')].map(b=>b.textContent.trim())}))};
+    let prev='';
+    const paint=()=>{const g=read();if(!g)return;const key=JSON.stringify(g);
+      boxes.forEach(b=>{b.innerHTML=g.map(p=>'<div class="sr"><span>'+p.nm+'</span>'+p.v.map((x,j)=>'<b'+(j===p.v.length-1?' class="p"':'')+'>'+x+'</b>').join('')+'</div>').join('')});
+      if(prev&&key!==prev){cards.forEach(c=>{c.classList.add('fl');setTimeout(()=>c.classList.remove('fl'),500)});document.querySelectorAll('.mir b.p').forEach(e=>e.classList.add('bump'))}prev=key};
+    const press=async side=>{const d=F.contentDocument;if(!d)return;let b=[...d.querySelectorAll('.pts2 .pbtn')];
+      if(b.every(x=>x.disabled)){const c=d.querySelector('#sp .ch button');if(c){c.click();await W(300)}b=[...d.querySelectorAll('.pts2 .pbtn')]}
+      const el=b[side];if(!el||el.disabled)return false;const r=el.getBoundingClientRect(),c=F._crop||{x:0,y:0,sc:ph.clientWidth/430};
+      tap.style.left=(r.left+r.width/2-c.x)*c.sc+'px';tap.style.top=(r.top+r.height/2-c.y)*c.sc+'px';tap.classList.remove('go');void tap.offsetWidth;tap.classList.add('go');
+      el.click();return true};
+    (async()=>{await loaded(F);fpr(F);fit();while(alive()){
+      prev='';paint();if(reduce)return;
+      const seq=[1,0,0,1,0,1,1,0,0];
+      for(const sd of seq){await W(1500);if(!alive())return;const ok=await press(sd);await W(120);fpr(F);paint();if(ok===false)break}
+      await W(2500);if(!alive())return;F.contentWindow.location.reload();await loaded(F);fpr(F);fit();
+    }})();
+  },
+  media(t){
+    const alive=()=>t===scenes.token,P=[...document.querySelectorAll('#g14 .gph')],fp=document.getElementById('fp14');
+    if(reduce){P.forEach(p=>{p.classList.add('on');p.querySelector('.pr').style.display='none'});P[2].classList.add('sel');fp.classList.add('on');return}
+    (async()=>{while(alive()){
+      P.forEach(p=>{p.classList.remove('on','sel');const pr=p.querySelector('.pr');pr.style.display='';pr.firstElementChild.style.width='0'});fp.classList.remove('on');
+      await W(900);
+      for(const p of P){if(!alive())return;p.classList.add('on');await W(60);p.querySelector('.pr i').style.width='100%';await W(520);p.querySelector('.pr').style.display='none'}
+      await W(700);P[2].classList.add('sel');await W(700);fp.classList.add('on');
+      await W(4500);
+    }})();
+  },
+  link(t){
+    const box=document.getElementById('lkBox'),url=document.getElementById('lkUrl'),ph=document.getElementById('lkPh'),scr=document.getElementById('lkScr'),F=document.getElementById('lkF'),cur=document.getElementById('lkCur');
+    const alive=()=>t===scenes.token, wait=ms=>new Promise(r=>setTimeout(r,ms));
+    const fit=()=>{F.style.width='412px';F.style.transform='scale('+(scr.clientWidth/412)+')';F.style.height=(scr.clientHeight/(scr.clientWidth/412))+'px'};
+    if(!F.getAttribute('src'))F.src=F.dataset.src;const ready=loaded(F);
+    const doc=()=>F.contentDocument, tab=k=>doc()?.querySelector('.tab[data-tab="'+k+'"]')?.click(), scroll=y=>F.contentWindow?.scrollTo({top:y,behavior:'smooth'});
+    const tabsY=()=>{const el=doc()?.querySelector('.tabs');return el?el.getBoundingClientRect().top+F.contentWindow.scrollY-46:420};
+    fit();addEventListener('resize',fit);
+    if(reduce){ph.classList.add('on');ready.then(()=>{fit()});return}
+    (async()=>{await ready;while(alive()){
+      fit();ph.classList.remove('on');cur.classList.remove('on','tap');url.classList.remove('tap');tab('schedule');F.contentWindow.scrollTo(0,0);
+      const b=box.getBoundingClientRect(),u=url.getBoundingClientRect();
+      cur.style.left=(b.width*.15)+'px';cur.style.top=(b.height*.85)+'px';
+      await wait(1200);if(!alive())return;
+      cur.classList.add('on');await wait(50);cur.style.left=(u.left-b.left+u.width/2)+'px';cur.style.top=(u.top-b.top+u.height/2)+'px';
+      await wait(800);cur.classList.add('tap');url.classList.add('tap');await wait(180);cur.classList.remove('tap');
+      await wait(250);cur.classList.remove('on');ph.classList.add('on');
+      await wait(1600);if(!alive())return;scroll(tabsY());
+      await wait(1800);if(!alive())return;tab('bracket');doc()?.querySelectorAll('.bk .step')[2]?.click();scroll(tabsY());
+      await wait(2600);if(!alive())return;tab('players');scroll(tabsY());
+      await wait(2200);if(!alive())return;tab('schedule');scroll(tabsY()+500);
+      await wait(2600);
+    }})();
+  },
+  cons(t){
+    const Q=document.getElementById('csQ'),G=document.getElementById('csG'),C1=document.getElementById('csC1'),C2=document.getElementById('csC2'),
+      Y=document.getElementById('csSys'),YT=document.getElementById('csSysT'),DD=[...document.querySelectorAll('#csDD div')],S=document.getElementById('csS');
+    const alive=()=>t===scenes.token, wait=ms=>new Promise(r=>setTimeout(r,ms)), pick=3;
+    const finalFrame=()=>{[Q,G,C1,C2].forEach(e=>e.classList.add('on'));Y.classList.remove('ph','open');YT.textContent=DD[pick].textContent;S.classList.add('on')};
+    if(reduce){finalFrame();return}
+    (async()=>{while(alive()){
+      [Q,G,C1,C2,S].forEach(e=>e.classList.remove('on'));Y.classList.add('ph');Y.classList.remove('open');YT.textContent='Выберите систему';DD.forEach(d=>d.classList.remove('hl'));
+      await wait(1200);if(!alive())return;
+      Q.classList.add('on');await wait(500);C1.classList.add('on');await wait(700);if(!alive())return;
+      G.classList.add('on');await wait(500);C2.classList.add('on');await wait(800);if(!alive())return;
+      Y.classList.add('open');await wait(500);
+      for(let k=0;k<=pick;k++){DD.forEach(d=>d.classList.remove('hl'));DD[k].classList.add('hl');await wait(380);if(!alive())return}
+      await wait(300);Y.classList.remove('open','ph');YT.textContent=DD[pick].textContent;
+      await wait(600);S.classList.add('on');
+      await wait(4200);
+    }})();
+  },
+  apps(t){
+    const F=document.getElementById('apF'),B=document.getElementById('apB'),ok=document.getElementById('apOk'),N=document.getElementById('apN'),nw=document.getElementById('apNw'),rf=document.getElementById('apRf'),T=document.getElementById('apT');
+    const url='sb.padelrus.ru/tournaments/1614';
+    const pairs=[['Бондаренко Р. / Матус А.',9740],['Яшков П. / Томайдис Э.',7229],['Дьяконов И. / Бобров Б.',5176],['Курмаев М. / Татарников П.',4010],['Богданов М. / Василюк А.',3350]];
+    const fresh=[['Парыгин М. / Карпушкин П.',6652],['Дорогой Т. / Тулупов С.',3869]];
+    const alive=()=>t===scenes.token, wait=ms=>new Promise(r=>setTimeout(r,ms));
+    const row=(n,[p,r],isNew)=>{const d=document.createElement('div');d.className='tr row';d.innerHTML=`<span class="n">${n}</span><span>${p}</span><span class="r">${r}</span><span class="s${isNew?' new':''}">${isNew?'Новая':'Основа'}</span>`;return d};
+    const finalFrame=()=>{F.textContent=url;ok.classList.add('show');N.textContent=23;nw.classList.add('show');rf.classList.add('show');T.querySelectorAll('.row').forEach(r=>r.remove());
+      [...pairs,...fresh].sort((a,b)=>b[1]-a[1]).forEach((p,k)=>{const d=row(k+1,p,fresh.includes(p));d.classList.add('show');T.appendChild(d)})};
+    if(reduce){finalFrame();return}
+    (async()=>{while(alive()){
+      F.innerHTML='<span class="cur"></span>';F.classList.remove('focus');ok.classList.remove('show');nw.classList.remove('show');rf.classList.remove('show');N.textContent=0;T.querySelectorAll('.row').forEach(r=>r.remove());
+      await wait(1400);if(!alive())return;F.classList.add('focus');
+      for(let c=1;c<=url.length;c++){F.innerHTML=url.slice(0,c)+'<span class="cur"></span>';await wait(38);if(!alive())return}
+      await wait(350);B.classList.add('press');await wait(220);B.classList.remove('press');F.classList.remove('focus');F.textContent=url;
+      for(let k=0;k<pairs.length;k++){await wait(260);if(!alive())return;const d=row(k+1,pairs[k]);T.appendChild(d);requestAnimationFrame(()=>d.classList.add('show'));}
+      N.textContent=21;ok.classList.add('show');await wait(600);rf.classList.add('show');
+      await wait(1800);if(!alive())return;
+      for(const f of fresh){const rows=[...T.querySelectorAll('.row')];const pos=rows.findIndex(r=>+r.querySelector('.r').textContent<f[1]);const d=row(0,f,true);d.classList.add('fresh');pos<0?T.appendChild(d):T.insertBefore(d,rows[pos]);requestAnimationFrame(()=>d.classList.add('show'));
+        [...T.querySelectorAll('.row')].forEach((r,k)=>r.querySelector('.n').textContent=k+1);await wait(380)}
+      N.textContent=23;nw.classList.add('show');
+      await wait(1400);T.querySelectorAll('.fresh').forEach(r=>r.classList.remove('fresh'));
+      await wait(2600);
+    }})();
+  }
+};
+show(i);
+</script>
+</body></html>
