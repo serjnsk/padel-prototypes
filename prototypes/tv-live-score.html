@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Табло у корта · лайв-счёт</title>
+<link rel="icon" href="../assets/brand/favicon.ico" sizes="32x32"><link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;0,900;1,800;1,900&family=Inter:wght@600;700;800&family=Roboto+Condensed:wght@600;700&display=swap">
+<style>
+/* Табло у корта по референсу Moscow 2026: игроки построчно с флагами, подача — точкой у игрока,
+   сеты в фиксированных колонках с «—», очки лаймом, внизу партнёры и время матча.
+   Холст 1920×1080 масштабируется под любой экран целиком. */
+:root{--bg:#0c1719;--bg-2:#0f1d20;--cell:rgba(12,23,25,.82);--line:#22363a;--line-strong:#2f474c;
+ --ink:#fff;--muted:#8a9ea0;--dim:#5e7174;--lime:#82eb00;--lime-ink:#0b1b06;
+ --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,sans-serif;--cond:"Roboto Condensed","Arial Narrow",sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--k,1));
+ display:flex;flex-direction:column;padding:62px 80px 56px;overflow:hidden;
+ background:
+  radial-gradient(900px 520px at 100% 0,rgba(130,235,0,.10),transparent 70%),
+  radial-gradient(1100px 700px at 0 100%,rgba(38,92,101,.35),transparent 70%),
+  repeating-linear-gradient(-66deg,transparent 0 46px,rgba(255,255,255,.022) 46px 54px),
+  var(--bg)}
+
+/* шапка: турнир слева, дивизион и стадия справа */
+.top{display:flex;align-items:flex-start;gap:34px}
+.cat{flex:none;margin-top:6px;background:var(--lime);color:var(--lime-ink);border-radius:10px;padding:14px 22px;font-family:var(--display);font-weight:900;font-style:italic;font-size:34px;line-height:1}
+.ttl{flex:1;min-width:0}
+.ttl b{display:block;font-family:var(--display);font-weight:900;font-style:italic;font-size:60px;line-height:1;text-transform:uppercase;letter-spacing:-.01em}
+.ttl span{display:block;margin-top:12px;font-size:28px;font-weight:700;color:var(--muted)}
+.stg{margin-left:auto;text-align:right;white-space:nowrap;font-family:var(--display);font-weight:800;font-size:46px;line-height:1.12;text-transform:uppercase;letter-spacing:.02em}
+.stg span{display:block;color:var(--lime)}
+
+/* таблица счёта */
+.board{margin-top:auto;display:grid;grid-template-columns:1fr repeat(3,184px) 270px}
+.venue{grid-column:1;align-self:end;padding:0 0 18px 4px;font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
+.tab{grid-column:2/6;display:grid;grid-template-columns:repeat(3,184px) 270px;background:var(--lime);color:var(--lime-ink);
+ clip-path:polygon(28px 0,100% 0,100% 100%,0 100%);border-radius:0 10px 0 0}
+.tab span{padding:18px 0 16px;text-align:center;font-weight:800;font-size:28px;letter-spacing:.1em;text-transform:uppercase}
+.row{display:contents}
+.row>*{background:var(--cell);border-bottom:2px solid var(--line-strong);border-right:2px solid var(--line-strong);height:256px}
+.row>:first-child{border-left:2px solid var(--line-strong)}
+.row.r0>:first-child{border-top:2px solid var(--line-strong);border-radius:12px 0 0 0}
+.row:last-child>:first-child{border-radius:0 0 0 12px}
+.row:last-child>:last-child{border-radius:0 0 12px 0}
+
+.team{position:relative;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:0 40px;min-width:0}
+.pl{display:flex;align-items:center;gap:22px;min-width:0;font-family:var(--cond);font-weight:700;font-size:66px;line-height:1.02;text-transform:uppercase;letter-spacing:.005em}
+.pl .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl.srv{color:var(--lime)}
+/* подача: точка у подающего игрока, не только цвет имени */
+.pl.srv::after{content:"";flex:none;width:30px;height:30px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 8px rgba(130,235,0,.16)}
+.fl{flex:none;width:60px;height:40px;border-radius:4px;background:linear-gradient(#fff 0 33.4%,#1c57a5 33.4% 66.7%,#d52b1e 66.7%) center/cover;box-shadow:0 0 0 2px rgba(255,255,255,.14)}
+
+.sc{display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:132px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.sc.lost{color:var(--muted)}
+.sc.none{color:var(--dim);font-size:96px}
+.sc sup{font-size:.36em;vertical-align:top;margin:.08em 0 0 .06em;color:var(--muted);letter-spacing:0}
+.pt{position:relative;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:138px;line-height:1;font-variant-numeric:tabular-nums;color:var(--lime);letter-spacing:-.03em}
+.pt.ad{font-size:112px}
+
+/* завершённый матч: проигравшая пара приглушена */
+.row.out .pl{color:var(--muted)}
+
+/* событие розыгрыша — плашкой под очками пары, к которой относится; STAR POINT — на линии между парами */
+.ev{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);height:52px;display:flex;align-items:center;padding:0 20px;border-radius:10px;
+ background:#fff;color:var(--lime-ink);font-family:var(--display);font-weight:900;font-style:italic;font-size:27px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;z-index:2}
+.ev.star{background:var(--lime)}
+.ev.mid{bottom:-27px}
+.ev.solo{bottom:auto;top:50%;transform:translate(-50%,-50%);height:72px;padding:0 28px;font-size:38px}
+.ev[hidden]{display:none}
+
+/* подвал: партнёры слева, время матча справа */
+.foot{margin-top:52px;display:flex;align-items:flex-end;gap:28px}
+.lg{flex:none;width:220px;height:84px;border:2px solid var(--line-strong);border-radius:12px;display:grid;place-items:center;color:var(--dim);font-size:17px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3}
+.ps{display:flex;align-items:center;gap:16px;margin-left:12px;padding-left:40px;border-left:2px solid var(--line);height:84px;
+ font-size:38px}
+/* Логотип «Табло»: мяч вместо точки, SELECT на наклонной плашке в акценте скина; правило — assets/tokens.css */
+.ps .logo{font-family:var(--display);font-style:italic;font-weight:900;letter-spacing:.02em;white-space:nowrap;text-decoration:none;--logo-plate:var(--lime);--logo-on:var(--lime-ink);--logo-dot:var(--lime)}
+.ps .logo .b{display:inline-block;width:.34em;height:.34em;border-radius:50%;background:var(--logo-dot,currentColor);margin:0 .12em 0 .08em;overflow:hidden;text-indent:1em}
+.ps .logo em{display:inline-block;position:relative;z-index:0;font-style:italic;color:var(--logo-on);padding:.11em .3em .09em .25em;line-height:1}
+.ps .logo em::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--logo-plate);transform:skewX(-12deg);border-radius:.08em}
+.dur{margin-left:auto;text-align:right}
+.dur span{display:block;font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime)}
+.dur b{display:block;margin-top:6px;font-family:var(--display);font-weight:900;font-size:104px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+</style>
+</head><body>
+<div class="stage" id="stage">
+  <div class="top">
+    <span class="cat">ФПР 250</span>
+    <span class="ttl"><b>Региональный рейтинговый турнир (Новосибирск)</b><span>Новосибирск · 29–30 августа</span></span>
+    <span class="stg">Нижняя сетка<span>1/2 финала</span></span>
+  </div>
+
+  <div class="board" id="board">
+    <div class="venue">Padel Tennis Club Станционная · Корт 2</div>
+    <div class="tab"><span>Сет 1</span><span>Сет 2</span><span>Сет 3</span><span>Очки</span></div>
+  </div>
+
+  <div class="foot">
+    <span class="lg">Логотип<br>партнёра</span>
+    <span class="lg">Логотип<br>партнёра</span>
+    <span class="lg">Логотип<br>партнёра</span>
+    <span class="ps"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span></span>
+    <span class="dur"><span>Время матча</span><b id="dur">00:58:22</b></span>
+  </div>
+</div>
+<script>
+// Данные — демо-турнир публичной страницы (295a92ea): LIVE-матч последнего дня, НС 1/2 №2 на корте 2.
+// Имена «Фамилия Имя», как на публичной странице; country — ISO-код, RU рисуется CSS.
+const pairs=[
+  [{n:'Петров Максим',c:'RU'},{n:'Кочанов Павел',c:'RU'}],
+  [{n:'Мироносицкий Алексей',c:'RU'},{n:'Елисеев Даниил',c:'RU'}],
+];
+// Состояния: ?state=live (по умолчанию, розыгрыш при 40:40 по кругу), tb (тай-брейк 3-го сета), end (матч завершён).
+// sets: [геймы пары 1, геймы пары 2, очки тай-брейка проигравшего] — null = сет не начат; cur — индекс текущего сета.
+// srv: [пара, игрок] подающего. ?s=N фиксирует шаг розыгрыша в live.
+// ?d= — правило 40:40 из настроек матча: star1 (одно «больше», по умолчанию), star2 (AD1, AD2), gold, adv
+const q=new URLSearchParams(location.search);
+const DEUCE={
+  star1:[{p:['40','40']},{p:['AD',''],ev:['Break point',0]},{p:['40','40'],ev:['★ Star point','mid'],star:true}],
+  star2:[{p:['40','40']},{p:['AD1',''],ev:['Break point',0]},{p:['40','40']},{p:['','AD2']},{p:['40','40'],ev:['★ Star point','mid'],star:true}],
+  gold:[{p:['40','40'],ev:['★ Golden point','mid'],star:true}],
+  adv:[{p:['40','40']},{p:['AD',''],ev:['Break point',0]},{p:['40','40']},{p:['','AD']}],
+};
+const states={
+  live:{sets:[[6,3],[4,3],null],cur:1,srv:[1,1],dur:3502,steps:[
+    {p:['15','30']},
+    {p:['40','30'],ev:['Break point',0]},
+    ...(DEUCE[q.get('d')]||DEUCE.star1),
+  ]},
+  tb:{sets:[[6,3],[3,6],[6,6]],cur:2,srv:[0,0],dur:5718,steps:[{p:['6','5'],ev:['Match point',0]}]},
+  end:{sets:[[6,3],[6,4],null],cur:-1,srv:null,dur:4910,win:0,steps:[{p:['',''],ev:['Победа',0],star:true}]},
+};
+const S=states[q.get('state')]||states.live;
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const flag=c=>`<i class="fl" role="img" aria-label="${c==='RU'?'Россия':c}"${c==='RU'?'':` style="background:url(https://flagcdn.com/w80/${c.toLowerCase()}.png) center/cover"`}></i>`;
+
+const board=document.getElementById('board');
+pairs.forEach((pr,i)=>{
+  const sets=S.sets.map((s,k)=>{
+    if(!s)return '<span class="sc none">—</span>';
+    const done=k!==S.cur,lost=done&&s[i]<s[1-i];
+    return `<span class="sc${lost?' lost':''}"><span>${s[i]}${lost&&s[2]!=null?`<sup>${s[2]}</sup>`:''}</span></span>`;
+  }).join('');
+  const out=S.win!=null&&S.win!==i;
+  board.insertAdjacentHTML('beforeend',`<div class="row${i?"":" r0"}${out?' out':''}">
+    <div class="team">${pr.map((x,j)=>`<span class="pl${S.srv&&S.srv[0]===i&&S.srv[1]===j?' srv':''}">${flag(x.c)}<span class="nm">${esc(x.n)}</span></span>`).join('')}</div>
+    ${sets}<span class="pt"><b></b><span class="ev" hidden></span></span></div>`);
+});
+
+const pts=[...board.querySelectorAll('.pt')],evs=[...board.querySelectorAll('.ev')];
+const show=i=>{const s=S.steps[i];
+  pts.forEach((c,j)=>{c.firstChild.textContent=s.p[j];c.classList.toggle('ad',s.p[j].startsWith('AD'))});
+  evs.forEach((e,j)=>{const on=!!s.ev&&(s.ev[1]===j||(s.ev[1]==='mid'&&j===0));e.hidden=!on;
+    if(on){e.textContent=s.ev[0];e.classList.toggle('star',!!s.star);e.classList.toggle('mid',s.ev[1]==='mid');e.classList.toggle('solo',!s.p[j])}});
+};
+const fixed=+q.get('s');
+if(fixed>=1&&fixed<=S.steps.length)show(fixed-1);
+else{let i=0;show(i);if(S.steps.length>1)setInterval(()=>show(i=(i+1)%S.steps.length),3000)}
+
+// Время матча идёт, пока матч не завершён
+const durEl=document.getElementById('dur');let t=S.dur;
+const fmt=x=>[x/3600|0,(x/60|0)%60,x%60].map(n=>String(n).padStart(2,'0')).join(':');
+durEl.textContent=fmt(t);
+if(S.win==null)setInterval(()=>durEl.textContent=fmt(++t),1000);
+
+// Длинные имена: кегль всех имён уменьшается, пока самое длинное не влезет целиком (обрезка — крайний случай)
+const fitNames=()=>{const nm=[...board.querySelectorAll('.pl')];let f=66;
+  const over=()=>nm.some(el=>{const n=el.querySelector('.nm');return n.scrollWidth>n.clientWidth});
+  nm.forEach(el=>el.style.fontSize='');while(over()&&f>48){f-=2;nm.forEach(el=>el.style.fontSize=f+'px')}};
+document.fonts.ready.then(fitNames);
+
+// Холст 1920×1080 целиком в любом окне
+const fit=()=>document.getElementById('stage').style.setProperty('--k',Math.min(innerWidth/1920,innerHeight/1080));
+addEventListener('resize',fit);fit();
+</script>
+</body></html>
