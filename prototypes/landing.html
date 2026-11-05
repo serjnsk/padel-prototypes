@@ -1,0 +1,1930 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PADEL.SELECT — платформа для проведения турниров и лиг по паделу</title>
+<link rel="icon" href="../assets/brand/favicon.ico" sizes="32x32"><link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
+<meta name="description" content="Турниры по паделу по регламенту ФПР: заявки с портала ФПР, жеребьёвка, расписание, судейство на вышке, живые сетки и ТВ-табло в одном сервисе.">
+<meta name="theme-color" content="#f0f5f6">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,700;0,800;1,700;1,800;1,900&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#f0f5f6;--surface:#fff;--surface-2:#f6f9f9;--line:#dde6e8;--line-2:#c9d5d8;
+  --ink:#142c31;--ink-2:#213d43;--muted:#5f7478;--faint:#909ea1;
+  --lime:#82eb00;--lime-soft:rgba(130,235,0,.18);--lime-ink:#0b1b06;
+  --tv:#0c1719;--tv-2:#132326;--tv-line:#22363a;
+  --warn:#92400e;--warn-bg:#fef3c7;--err:#b91c1c;--err-bg:#fee2e2;
+  --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:16px;--r-s:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+
+/* ---------- шапка ---------- */
+.top{position:sticky;top:0;z-index:50;background:rgba(240,245,246,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{height:68px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px}
+/* Логотип «Табло»: мяч вместо точки, SELECT на наклонной плашке в акценте скина; правило — assets/tokens.css */
+.logo{font-family:var(--display);font-style:italic;font-weight:900;letter-spacing:.02em;white-space:nowrap;text-decoration:none;font-size:18px;--logo-plate:var(--lime);--logo-on:var(--lime-ink)}
+.logo .b{display:inline-block;width:.34em;height:.34em;border-radius:50%;background:var(--logo-dot,currentColor);margin:0 .12em 0 .08em;overflow:hidden;text-indent:1em}
+.logo em{display:inline-block;position:relative;z-index:0;font-style:italic;color:var(--logo-on);padding:.11em .3em .09em .25em;line-height:1}
+.logo em::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--logo-plate);transform:skewX(-12deg);border-radius:.08em}
+.nav{display:flex;gap:32px;font-size:15px;font-weight:500;color:var(--muted)}
+.nav a{text-decoration:none}.nav a:hover{color:var(--ink)}
+.lbl-m{display:none}
+.top-actions{display:flex;gap:10px;align-items:center;justify-self:end}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 20px;font-weight:700;font-size:15px;text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:transform .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-ghost{border-color:var(--line-2);background:var(--surface)}
+.btn-lime{background:var(--lime);color:var(--lime-ink)}
+.btn-lg{padding:16px 28px;font-size:17px}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 0;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(-62deg,transparent 0 46px,rgba(130,235,0,.16) 46px 58px);
+  -webkit-mask:radial-gradient(60% 55% at 50% 0%,#000 0,transparent 75%);mask:radial-gradient(60% 55% at 50% 0%,#000 0,transparent 75%);pointer-events:none}
+.hero .wrap{position:relative}
+.pill{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 14px 5px 5px;font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;transition:border-color .2s}
+.pill:hover{border-color:var(--ink)}
+.pill b{font-family:var(--display);font-style:italic;font-weight:900;font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:var(--lime);color:var(--lime-ink);border-radius:999px;padding:4px 11px;white-space:nowrap;flex:none}
+h1{font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(30px,4.3vw,58px);line-height:1.08;letter-spacing:-.02em;margin:26px auto 22px;max-width:1000px}
+.br-d{display:inline}
+.hl1{display:inline-block;background:var(--lime);color:var(--lime-ink);padding:0 .2em .04em;border-radius:.14em;transform:skewX(-6deg);margin-top:.06em}
+.lead{font-size:20px;line-height:1.55;color:var(--muted);max-width:720px;margin:0 auto 32px}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.trust{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin:26px 0 0;padding:0;list-style:none;font-size:14px;color:var(--muted);font-weight:500}
+.trust li{display:flex;align-items:center;gap:8px}
+.trust svg{width:18px;height:18px;padding:3px;border-radius:50%;background:var(--lime);color:var(--lime-ink);flex:none}
+
+/* витрина продукта */
+.show{margin:56px auto 0;background:var(--surface);border:1px solid var(--line);border-radius:24px 24px 0 0;border-bottom:0;padding:18px 18px 0;max-width:1200px;box-shadow:0 -20px 60px -30px rgba(20,44,49,.25)}
+.tabs{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px;width:max-content;max-width:100%;margin:0 auto 16px}
+.tab{border:0;background:transparent;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);color:#fff}
+.screen{position:relative;border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;overflow:hidden;background:var(--surface-2)}
+.chrome{height:38px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+.chrome i{width:11px;height:11px;border-radius:50%;background:var(--line-2)}
+.chrome .url{margin-left:14px;font-size:12px;color:var(--faint);font-family:ui-monospace,Menlo,monospace;background:var(--surface-2);border-radius:6px;padding:4px 12px}
+.chrome .open{margin-left:auto;font-size:12px;font-weight:600;color:var(--ink);text-decoration:none;box-shadow:inset 0 -2px 0 var(--lime)}
+.frame{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--bg)}
+.sizer{pointer-events:none}
+.frame-hint{display:none;text-align:center;font-size:13px;color:var(--faint);padding:8px 0 10px}
+.canvas{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0}
+.scr{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;text-align:left;font-size:13px;line-height:1.35}
+.scr.on{opacity:1;visibility:visible}
+/* 1 кабинет */
+.s-cab{background:#f5f6f8;display:grid;grid-template-rows:52px 1fr}
+.c-top{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 22px}
+.c-top .logo{font-size:15px}
+.c-user{margin-left:auto;display:flex;align-items:center;gap:8px;font-weight:600;font-size:12.5px;border:1px solid var(--line);border-radius:8px;padding:5px 10px 5px 5px}
+.c-user .av{width:24px;height:24px;font-size:10px;background:var(--lime);color:var(--lime-ink)}
+.c-body{display:grid;grid-template-columns:190px 1fr 270px;min-height:0}
+.c-nav{background:#fff;border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.c-nav b{font-weight:500;font-size:14px;padding:10px 12px;border-radius:8px;color:var(--ink-2)}
+.c-nav b.on{background:var(--surface-2);font-weight:700}
+.c-main{padding:20px 22px;min-width:0}
+.c-title{font-family:var(--display);font-style:italic;font-weight:900;font-size:30px;text-transform:uppercase;letter-spacing:-.01em}
+.c-sub{color:var(--muted);font-size:14px;margin:4px 0 18px}
+.c-stages{display:flex;gap:6px;margin-bottom:18px}
+.c-stages span{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.c-stages span.d::before{content:"✓";display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--lime);color:var(--lime-ink);font-size:9px;margin-right:6px}
+.c-stages span.cur{background:var(--ink);color:#fff;border-color:var(--ink)}
+.c-stages small{display:block;font-weight:500;color:#b8c7ca;font-size:10.5px}
+.c-row{display:flex;gap:10px;margin-bottom:16px}
+.c-row .seg span{font-size:13px;padding:7px 13px}
+.c-courts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.c-col{display:flex;flex-direction:column;gap:10px}
+.c-ch{display:flex;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-weight:800;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.c-ch span{color:var(--faint);font-weight:500;letter-spacing:0;text-transform:none}
+.c-m{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.c-m.is-live{border-color:#fecaca;box-shadow:0 0 0 3px #fff1f1}
+.c-m.nl{border-style:dashed;background:transparent}
+.c-mh{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.c-mh .ok{text-transform:none;letter-spacing:0;font-weight:600;color:var(--muted)}
+.c-p{display:flex;justify-content:space-between;padding:3px 0;font-size:15px}
+.c-p span{font-variant-numeric:tabular-nums;letter-spacing:.14em;font-weight:600}
+.c-p.w{font-weight:700}
+.c-mf{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--faint)}
+.c-links{background:#fff;border-left:1px solid var(--line);padding:18px 16px;display:flex;flex-direction:column;gap:2px}
+.c-lh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.c-links>div:not(.c-now){display:flex;align-items:center;gap:9px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-weight:600;font-size:13.5px;margin-bottom:5px}
+.c-links svg{width:15px;height:15px;color:var(--ink-2)}
+.c-now{font-size:13px;padding:8px 0;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.c-next{margin-top:auto;padding:11px}
+/* 2 сетка */
+.s-br{background:var(--bg)}
+.b-head{background:#fff;border-bottom:1px solid var(--line);padding:22px 40px 0;display:flex;flex-direction:column;gap:14px}
+.b-title{font-family:var(--display);font-style:italic;font-weight:900;font-size:30px;letter-spacing:-.01em;margin-top:8px;line-height:1.05}
+.b-sub{color:var(--muted);font-size:13px}
+.b-tabs{display:flex;gap:26px}
+.b-tabs span{padding-bottom:12px;font-weight:600;color:var(--muted);font-size:14px}
+.b-tabs span.on{color:var(--ink);box-shadow:inset 0 -3px 0 var(--lime)}
+.b-bar{display:flex;align-items:center;gap:16px;padding:16px 40px 0}
+.b-leg{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.b-area{position:absolute;left:0;right:0;top:250px;height:470px}
+.b-rh{position:absolute;top:8px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.b-lines{position:absolute;left:0;top:0;width:1280px;height:470px;fill:none;stroke:var(--line-2);stroke-width:1.5}
+.b-m,.b-3rd{position:absolute;width:260px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:visible}
+.b-m>div:not(.b-lv),.b-3rd>div:not(.b-lv){display:flex;align-items:center;gap:8px;height:31px;padding:0 12px;font-size:13px}
+.b-m>div:not(.b-lv)+div,.b-3rd>div:not(.b-lv)+div{border-top:1px solid var(--line)}
+.b-m i,.b-3rd i{font-style:normal;color:var(--faint);font-size:11px;width:12px}
+.b-m span{margin-left:auto;font-variant-numeric:tabular-nums;letter-spacing:.14em;font-weight:600}
+.b-m .w{font-weight:700}
+.b-m.is-live{border-color:#fecaca;box-shadow:0 0 0 3px #fff1f1}
+.b-m.tbd,.b-3rd{border-style:dashed;color:var(--faint)}
+.b-lv{position:absolute;bottom:100%;left:2px;margin-bottom:4px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.b-cup{position:absolute;width:220px;height:120px;border-radius:14px;background:var(--ink);color:#fff;display:grid;place-items:center;align-content:center;gap:2px;text-align:center}
+.b-cup span{font-size:26px}.b-cup b{font-family:var(--display);font-style:italic;font-size:22px}.b-cup small{color:#b8c7ca;font-size:11px}
+/* 3 телефоны */
+.s-ph{background:linear-gradient(160deg,#e3eef0,#f6f9f9)}
+.ph-dev{position:absolute;width:300px;height:620px;border:10px solid var(--ink);border-radius:44px;background:var(--tv);overflow:hidden;box-shadow:0 30px 60px -24px rgba(20,44,49,.45);font-size:12px}
+.ph-dev.main{left:490px;top:40px;z-index:2}
+.ph-dev.pside{top:80px;transform:scale(.9);opacity:.92}
+.ph-dev img{display:block;width:100%;height:auto}
+.ph-dev.l{left:170px}.ph-dev.r{left:810px}
+/* 4 судья */
+.s-ref{background:linear-gradient(160deg,#e3eef0,#f6f9f9)}
+.r-img{position:absolute;left:170px;top:30px;height:660px;width:auto;filter:drop-shadow(0 30px 40px rgba(20,44,49,.4))}
+.r-flow{position:absolute;left:560px;top:70px;width:560px;display:flex;flex-direction:column;gap:22px}
+.r-arrow{display:flex;align-items:center;gap:10px;font-family:var(--display);font-style:italic;font-weight:900;font-size:26px;letter-spacing:-.01em}
+.r-arrow svg{width:26px;height:26px;padding:4px;border-radius:50%;background:var(--lime);color:var(--lime-ink)}
+.r-lbl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;margin-bottom:8px}
+.r-lbl svg{width:16px;height:16px}
+.r-dst .tvm{aspect-ratio:auto;height:250px}
+.tr4{display:grid;grid-template-columns:1fr repeat(3,30px) 48px;align-items:center;gap:6px}
+.tr4 .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px}
+.tr4 .nm i{width:7px;height:7px;border-radius:50%;background:var(--lime)}
+.tr4 .g{text-align:center;color:#5e7174;font-weight:700;font-variant-numeric:tabular-nums}
+.tr4 .g.c{color:#fff}
+.tr4 .pt{text-align:center;background:var(--lime);color:var(--lime-ink);border-radius:6px;font-family:var(--display);font-style:italic;font-weight:900;font-size:22px;padding:2px 0}
+.tr4 .pt.d{background:var(--tv-2);color:#fff}
+.r-dst .pm{background:#fff;max-width:340px}
+/* 5 ТВ */
+.s-tv{background:var(--tv);color:#fff;padding:44px 64px;display:flex;flex-direction:column}
+.s-tv.on{display:flex}
+.t-head{display:flex;align-items:center;gap:20px}
+.t-cat{background:var(--lime);color:var(--lime-ink);font-weight:900;font-family:var(--display);font-style:italic;padding:8px 14px;border-radius:6px;font-size:18px}
+.t-head b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:34px;letter-spacing:-.01em;line-height:1}
+.t-head small{color:#8a9ea0;font-weight:700;letter-spacing:.08em;font-size:13px}
+.s-tv .t-live{margin-left:auto;font-size:16px}
+.s-tv .t-live .dot{width:12px;height:12px}
+.t-grid{margin-top:52px;display:grid;gap:14px}
+.t-hr,.t-row{display:grid;grid-template-columns:1fr 110px 110px 150px;align-items:center;gap:12px}
+.t-hr span{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#5e7174}
+.t-hr span+span{text-align:center}
+.t-row{background:var(--tv-2);border:1px solid var(--tv-line);border-radius:14px;padding:18px 24px}
+.t-row.act{border-color:rgba(130,235,0,.5)}
+.t-nm{font-family:var(--display);font-style:italic;font-weight:900;font-size:40px;display:flex;align-items:center;gap:16px;letter-spacing:-.01em}
+.t-nm i{width:14px;height:14px;border-radius:50%;background:var(--lime)}
+.t-g{text-align:center;font-family:var(--display);font-weight:800;font-size:44px;color:#5e7174}
+.t-g.cur{color:#fff}
+.t-pt{text-align:center;background:var(--lime);color:var(--lime-ink);border-radius:10px;font-family:var(--display);font-style:italic;font-weight:900;font-size:52px;line-height:1.3}
+.t-pt.d{background:#22363a;color:#fff}
+.t-flag{align-self:flex-start;margin-top:22px;background:#facc15;color:#000;font-weight:900;letter-spacing:.12em;font-size:16px;padding:8px 16px;border-radius:6px}
+.t-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--tv-line);padding-top:18px;color:#8a9ea0;font-size:15px}
+.t-foot b{color:#fff}
+.t-sp{display:flex;gap:14px}
+.t-sp i{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.1em;color:#5e7174;border:1px solid var(--tv-line);border-radius:6px;padding:6px 14px}
+
+/* моушен витрины: вкладки листаются сами, на каждом экране свой живой сценарий */
+.tab{position:relative}
+.tab .pr{position:absolute;left:16px;right:16px;bottom:4px;height:2px;border-radius:2px;background:rgba(255,255,255,.2);opacity:0;overflow:hidden}
+.tab[aria-selected=true] .pr{opacity:1}
+.tab .pr i{display:block;height:100%;width:0;background:var(--lime)}
+.play .in{animation:rise .55s cubic-bezier(.2,.7,.2,1) var(--d,0ms) both}
+@keyframes rise{from{opacity:0;translate:0 16px}}
+.fx{display:inline-block;animation:fx .5s cubic-bezier(.2,.7,.2,1)}
+@keyframes fx{0%{transform:translateY(-60%);opacity:0}60%{opacity:1}}
+.hit{animation:hit 1.4s ease-out}
+@keyframes hit{0%,25%{background-color:rgba(130,235,0,.3)}}
+.mcur{position:absolute;left:720px;top:760px;z-index:20;width:24px;height:24px;margin:-3px 0 0 -3px;pointer-events:none;transition:left 1.1s cubic-bezier(.45,0,.2,1),top 1.1s cubic-bezier(.45,0,.2,1);filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+.mcur::after{content:"";position:absolute;left:-12px;top:-12px;width:30px;height:30px;border-radius:50%;background:rgba(130,235,0,.6);opacity:0}
+.mcur.clk::after{animation:clk .6s ease-out}
+@keyframes clk{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.7);opacity:0}}
+.c-links{position:relative}
+.c-links>div{transition:border-color .25s,box-shadow .25s}
+.c-links>div.pick{border-color:var(--lime);box-shadow:0 0 0 3px rgba(130,235,0,.25)}
+.c-toast{position:absolute;left:16px;right:16px;bottom:64px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.c-toast.on{opacity:1;transform:none}
+.c-m{transition:border-color .3s,box-shadow .3s}
+.b-lines path{stroke-dasharray:1;stroke-dashoffset:0}
+.play .b-lines path.dr{animation:draw .7s ease-out var(--d,0ms) both}
+@keyframes draw{from{stroke-dashoffset:1}}
+.b-lines path.b-win{stroke:var(--lime);stroke-width:3;stroke-dashoffset:1;transition:stroke-dashoffset .8s ease-out}
+.b-lines path.b-win.on{stroke-dashoffset:0}
+.b-m{transition:border-color .3s,box-shadow .3s}
+.b-m.tbd .w,.b-3rd .w{color:var(--ink)}
+.t-flag{opacity:0;transform:scale(.6);transform-origin:left center;transition:opacity .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.t-flag.on{opacity:1;transform:none}
+.t-row{transition:border-color .3s}
+.t-row:not(.act) .t-nm i{visibility:hidden}
+.t-ban{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:var(--lime);color:var(--lime-ink);font-family:var(--display);font-style:italic;font-weight:900;font-size:54px;letter-spacing:-.01em;padding:18px 44px;border-radius:16px;white-space:nowrap;opacity:0;transition:opacity .3s,transform .35s cubic-bezier(.3,1.5,.5,1);box-shadow:0 30px 80px -20px rgba(130,235,0,.5)}
+.t-ban.on{opacity:1;transform:translate(-50%,-50%)}
+/* теле виджет */
+.s-wg{background:#0a1214;color:#fff}
+.w-cam{position:absolute;inset:0;width:100%;height:100%}
+.w-ball{animation:ball 2.4s ease-in-out infinite}
+@keyframes ball{0%,100%{transform:translate(0,0)}25%{transform:translate(160px,-150px)}50%{transform:translate(240px,40px)}75%{transform:translate(60px,-120px)}}
+.w-rec{position:absolute;right:40px;top:34px;display:flex;align-items:center;gap:10px;background:rgba(10,18,20,.7);border-radius:8px;padding:7px 12px;font-size:14px}
+.w-rec .live{font-size:12px}
+.w-rec b{font-variant-numeric:tabular-nums}
+.w-bug{position:absolute;left:40px;top:34px;width:430px;background:rgba(12,23,25,.94);border-radius:12px;overflow:visible;box-shadow:0 20px 40px -16px rgba(0,0,0,.7)}
+.play .w-bug{animation-name:slidein}
+@keyframes slidein{from{opacity:0;translate:-40px 0}}
+.w-bh{display:flex;justify-content:space-between;align-items:center;background:var(--lime);color:var(--lime-ink);border-radius:12px 12px 0 0;padding:6px 12px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.w-bh .logo{font-size:12px;--logo-plate:var(--lime-ink);--logo-on:var(--lime);--logo-dot:var(--lime-ink)}
+.w-row{display:grid;grid-template-columns:1fr 34px 34px 58px;align-items:center;height:46px;padding-left:14px;border-top:1px solid var(--tv-line)}
+.w-nm{font-family:var(--display);font-style:italic;font-weight:900;font-size:21px;display:flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:-.01em}
+.w-nm i{width:9px;height:9px;border-radius:50%;background:var(--lime);visibility:hidden}
+.w-row.act .w-nm i{visibility:visible}
+.w-s{text-align:center;font-family:var(--display);font-weight:800;font-size:22px;color:#5e7174;overflow:hidden}
+.w-s.cur{color:#fff}
+.w-pt{height:100%;display:grid;place-items:center;background:#22363a;font-family:var(--display);font-style:italic;font-weight:900;font-size:26px;overflow:hidden}
+.w-row:last-of-type .w-pt{border-radius:0 0 12px 0}
+.w-tag{position:absolute;left:0;top:100%;margin-top:8px;background:var(--lime);color:var(--lime-ink);font-family:var(--display);font-style:italic;font-weight:900;font-size:18px;padding:7px 14px;border-radius:8px;opacity:0;translate:-20px 0;transition:opacity .3s,translate .35s cubic-bezier(.2,.8,.2,1)}
+.w-tag.on{opacity:1;translate:0 0}
+.w-low{position:absolute;left:40px;bottom:36px;display:flex;align-items:center;gap:14px;background:rgba(12,23,25,.92);border-radius:12px;padding:10px 18px 10px 10px}
+.w-lc{background:var(--lime);color:var(--lime-ink);font-family:var(--display);font-style:italic;font-weight:900;font-size:16px;padding:8px 12px;border-radius:8px;text-transform:uppercase}
+.w-low b{display:block;font-size:16px}.w-low small{color:#8a9ea0;font-size:13px}
+.w-sp{position:absolute;right:40px;bottom:36px;width:220px;text-align:center;background:rgba(245,248,248,.95);color:var(--ink);border-radius:12px;padding:10px 14px}
+.w-sp small{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.w-sp b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:20px;overflow:hidden}
+/* витрина, вариант B: схемы с акцентом на главное */
+.sx{background:var(--bg);background-image:radial-gradient(#d3dfe1 1.2px,transparent 1.3px);background-size:24px 24px;color:var(--ink)}
+.x-h{position:absolute;left:64px;top:96px;width:380px}
+.x-h small{display:block;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.x-h>b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:46px;line-height:1.04;letter-spacing:-.02em}
+.x-h>b em{display:inline-block;font-style:inherit;background:var(--lime);color:var(--lime-ink);line-height:1.1;padding:0 .12em .04em;margin-top:.14em;border-radius:.1em}
+.x-ul{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:14px;font-size:17px;font-weight:600}
+.x-ul li{display:flex;gap:10px;align-items:center}
+.x-ul li::before{content:"✓";width:24px;height:24px;border-radius:50%;background:var(--lime);color:var(--lime-ink);display:grid;place-items:center;font-size:12px;flex:none}
+.x-sk{display:block;height:9px;border-radius:5px;background:#dfe7e8}
+.x-svg{position:absolute;left:0;top:0;width:1280px;height:720px;fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;overflow:visible;pointer-events:none}
+.x-dr{stroke-dasharray:1;stroke-dashoffset:0}
+.play .x-dr{animation:draw .6s ease-out var(--d,0ms) both}
+.x-lbl{position:absolute;text-align:center;font-size:14px;font-weight:700;color:var(--muted)}
+.x-tm{font-size:12px;font-weight:700;color:var(--muted)}
+.x-ok{font-size:12px;font-weight:600;color:var(--faint)}
+/* B1 */
+.x-courts{position:absolute;left:500px;top:230px;width:716px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.x-col{display:grid;gap:16px;align-content:start}
+.x-chd{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:0 4px}
+.x-cd{background:#fff;border:2px solid #c9d6d8;border-radius:14px;padding:18px 16px;display:grid;gap:14px;transition:border-color .3s,box-shadow .3s}
+.x-cd.on{border-color:var(--ink);box-shadow:0 0 0 4px rgba(130,235,0,.35)}
+.x-cd.ok{opacity:.6}
+.x-cd.tbd{border-style:dashed;background:transparent}
+.x-ct{display:flex;justify-content:space-between;align-items:center;min-height:16px}
+.x-pr{display:flex;align-items:center;gap:10px;min-height:22px}.x-pr .x-sk{min-width:0;flex-shrink:1}
+.x-pr b{margin-left:auto;white-space:nowrap;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.12em;font-variant-numeric:tabular-nums;overflow:hidden}
+/* B2 */
+/* B3 */
+.x-rh{position:absolute;top:96px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.x-br path{stroke:#c9d6d8;stroke-width:2}
+.x-br path.x-wp{stroke:var(--lime);stroke-width:4;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .5s ease-out}
+.x-br path.x-wp.on{stroke-dashoffset:0}
+.x-n{position:absolute;height:36px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#fff;border:2px solid #c9d6d8;border-radius:10px;transition:background .3s,border-color .3s,box-shadow .3s}
+.x-n i{font-style:normal;font-weight:800;font-size:13px;width:12px;color:var(--muted)}
+.x-n .x-sk{flex:1}
+.x-n.tbd{border-style:dashed;background:rgba(255,255,255,.5)}
+.x-n.tbd .x-sk{opacity:0}
+.x-n.win{background:var(--lime);border-color:var(--lime-ink)}
+.x-n.win i{color:var(--lime-ink)}.x-n.win .x-sk{background:rgba(20,44,49,.25)}
+.x-n.champ{box-shadow:0 0 0 6px rgba(130,235,0,.3),0 16px 30px -12px rgba(20,44,49,.5)}
+.x-n.champ::after{content:"🏆";position:absolute;right:-6px;top:-30px;font-size:26px}
+/* B4 */
+.x-dash path{stroke:#9db0b3;stroke-width:2;stroke-dasharray:1}
+.x-hub{position:absolute;left:500px;top:170px;width:230px;height:380px;background:var(--ink);color:#fff;border-radius:34px;padding:26px 18px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 30px 50px -24px rgba(20,44,49,.6)}
+.x-hub small{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a9ea0}
+.x-hub>b{font-family:var(--display);font-style:italic;font-weight:900;font-size:48px;font-variant-numeric:tabular-nums;margin:10px 0 auto;overflow:hidden}
+.x-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.x-btns span{background:var(--lime);color:var(--lime-ink);border-radius:18px;padding:22px 0 14px;text-align:center;font-family:var(--display);font-style:italic;font-weight:900;font-size:34px;line-height:1;transition:transform .15s}
+.x-btns small{display:block;font-family:inherit;font-style:normal;font-weight:700;font-size:10px;color:rgba(20,44,49,.65);margin-top:8px;letter-spacing:0;text-transform:none}
+.x-btns span.press{transform:scale(.92)}
+.x-ep{position:absolute;left:900px;width:316px;height:96px;background:#fff;border:2px solid var(--ink);border-radius:16px;display:flex;align-items:center;gap:12px;padding:0 18px;transition:box-shadow .3s}
+.x-ep svg{width:22px;height:22px;flex:none}
+.x-ep span{font-weight:700;font-size:14px;white-space:nowrap}
+.x-ep b{margin-left:auto;font-family:var(--display);font-style:italic;font-weight:900;font-size:24px;font-variant-numeric:tabular-nums;overflow:hidden;white-space:nowrap}
+.x-pulse{position:absolute;left:0;top:0;width:16px;height:16px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 5px rgba(130,235,0,.3);opacity:0;offset-rotate:0deg;offset-distance:0%}
+.x-pulse.on{animation:pul .6s ease-in both}
+@keyframes pul{0%{offset-distance:0%;opacity:1}85%{opacity:1}100%{offset-distance:100%;opacity:0}}
+/* B5 */
+/* B6 */
+.x-vid,.x-ov{position:absolute;left:540px;top:220px;width:620px;height:349px;border-radius:14px}
+.x-vid{background:repeating-linear-gradient(135deg,#1b2b2e 0 14px,#162528 14px 28px);border:3px solid var(--ink)}
+.x-camic{position:absolute;left:50%;top:50%;width:64px;height:64px;translate:-50% -50%;fill:none;stroke:#5e7174;stroke-width:2.5;stroke-linejoin:round}
+.x-ov{border:2.5px dashed var(--ink);transform:translate(70px,-110px);transition:transform 1s cubic-bezier(.5,0,.2,1),border-color .4s}
+.x-ov.on{transform:none;border-color:transparent}
+.x-chk{position:absolute;inset:0;border-radius:12px;background:conic-gradient(#e3eaeb 25%,#fff 0 50%,#e3eaeb 0 75%,#fff 0) 0 0/22px 22px;opacity:.85;transition:opacity .5s}
+.x-ov.on .x-chk{opacity:0}
+.x-chip{position:absolute;left:14px;top:-15px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;white-space:nowrap;z-index:1}
+.x-chip.lime{background:var(--lime);color:var(--lime-ink);left:auto;right:14px;transition:opacity .4s}
+.x-ov.on .x-chip.lime{opacity:0}
+.x-vid .x-chip{top:auto;bottom:-15px}
+.x-bug{position:absolute;left:22px;top:24px;width:340px;background:rgba(12,23,25,.95);color:#fff;border-radius:10px;overflow:hidden;box-shadow:0 12px 24px -12px rgba(0,0,0,.7)}
+.x-bug>div{display:grid;grid-template-columns:1fr 26px 26px 44px;align-items:center;height:36px;padding-left:12px;font-family:var(--display);font-style:italic;font-weight:900;font-size:15px}
+.x-bug>div+div{border-top:1px solid var(--tv-line)}
+.x-bug i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-right:7px;vertical-align:middle}
+.x-bug em{font-style:normal;text-align:center;color:#5e7174;font-weight:800;overflow:hidden}.x-bug em.c{color:#fff}
+.x-bug b{height:100%;display:grid;place-items:center;background:var(--lime);color:var(--lime-ink);font-size:18px;overflow:hidden}
+.x-bug>div+div b{background:#22363a;color:#fff}
+.x-spn{position:absolute;right:22px;bottom:22px;background:#fff;color:var(--ink);border-radius:8px;padding:8px 14px;font-family:var(--display);font-style:italic;font-weight:900;font-size:14px;overflow:hidden}
+.x-link{position:absolute;left:540px;top:610px;display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 16px;font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:600}
+.x-link svg{width:18px;height:18px}
+.x-link span{font-family:var(--sans,inherit);color:var(--muted);font-weight:600}
+/* B1: стадии */
+.x-chips{position:absolute;left:480px;top:96px;width:736px;display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.x-cp{background:#fff;border:2px solid #c9d6d8;border-radius:10px;padding:7px 9px;transition:background .3s,border-color .3s,color .3s}
+.x-cp b{display:block;font-size:12.5px;white-space:nowrap}
+.x-cp small{display:block;font-size:11px;font-weight:600;color:var(--faint);white-space:nowrap}
+.x-cp.done{border-color:var(--ink)}
+.x-cp.done small{color:var(--ink)}.x-cp.done small::before{content:"✓ ";color:#4f9c00;font-weight:900}
+.x-cp.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+.x-cp.cur small{color:var(--lime)}
+.x-pan{position:absolute;left:480px;top:168px;width:736px;height:490px;background:#fff;border:2px solid var(--ink);border-radius:18px;overflow:hidden}
+.x-pp{position:absolute;inset:0;padding:22px 24px;opacity:0;translate:0 12px;transition:opacity .35s,translate .35s}
+.x-pp.on{opacity:1;translate:0 0}
+.x-pt{display:flex;align-items:baseline;justify-content:space-between;font-family:var(--display);font-style:italic;font-weight:900;font-size:24px;margin-bottom:16px}
+.x-pt small{font-family:var(--sans,inherit);font-style:normal;font-size:12px;font-weight:700;background:var(--lime);color:var(--lime-ink);border-radius:999px;padding:3px 10px}
+.x-pp.on .st{animation:rise .4s cubic-bezier(.2,.7,.2,1) calc(var(--i)*var(--step,90ms)) both}
+.x-fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.x-f{border:1.5px solid #dfe7e8;border-radius:10px;padding:9px 12px}
+.x-f small{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.x-f b{font-size:16px}
+.x-zt{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.x-zt span{font-size:12px;font-weight:700;border:1.5px solid #dfe7e8;border-radius:999px;padding:4px 10px;color:var(--muted)}
+.x-zt span.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.x-zt b{margin-left:auto;font-size:15px}
+.x-al{display:grid;gap:6px}
+.x-ar{display:grid;grid-template-columns:24px 1fr 60px 112px;align-items:center;gap:12px;border:1.5px solid #dfe7e8;border-radius:10px;padding:0 12px;height:42px}
+.x-ar i{font-style:normal;font-weight:800;color:var(--faint);font-size:13px}
+.x-ar em{font-style:normal;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.x-ar u{text-decoration:none;justify-self:end;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;background:#e7eeef}
+.x-ar u.q{background:#e8f9d3}.x-ar u.r{background:transparent;border:1.5px dashed #c9d6d8;color:var(--faint)}
+.x-note{margin:-6px 0 14px;font-size:13.5px;color:var(--muted)}
+.x-dw{display:grid;gap:18px}
+.x-dc{display:grid;gap:18px;align-content:start}
+.x-dm{display:grid;gap:6px;position:relative}
+.x-dm::after{content:"";position:absolute;right:-12px;top:14px;bottom:14px;width:10px;border:2px solid #c9d6d8;border-left:0;border-radius:0 6px 6px 0}
+.x-sl{height:38px;border:1.5px dashed #c9d6d8;border-radius:8px;overflow:hidden}
+.x-sl>span{display:flex;align-items:center;gap:8px;height:100%;padding:0 10px;background:#fff;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.x-sl i{font-style:normal;font-weight:800;font-size:12px;width:18px}
+.x-sl .x-sk{flex:1;height:8px}
+.x-pp[data-x="p3"] .st{--step:55ms}
+.x-pp[data-x="p2"] .x-sl{height:50px}.x-pp[data-x="p2"] .x-dc{gap:34px}.x-pp[data-x="p2"] .x-dm{gap:10px}
+.x-pp[data-x="p3"] .x-sl{height:34px}.x-pp[data-x="p3"] .x-dc{gap:22px}
+.x-qg{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}
+.x-qm{border:2px solid #c9d6d8;border-radius:12px;overflow:hidden}
+.x-qp{display:grid;grid-template-columns:28px 1fr auto 30px;align-items:center;gap:10px;height:62px;padding:0 12px;background:#fff}
+.x-qp+.x-qp{border-top:1.5px solid #dfe7e8;opacity:.55}
+.x-qp i{font-style:normal;font-weight:800;font-size:12px;color:var(--faint)}
+.x-qp b{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.12em}
+.x-qp u{text-decoration:none}
+.x-pp.on .x-qp.wn{animation:win .35s ease-out calc(300ms + var(--i)*260ms) both}
+@keyframes win{from{background:#fff}to{background:var(--lime)}}
+.x-qb{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--lime);font-weight:900;font-size:12px}
+.x-pp.on .x-qb{animation:pop .35s cubic-bezier(.3,1.6,.5,1) calc(500ms + var(--i)*260ms) both}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
+.x-mc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.x-mcol{display:grid;gap:12px;align-content:start}
+.x-mc .x-cd{padding:14px}
+.x-champ{position:absolute;left:24px;right:24px;bottom:22px;background:var(--lime);color:var(--lime-ink);border-radius:12px;padding:14px;text-align:center;font-family:var(--display);font-style:italic;font-weight:900;font-size:20px;opacity:0;translate:0 10px;transition:opacity .4s,translate .4s}
+.x-champ.on{opacity:1;translate:0 0}
+.x-cd.fin{border-color:var(--lime-ink);background:var(--lime)}.x-cd.fin .x-sk{background:rgba(20,44,49,.25)}.x-cd.fin .x-ok{color:var(--lime-ink)}
+/* B5: два режима */
+.x-mode{position:absolute;left:670px;top:92px;display:flex;gap:4px;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:4px}
+.x-mode span{padding:7px 16px;border-radius:999px;font-size:14px;font-weight:800;color:var(--muted);transition:background .3s,color .3s}
+.x-mode span.on{background:var(--ink);color:#fff}
+.x-tv2{position:absolute;left:500px;top:150px;width:700px;height:394px;background:var(--tv);border:10px solid var(--ink);border-radius:16px;overflow:hidden;color:#fff}
+.x-stand2{position:absolute;left:800px;top:544px;width:100px;height:26px;background:var(--ink);clip-path:polygon(25% 0,75% 0,100% 100%,0 100%)}
+.x-cap{position:absolute;left:500px;top:592px;width:700px;text-align:center;font-size:16px;font-weight:700;color:var(--ink-2)}
+.tvx{position:absolute;inset:0;padding:16px 18px;display:flex;flex-direction:column;opacity:0;transition:opacity .45s}
+.tvx.on{opacity:1}
+.tv-cat{background:var(--lime);color:var(--lime-ink);font-family:var(--display);font-style:italic;font-weight:900;border-radius:5px;padding:4px 9px;font-size:13px}
+.tg-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.tg-top b{font-family:var(--display);font-style:italic;font-weight:900;font-size:20px}
+.tg-dt{margin-left:auto;color:#8a9ea0;font-weight:800;font-size:12px;letter-spacing:.08em}
+.tg-dt span{color:#fff;font-size:15px}
+.tg-cols{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;min-height:0}
+.tg-col{display:flex;flex-direction:column;gap:8px}
+.tg-ch{background:#18272a;border-radius:5px;padding:7px;text-align:center;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.12em}
+.tg-m{flex:1;background:var(--tv-2);border:1px solid var(--tv-line);border-radius:6px;padding:9px 10px;display:flex;flex-direction:column;justify-content:center;transition:border-color .3s}
+.tg-m.on{border-color:rgba(130,235,0,.6)}
+.tg-h{font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#8a9ea0;margin-bottom:5px}
+.tg-h .lv,.tg-h span.lv{color:var(--lime)}
+.tg-p{display:flex;justify-content:space-between;font-weight:800;font-size:14px;line-height:1.35}
+.tg-p em{font-style:normal;letter-spacing:.14em;font-variant-numeric:tabular-nums;overflow:hidden}
+.tg-p i{font-weight:600;color:#5e7174}
+.tg-dots{display:flex;justify-content:center;gap:6px;padding-top:10px}
+.tg-dots i{width:26px;height:4px;border-radius:2px;background:#22343a;transition:background .3s,width .3s}
+.tg-dots i.on{background:var(--lime);width:34px}
+.tc-top{display:flex;align-items:center;gap:12px}
+.tc-top b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:22px;line-height:1}
+.tc-top small{display:block;color:var(--lime);font-weight:800;font-size:11px;letter-spacing:.1em;margin-top:3px}
+.tc-lv{margin-left:auto;display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.1em}
+.tc-lv .dot{width:10px;height:10px}
+.tc-hr,.tc-r{display:grid;grid-template-columns:1fr 70px 80px 110px;align-items:center;gap:10px}
+.tc-hr{margin:16px 0 6px;padding:0 16px}
+.tc-hr span{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5d7175;text-align:center}
+.tc-hr span:first-child{text-align:left}
+.tc-r{background:var(--tv-2);border:1px solid var(--tv-line);border-radius:12px;padding:12px 16px;margin-bottom:8px;transition:border-color .3s,background .3s}
+.tc-r.srv{border-color:rgba(130,235,0,.45);background:linear-gradient(90deg,rgba(130,235,0,.1),var(--tv-2) 45%)}
+.tc-n{display:flex;align-items:center;gap:12px;font-family:var(--display);font-style:italic;font-weight:900;font-size:27px;white-space:nowrap}
+.tc-n i{width:14px;height:14px;border-radius:50%;background:#2c4045}
+.tc-r.srv .tc-n i{background:var(--lime)}
+.tc-s{text-align:center;font-family:var(--display);font-weight:800;font-size:30px;color:#8ba0a4}
+.tc-g{text-align:center;font-family:var(--display);font-weight:800;font-size:36px;overflow:hidden}
+.tc-p{text-align:center;font-family:var(--display);font-weight:900;font-size:48px;line-height:1;overflow:hidden}
+.tc-r.srv .tc-p{color:var(--lime)}
+.tc-ev{align-self:flex-end;background:var(--lime);color:var(--lime-ink);font-weight:800;letter-spacing:.12em;font-size:14px;padding:7px 14px;border-radius:8px;opacity:0;transform:scale(.6);transition:opacity .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.tc-ev.on{opacity:1;transform:none}
+.tc-ft{margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--tv-line);padding-top:10px;color:#8a9ea0;font-size:13px}
+.tc-ft b{color:#fff}
+.tc-sp{display:flex;gap:8px}.tc-sp i{width:56px;height:20px;border:1px solid var(--tv-line);border-radius:5px}
+/* B1: сервис делает сам */
+.x-auto{margin-top:30px;background:#fff;border:2px solid var(--ink);border-radius:16px;padding:16px 18px;box-shadow:0 16px 30px -20px rgba(20,44,49,.5)}
+.x-auto small{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.x-auto small::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(130,235,0,.25)}
+.x-auto b{display:block;font-size:21px;line-height:1.25;min-height:52px}
+.x-auto b.fx{display:block}
+/* B3: 3-е место и синхронизация */
+[data-x="n3rd"] i{width:auto;white-space:nowrap}
+.x-lbl3{position:absolute;left:1060px;top:520px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.x-sync{position:absolute;left:480px;top:640px;background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;opacity:0}
+.x-sync.on{animation:sync 1.6s ease-out}
+@keyframes sync{0%{opacity:0;translate:0 8px}15%,75%{opacity:1;translate:0 0}100%{opacity:0}}
+/* B2: расписание → все экраны */
+.x-sb{position:absolute;left:480px;top:100px;width:432px;background:#fff;border:2px solid var(--ink);border-radius:18px;padding:14px;display:grid;gap:8px}
+.x-sbh,.x-sr{display:grid;grid-template-columns:42px repeat(3,1fr);gap:8px;align-items:stretch}
+.x-sbh b{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center;background:#eef3f4;border-radius:6px;padding:5px 0}
+.x-sr>span{font-size:12px;font-weight:800;color:var(--muted);padding-top:8px;overflow:hidden}
+.x-bm,.x-slot,.x-em{min-height:78px;border-radius:10px}
+.x-bm{position:relative;border:1.5px solid #c9d6d8;background:#fff;padding:7px 8px;font-size:11.5px;font-weight:600;line-height:1.35;transition:left .8s cubic-bezier(.5,0,.2,1),top .8s cubic-bezier(.5,0,.2,1),border-color .3s,box-shadow .3s,opacity .3s}
+.x-bm i{font-weight:500;color:var(--faint)}
+.x-bh{font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--muted);margin-bottom:3px;min-height:14px}
+.x-bh .live{font-size:10px}
+.x-bm.done{opacity:.55}
+.x-bm.air{border-color:var(--ink);box-shadow:0 0 0 3px rgba(130,235,0,.35)}
+.x-bm.tbd{border-style:dashed}
+.x-bm.drag{left:0;top:0;border-color:var(--ink);box-shadow:0 12px 24px -12px rgba(20,44,49,.6);z-index:2}
+.x-bm.go{rotate:-2deg}
+.x-slot{border:1.5px dashed #9db0b3;display:grid;place-items:center;font-size:10.5px;color:var(--faint);text-align:center;background:repeating-linear-gradient(135deg,#f6f9f9 0 6px,#fff 6px 12px)}
+.x-em{border:1.5px dashed #e1e8e9}
+.x-tray{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;border-top:1.5px dashed #c9d6d8;margin-top:6px;padding-top:12px}
+.x-tray small{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.x-tray.empty small::after{content:" · все матчи на кортах ✓";color:#4f9c00;letter-spacing:0;text-transform:none;font-weight:700}
+.x-out{position:absolute;left:1000px;width:216px;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:9px 12px;display:grid;gap:3px}
+.x-oh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;margin-bottom:2px}
+.x-oh svg{width:17px;height:17px}
+.x-or{display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:8px;height:21px;border-radius:6px;padding:0 4px}
+.x-or .x-sk{height:7px}
+.x-or em{font-style:normal;font-size:11px;font-weight:800;overflow:hidden}
+.x-dotc{width:8px;height:8px;border-radius:50%;background:#c9d6d8}
+.x-oh+.x-or .x-dotc{background:#ef4444}
+.x-oh+.x-or em{color:#ef4444}
+.x-or.dn .x-dotc{background:#c9d6d8}.x-or.dn em{color:var(--muted)}
+.x-or.nw{display:none}.x-or.nw.vis{display:grid}
+.x-say{position:absolute;left:480px;top:640px;background:var(--ink);color:#fff;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:700;opacity:0}
+.x-say.on{animation:sync 2.2s ease-out both}
+/* анимированные макеты в блоках возможностей: холст фиксированного размера, масштаб под ширину карточки */
+.mo{position:relative;overflow:hidden;width:100%}
+.mo-c{position:absolute;left:0;top:0;transform-origin:0 0}
+.mo-tv{background:var(--tv);color:#fff}
+.mo-ref{width:260px;max-width:100%;margin:0 auto;filter:drop-shadow(0 24px 30px rgba(20,44,49,.35))}
+.mo-ref .rf{box-shadow:none}
+.mo-ph{width:270px;max-width:100%;margin:0 auto}
+.mo-ph .ph-dev{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.dw{position:absolute;inset:0;background:repeating-linear-gradient(180deg,#0b1412 0 44px,#0e1a18 44px 88px);color:#fff;font-family:var(--display);display:flex;flex-direction:column}
+.dw-h{display:flex;align-items:center;gap:22px;padding:28px 44px 18px}
+.dw-cat{background:var(--lime);color:var(--lime-ink);border-radius:6px;padding:10px 18px;font-weight:900;font-style:italic;font-size:24px}
+.dw-t b{display:block;font-weight:900;font-style:italic;font-size:30px;line-height:1.05}
+.dw-t span{display:block;font-weight:800;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);margin-top:5px}
+.dw-pop{margin-left:auto;display:flex;align-items:center;gap:12px;background:#fff;color:#0b1414;border-radius:10px;padding:9px 16px;font-weight:900;font-style:italic;opacity:0;translate:0 -8px;transition:opacity .3s,translate .3s}
+.dw-pop.on{opacity:1;translate:0 0}
+.dw-pop small{font-style:normal;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#4f9c00}
+.dw-pop b{font-size:21px}
+.dw-lv{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:.08em}
+.dw-lv i{width:12px;height:12px;border-radius:50%;background:#ff4d4d;animation:blink 1.4s infinite}
+.dw-br{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0 80px;padding:0 70px 30px 44px;align-content:center}
+.dw-col{display:grid;gap:6px}
+.dw-r{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center}
+.dw-r.b{margin-bottom:14px}
+.dw-r em{font-style:italic;font-weight:900;font-size:22px;color:var(--lime);text-align:right}
+.dw-r span{position:relative;height:46px;border:1px solid #1e3a2a;border-radius:4px;display:flex;align-items:center;padding:0 16px;font-weight:900;font-style:italic;font-size:20px;color:transparent;white-space:nowrap;transition:background .3s,color .3s,border-color .3s}
+.dw-r.f span{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
+.dw-r span::after{content:"";position:absolute;left:100%;width:24px;border:2px solid #1e3a2a;border-left:0}
+.dw-r.t span::after{top:50%;bottom:-28px;border-bottom:0;border-radius:0 4px 0 0}
+.dw-r.b span::after{top:-28px;bottom:50%;border-top:0;border-radius:0 0 4px 0}
+.dw-r.new span{animation:dwin .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes dwin{0%{transform:scale(1.06);box-shadow:0 0 0 10px rgba(130,235,0,.35)}100%{transform:none;box-shadow:0 0 0 0 rgba(130,235,0,0)}}
+/* судья: живой экран вместо картинки */
+.rf{position:absolute;left:150px;top:30px;width:340px;height:660px;border:9px solid var(--ink);border-radius:46px;background:var(--tv);color:#fff;padding:24px 16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 60px -24px rgba(20,44,49,.5)}
+.rf-h{display:flex;justify-content:space-between;align-items:flex-start;padding:0 4px}
+.rf-h b{display:block;font-size:15px;font-weight:800}
+.rf-h small{color:#8a9ea0;font-size:12px}
+.rf-tm{text-align:right}
+.rf-tm b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums;line-height:1}
+.rf-tm small{font-size:10px;font-weight:700;letter-spacing:.1em}
+.rf-nm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rf-nm span{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--tv-line);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+.rf-nm span::before{content:"";width:8px;height:8px;border-radius:50%;background:#33474a}
+.rf-nm .sv{color:var(--lime)}.rf-nm .sv::before{background:var(--lime)}
+.rf-r{display:grid;grid-template-columns:1fr 64px 1fr;gap:8px;align-items:center}
+.rf-r b{height:62px;display:grid;place-items:center;background:#fff;color:var(--ink);border-radius:12px;font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;overflow:hidden}
+.rf-r.done b{color:#7d8f92}
+.rf-r span{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8a9ea0}
+.rf-r.big b{height:136px;font-size:72px;font-weight:900}
+.rf-sv{text-align:center;font-size:12px;color:#8a9ea0}.rf-sv b{color:#fff}
+.rf-bt{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rf-b{background:#264a0b;color:var(--lime);border-radius:18px;padding:24px 0 20px;text-align:center;font-family:var(--display);font-style:italic;font-weight:900;font-size:24px;transition:transform .15s,background .15s}
+.rf-b small{display:block;font-family:var(--sans,inherit);font-style:normal;font-weight:600;font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+.rf-b.press{transform:scale(.94);background:#3c7210}
+.tap{position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.3);border:2px solid rgba(255,255,255,.85);opacity:0;pointer-events:none;translate:-50% -50%}
+.tap.on{animation:tap .6s ease-out}
+@keyframes tap{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(.8)}100%{opacity:0;transform:scale(1.2)}}
+.r-arrow svg.ping{animation:ping .6s}
+@keyframes ping{40%{transform:scale(1.35);box-shadow:0 0 0 8px rgba(130,235,0,.25)}}
+.tvm .tr .pt,.tvm .tr .g{overflow:hidden}
+.tvm .tr{border-radius:6px}
+.pm .pr{align-items:center;border-radius:5px}
+.pm .pr span{margin-left:auto}
+.pm .pr em{font-style:normal;display:inline-block;min-width:26px;margin-left:8px;text-align:center;background:var(--surface-2);border-radius:5px;font-size:11.5px;font-weight:700;padding:1px 0}
+/* телефон зрителя: живая страница турнира */
+.pa{position:absolute;inset:0;background:var(--tv);color:#fff;padding:0 12px;font-size:12px;line-height:1.3}
+.pa-top{display:flex;justify-content:space-between;align-items:center;height:52px}
+.pa-top .logo{font-size:15px;--logo-dot:var(--lime)}
+.pa-sh{width:30px;height:30px;border:1px solid var(--tv-line);border-radius:8px}
+.pa-hero{text-align:center;padding:4px 12px 14px;border-bottom:1px solid var(--tv-line);margin:0 -12px}
+.pa-live{display:inline-flex;gap:5px;align-items:center;background:#ef4444;border-radius:6px;padding:3px 9px;font-size:10px;font-weight:800;letter-spacing:.1em}
+.pa-live .dot{background:#fff}
+.pa-hero b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:21px;line-height:1.05;text-transform:uppercase;margin:8px 6px 6px}
+.pa-hero small{color:#8a9ea0;font-size:11px}
+.pa-tabs{display:flex;gap:6px;padding:12px 0}
+.pa-tabs span{padding:7px 11px;border-radius:7px;background:var(--tv-2);font-weight:600;color:#cfd9da}
+.pa-tabs .on{background:var(--lime);color:var(--lime-ink)}
+.pa-m{display:grid;grid-template-columns:50px 1fr;gap:8px;border:1px solid var(--tv-line);border-radius:12px;padding:10px;margin-bottom:8px;transition:border-color .3s}
+.pa-m.air{border-color:var(--lime)}
+.pa-mt b{display:block;font-size:16px;font-weight:800}
+.pa-mt small{color:#8a9ea0;font-size:10.5px}
+.pa-mh{display:flex;justify-content:space-between;align-items:center;min-height:18px;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8a9ea0;margin-bottom:3px}
+.pa-lv{display:none;align-items:center;gap:4px;background:var(--lime);color:var(--lime-ink);border-radius:5px;padding:2px 6px}
+.pa-lv .dot{background:var(--lime-ink)}
+.pa-m.air .pa-lv{display:inline-flex}
+.pa-p{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:#cfd9da}
+.pa-p.w{color:#fff;font-weight:700}
+.pa-p span{font-variant-numeric:tabular-nums;letter-spacing:.14em;font-weight:700}
+.pa-m.tbd{border-style:dashed}.pa-m.tbd .pa-p{color:#5e7174}
+.pa-push{position:absolute;left:8px;right:8px;top:8px;z-index:3;display:flex;gap:10px;align-items:center;background:rgba(240,245,246,.97);color:var(--ink);border-radius:16px;padding:10px 12px;font-size:11.5px;box-shadow:0 10px 24px -10px rgba(0,0,0,.6);transform:translateY(-130%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.pa-push.on{transform:none}
+.pa-push i{width:30px;height:30px;flex:none;border-radius:8px;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-style:italic;font-weight:900;font-family:var(--display)}
+.pa-push b{display:block}
+
+/* ---------- фичи ---------- */
+.feat{background:var(--surface);padding:100px 0 60px;border-top:1px solid var(--line)}
+.sec-h{text-align:center;max-width:1100px;margin:0 auto 56px}
+h2{font-family:var(--display);font-weight:900;font-style:italic;font-size:clamp(30px,4vw,50px);line-height:1.06;letter-spacing:-.015em;margin:0 0 16px}
+.sec-h p{font-size:19px;color:var(--muted);margin:0}
+.fgrid{display:grid;grid-template-columns:220px 1fr;gap:56px;align-items:start}
+.side{position:sticky;top:100px;display:flex;flex-direction:column;gap:2px}
+.side a{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:18px;font-weight:600;color:var(--faint);padding:9px 0;transition:color .2s}
+.side a::before{content:"";width:0;height:3px;border-radius:2px;background:var(--lime);transition:width .25s}
+.side a.on{color:var(--ink)}.side a.on::before{width:18px}
+.side .num{font-size:12px;font-weight:700;color:var(--line-2);margin-left:auto}
+.side a.on .num{color:var(--ink)}
+.cat{margin-bottom:72px}
+.cat-h{display:flex;align-items:baseline;gap:14px;margin:0 0 22px}
+.cat-h h3{font-family:var(--display);font-weight:900;font-style:italic;font-size:32px;letter-spacing:-.01em;margin:0}
+.cat-h span{color:var(--muted);font-size:16px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--bg);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:0;min-width:0}
+.card.wide{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.eb{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px}
+.eb::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--lime);margin-right:8px;vertical-align:1px}
+.card h4{font-family:var(--display);font-weight:800;font-style:italic;font-size:24px;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px}
+.card p{margin:0;color:var(--muted);font-size:16px}
+.card .mock{margin-top:22px}
+.card.wide .mock{margin-top:0}
+.card.stack{grid-column:1/-1}
+.stack-h{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:32px;align-items:end}
+.stack-h p{margin:0}
+.shot{margin-top:24px;background:#f5f6f8;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 12px 30px -18px rgba(20,44,49,.25)}
+.shot img{display:block;width:100%;height:auto}
+.shot-hint{display:none;text-align:center;font-size:13px;color:var(--faint);margin-top:8px}
+.shot.tv{border:10px solid #1b2a2d;border-radius:14px;background:var(--tv)}
+
+/* ---------- макеты ---------- */
+.mock{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;font-size:13px;line-height:1.35;color:var(--ink);box-shadow:0 12px 30px -18px rgba(20,44,49,.25)}
+.mock .row{display:flex;align-items:center;gap:8px}
+.mock .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:12px 0 6px}
+.mock .lbl:first-child{margin-top:0}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--ink-2);background:var(--surface);white-space:nowrap}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.lime{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+.chip.warn{background:var(--warn-bg);border-color:#fde68a;color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px;gap:2px}
+.seg span{padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted)}
+.seg span.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.mbtn{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;background:var(--ink);color:#fff}
+.mbtn.lime{background:var(--lime);color:var(--lime-ink)}
+.mbtn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.dot{width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.08em;color:#ef4444}
+.ok{color:var(--ink);font-weight:800}
+.mut{color:var(--muted)}.fa{color:var(--faint)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 6px 6px}
+.tbl td{padding:7px 6px;border-top:1px solid var(--line)}
+.tbl .n{text-align:center;font-variant-numeric:tabular-nums}
+.tbl tr.cut td{border-top:2px solid var(--lime)}
+/* шаги визарда */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.steps div{border-top:3px solid var(--line);padding-top:7px;font-size:11.5px;font-weight:600;color:var(--faint)}
+.steps div.done{border-color:var(--ink);color:var(--ink-2)}
+.steps div.cur{border-color:var(--lime);color:var(--ink)}
+.steps b{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.fld{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);display:flex;justify-content:space-between;gap:8px}
+.fld2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+/* этапы */
+.rules .lbl{display:block}
+.tg{width:32px;height:18px;border-radius:999px;background:var(--lime);position:relative;flex:none}
+.tg::after{content:"";position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.slot{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.slot .cb{width:18px;height:18px;border-radius:5px;background:var(--ink);display:grid;place-items:center;color:#fff;font-size:11px;flex:none}
+.slot b{font-size:13px}.slot small{display:block;color:var(--muted);font-size:12px}
+.slot.sel{border-color:var(--lime);background:var(--lime-soft)}
+.slot .sch{margin-left:auto;display:flex;gap:3px;align-items:flex-end}
+.slot .sch i{display:block;width:5px;background:var(--ink-2);border-radius:2px}
+.counter{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:4px}
+.counter b{color:var(--ink)}
+/* ecp */
+.inp{display:flex;gap:8px}
+.inp .fld{flex:1;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--ink-2)}
+.log{margin-top:12px;display:grid;gap:7px}
+.log div{display:flex;gap:9px;align-items:flex-start}
+.log .ic{width:20px;height:20px;border-radius:50%;background:var(--lime);color:var(--lime-ink);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.log .ic.sp{background:var(--surface-2);color:var(--muted)}
+/* жеребьёвка */
+.draw{display:grid;grid-template-columns:1fr 1.2fr;gap:12px}
+.q div{border:1px dashed var(--line-2);border-radius:8px;padding:6px 8px;margin-bottom:5px;font-size:12px;display:flex;justify-content:space-between}
+.q div.drag{border-style:solid;border-color:var(--lime);background:var(--lime-soft);transform:rotate(-2deg);box-shadow:0 8px 16px -8px rgba(20,44,49,.4)}
+.br{display:grid;gap:5px}
+.br div{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12px;display:flex;gap:8px}
+.br div i{font-style:normal;color:var(--faint);width:14px}
+.br div.empty{border-style:dashed;color:var(--faint)}
+.br div.hl{border-color:var(--lime);box-shadow:0 0 0 3px var(--lime-soft)}
+/* счёт → сетка */
+/* судьи */
+.ref{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.ref:first-child{border-top:0}
+.av{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:11px;color:var(--ink-2);flex:none}
+.ref .chip{margin-left:auto}
+/* телефон */
+.phone-m{width:236px;margin:0 auto;border:8px solid var(--ink);border-radius:34px;overflow:hidden;background:var(--tv);color:#fff;box-shadow:0 24px 40px -20px rgba(20,44,49,.5)}
+.ump{padding:12px 12px 14px}
+.ump .hd{display:flex;justify-content:space-between;font-size:10px;color:#8a9ea0;font-weight:600;letter-spacing:.04em}
+.ump .sets{display:flex;justify-content:center;gap:6px;margin:8px 0 10px}
+.ump .sets span{font-size:11px;font-weight:700;border:1px solid var(--tv-line);border-radius:5px;padding:2px 7px;color:#cfd9da}
+.side-t{border-radius:14px;padding:12px;text-align:center;margin-bottom:8px;background:var(--tv-2);border:1px solid var(--tv-line)}
+.side-t.act{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
+.side-t small{display:block;font-size:10.5px;font-weight:600;opacity:.75}
+.side-t b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:40px;line-height:1.05}
+.side-t .srv{font-size:10px;font-weight:800;letter-spacing:.06em}
+.ump .bar{display:flex;gap:6px}
+.ump .bar span{flex:1;text-align:center;border:1px solid var(--tv-line);border-radius:8px;padding:6px 0;font-size:10.5px;font-weight:700;color:#cfd9da}
+.pm{background:var(--surface);border-radius:10px;padding:8px 10px;border:1px solid var(--line)}
+.pm .top-r{display:flex;justify-content:space-between;color:var(--faint);font-size:10px;margin-bottom:5px}
+.pm .pr{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0}
+.pm .pr.w{font-weight:700}
+.pm .pr span{font-variant-numeric:tabular-nums;letter-spacing:.12em}
+.phone-shot{width:270px;margin:0 auto;border:9px solid var(--ink);border-bottom:0;border-radius:40px 40px 0 0;overflow:hidden;box-shadow:0 24px 40px -20px rgba(20,44,49,.5);height:440px}
+.phone-shot img{display:block;width:100%;height:auto}
+.ref-shot{display:block;width:280px;max-width:100%;height:auto;filter:drop-shadow(0 24px 30px rgba(20,44,49,.35))}
+/* ТВ */
+.tvm{background:var(--tv);border-radius:12px;padding:16px 18px;color:#fff;aspect-ratio:16/9;display:flex;flex-direction:column;border:6px solid #1b2a2d;box-shadow:0 20px 40px -24px rgba(20,44,49,.6)}
+.tvm .th{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#8a9ea0;font-weight:600}
+.tvm .th b{font-family:var(--display);font-style:italic;color:#fff;font-size:13px}
+.tvm .rows{margin:auto 0;display:grid;gap:8px}
+.tvm .tr{display:grid;grid-template-columns:1fr repeat(2,30px) 48px;align-items:center;gap:6px}
+.tvm .tr .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px}
+.tvm .tr .nm i{width:7px;height:7px;border-radius:50%;background:var(--lime)}
+.tvm .tr .g{text-align:center;color:#8a9ea0;font-weight:700;font-variant-numeric:tabular-nums}
+.tvm .tr .pt{text-align:center;background:var(--lime);color:var(--lime-ink);border-radius:6px;font-family:var(--display);font-style:italic;font-weight:900;font-size:22px;padding:2px 0}
+.tvm .tr .pt.d{background:var(--tv-2);color:#fff}
+.tvm .tf{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:#8a9ea0;border-top:1px solid var(--tv-line);padding-top:8px}
+.tvm .flag{background:#facc15;color:#000;font-weight:800;font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:4px}
+.spons{display:flex;gap:10px}.spons i{display:block;width:44px;height:12px;border-radius:3px;background:#2b3e42}
+/* трансляция */
+.cam{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:
+  linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),
+  linear-gradient(115deg,#2f6f87 0%,#3d8aa3 38%,#2a6a54 38.2%,#3b8f6d 100%)}
+.cam::before{content:"";position:absolute;left:12%;right:12%;top:52%;bottom:-10%;border:2px solid rgba(255,255,255,.55);transform:perspective(300px) rotateX(55deg);border-radius:2px}
+.cam::after{content:"";position:absolute;left:50%;top:52%;bottom:-10%;width:2px;background:rgba(255,255,255,.55);transform:translateX(-50%) perspective(300px) rotateX(55deg)}
+.bug{position:absolute;left:12px;top:12px;background:rgba(12,23,25,.92);border-radius:8px;overflow:hidden;color:#fff;font-size:11.5px;min-width:190px;z-index:2}
+.bug .br2{display:grid;grid-template-columns:1fr 18px 18px 30px;align-items:center;gap:4px;padding:5px 8px}
+.bug .br2+.br2{border-top:1px solid #22363a}
+.bug .br2 span{text-align:center;color:#8a9ea0;font-weight:700}
+.bug .br2 em{font-style:normal;text-align:center;background:var(--lime);color:var(--lime-ink);border-radius:4px;font-weight:800}
+.bug .bf{background:var(--lime);color:var(--lime-ink);font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:3px 8px}
+.rec{position:absolute;right:12px;top:12px;font-size:10px;font-weight:800;color:#fff;background:rgba(0,0,0,.35);border-radius:4px;padding:3px 7px;display:flex;align-items:center;gap:5px;z-index:2}
+/* ссылки */
+.lnk{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.lnk:first-child{border-top:0;padding-top:0}
+.lnk .ico{width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.lnk .ico svg{width:16px;height:16px;color:var(--ink-2)}
+.lnk b{font-size:13px;display:block}
+.lnk small{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+.lnk .cp{margin-left:auto;font-size:11.5px;font-weight:700;border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;background:var(--surface)}
+.lnk .cp.done{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+/* бренд */
+.sw{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.sw button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px 4px 5px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer}
+.sw button i{width:16px;height:16px;border-radius:50%}
+.sw button[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.brand-tv{--c:#82eb00;--ci:#0b1b06;--b:#0c1719;--b2:#132326;transition:background .3s}
+.brand-tv.tvm{background:var(--b)}
+.brand-tv .tr .pt{background:var(--c);color:var(--ci)}
+.brand-tv .tr .pt.d{background:var(--b2);color:#fff}
+.brand-tv .tr .nm i{background:var(--c)}
+.brand-tv .th b{color:var(--c)}
+.place{position:relative}
+.place .tvm{padding:14px 16px}
+.lg{position:absolute;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--lime-ink);background:var(--lime);border-radius:4px;transition:all .3s;opacity:0}
+.lg.on{opacity:1}
+.lg.footer{left:6px;right:6px;bottom:6px;height:20px;border-radius:0 0 6px 6px;background:#fff;color:var(--ink);gap:16px}
+.lg.corner{right:14px;top:14px;width:64px;height:22px}
+.lg.water{left:50%;top:50%;transform:translate(-50%,-50%);width:120px;height:36px;background:transparent;color:rgba(255,255,255,.12);font-size:20px;font-family:var(--display);font-style:italic}
+.lg.splash{inset:6px;border-radius:6px;background:var(--lime);font-size:18px;font-family:var(--display);font-style:italic;font-weight:900;flex-direction:column;gap:4px}
+.lg.splash small{font-size:10px;font-family:var(--sans);font-style:normal;font-weight:700;letter-spacing:.1em}
+.slots{display:grid;gap:6px}
+.slt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.slt .ico{width:28px;height:20px;border-radius:4px;background:var(--tv);flex:none;position:relative}
+.slt .ico::after{content:"";position:absolute;left:3px;right:3px;bottom:3px;height:4px;background:var(--lime);border-radius:1px}
+.slt b{font-size:12.5px}
+.slt .chip{margin-left:auto}
+
+/* ---------- вход ---------- */
+.login{border:0;padding:0;border-radius:20px;width:min(420px,calc(100vw - 32px));background:var(--surface);color:var(--ink);box-shadow:0 30px 80px -20px rgba(20,44,49,.45)}
+.login::backdrop{background:rgba(20,44,49,.45);backdrop-filter:blur(3px)}
+.login{position:fixed;max-height:calc(100vh - 32px);overflow:auto}
+.login .aview{padding:32px;display:none;gap:14px}
+.login .aview.on{display:grid}
+.login .x{position:absolute;right:20px;top:24px}
+.login .txt{margin:0;color:var(--muted);font-size:15px}
+.login .txt b{color:var(--ink);white-space:nowrap}
+.lrow{display:flex;justify-content:space-between;align-items:baseline}
+.lrow a{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;box-shadow:inset 0 -2px 0 var(--lime)}
+.login .cb{display:flex;gap:10px;align-items:flex-start;text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--muted);line-height:1.4}
+.login .cb input{width:18px;height:18px;padding:0;margin:1px 0 0;accent-color:var(--ink);flex:none}
+.login .cb a{color:var(--ink)}
+.lrow em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint);font-size:12px}
+.otp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.otp input{min-width:0;width:100%;text-align:center;font-family:var(--display);font-style:italic;font-weight:900;font-size:28px;padding:10px 0;height:60px}
+.link-btn{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;justify-self:center;padding:4px}
+.link-btn:disabled{color:var(--faint);cursor:default}
+.fld-c{display:grid;gap:8px}
+.lbl-c{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg-c{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg-c button{border:0;background:transparent;border-radius:8px;padding:9px 0;font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg-c button[aria-checked=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(20,44,49,.15)}
+.login .err{margin:0;background:var(--err-bg);color:var(--err);border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600}
+.login input.bad{border-color:var(--err)}
+.login-help{font-size:13px;color:var(--faint);text-align:center;margin:-4px 0 0}
+.login-help a{color:var(--muted)}
+.login h3{font-family:var(--display);font-style:italic;font-weight:900;font-size:30px;margin:0;letter-spacing:-.01em}
+.login .x{border:0;background:var(--surface-2);width:36px;height:36px;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;color:var(--muted)}
+.login label{display:grid;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.login input{font:inherit;font-size:16px;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:13px 14px;outline:none}
+.login input:focus{border-color:var(--ink);box-shadow:0 0 0 3px var(--lime-soft)}
+.login .btn{justify-content:center;width:100%;margin-top:4px}
+.login-note{font-size:14px;color:var(--muted);text-align:center;margin:0}
+.login-note a{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--lime);text-decoration:none}
+
+/* ---------- тарифы ---------- */
+.price{padding:100px 0 0}
+.price .sec-h{margin-bottom:32px}
+.price .sec-h p{margin-top:12px}
+.trial{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 auto 24px;max-width:1080px}
+.trial-b{font-family:var(--display);font-style:italic;font-weight:900;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--lime);color:var(--lime-ink);border-radius:6px;padding:5px 10px}
+.trial b{font-size:17px}
+.trial-t{color:var(--muted);font-size:16px}
+.p-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;max-width:1080px;margin:0 auto}
+.p-box{position:relative;z-index:5;background:var(--lime-soft);border:1px solid #c5ef8f;border-radius:20px;padding:6px 6px 18px}
+.p-subs .p-row.base{background:#f7fdf0;border-radius:16px 16px 0 0}
+.p-row{display:grid;grid-template-columns:1fr auto auto;gap:20px;align-items:center;padding:16px 18px;border-radius:14px;cursor:pointer;transition:background .2s;position:relative}
+.p-row.base{cursor:default}
+.p-head{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);padding:14px 18px 12px}
+.p-row h4{font-size:17px;font-weight:700;margin:0}
+.p-row .nw{white-space:nowrap}
+.p-row p{margin:0;color:var(--muted);font-size:14px}
+.p-cost{font-weight:800;font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p-row:not(.on):not(.base) .p-cost{color:var(--faint)}
+.p-subs{position:relative;margin-left:34px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.p-subs::before{content:"";position:absolute;left:-17px;top:-10px;bottom:34px;width:2px;background:#a6dc5e;border-radius:2px}
+.p-subs .p-row::before{content:"";position:absolute;left:-18px;top:50%;width:18px;height:2px;background:#a6dc5e}
+.p-subs .p-row+.p-row{border-top:1px solid var(--line);border-radius:0}
+.p-subs .p-row:hover{background:var(--surface-2)}
+.p-sw{width:44px;height:26px;border-radius:999px;background:var(--line-2);position:relative;transition:background .2s;justify-self:center}
+.p-sw::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .2s}
+.p-row.on .p-sw{background:var(--ink)}
+.p-row.on .p-sw::after,.p-sw.lock::after{left:21px}
+.p-sw.lock{background:var(--lime);cursor:not-allowed}
+.p-sw.lock::after{content:"✓";display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--lime-ink)}
+.p-sw{margin:0 2px 0 4px}
+/* подсказка «что входит» */
+.p-q{position:relative;vertical-align:2px;margin-left:6px;width:20px;height:20px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-2);color:var(--muted);font-size:12px;font-weight:800;display:inline-grid;place-items:center;cursor:help;outline:none}
+.p-q:hover,.p-q.open,.p-q:focus-visible{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+.p-tip{white-space:normal;position:absolute;left:-14px;bottom:calc(100% + 12px);z-index:30;width:380px;background:var(--ink);color:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 20px 40px -16px rgba(20,44,49,.55);display:none;text-align:left;cursor:default;font-weight:400}
+@keyframes tipin{from{opacity:0;transform:translateY(6px)}}
+.p-tip::after{content:"";position:absolute;left:20px;top:100%;border:7px solid transparent;border-top-color:var(--ink)}
+.p-q:hover .p-tip,.p-q.open .p-tip,.p-q:focus-visible .p-tip{display:block;animation:tipin .18s}
+.p-tip-h{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:17px;margin-bottom:10px;color:var(--lime)}
+.p-tip ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.p-tip li{display:grid;grid-template-columns:124px 1fr;gap:10px;font-size:13px;line-height:1.35}
+.p-tip li b{font-weight:700;color:#fff}
+.p-tip li span{color:#b8c7ca}
+.p-sum{position:sticky;top:96px;background:var(--ink);color:#fff;border-radius:20px;padding:28px}
+.p-sum .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a9ea0}
+.p-qty{display:grid;grid-template-columns:48px 1fr 48px;gap:6px;margin:10px 0 10px}
+.p-qty button{border:1px solid #2a4248;background:transparent;color:#fff;border-radius:12px;font-size:24px;line-height:1;cursor:pointer;height:52px}
+.p-qty button:hover{border-color:var(--lime);color:var(--lime)}
+.p-qty input{width:100%;min-width:0;text-align:center;font:inherit;font-family:var(--display);font-style:italic;font-weight:900;font-size:28px;color:#fff;background:#142c31;border:1px solid #2a4248;border-radius:12px;height:52px;-moz-appearance:textfield;outline:none}
+.p-qty input:focus{border-color:var(--lime)}
+.p-qty input::-webkit-inner-spin-button,.p-qty input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.p-hint{font-size:13px;font-weight:600;color:#8a9ea0;margin-bottom:22px}
+.p-hint.on{color:var(--lime)}
+.p-total{font-family:var(--display);font-style:italic;font-weight:900;font-size:46px;letter-spacing:-.02em;line-height:1.05;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.p-per{color:#b8c7ca;font-size:14px;margin-bottom:22px}
+.p-per s{color:#8a9ea0}
+.p-sum .btn{width:100%;justify-content:center}
+
+/* ---------- вход ---------- */
+
+/* ---------- FAQ ---------- */
+.faq{padding:100px 0}
+.faq-grid{display:grid;grid-template-columns:360px 1fr;gap:64px;align-items:start}
+.faq-side p{color:var(--muted);font-size:17px;margin:0 0 24px}
+.qa{border-top:1px solid var(--line-2)}
+.qa:last-child{border-bottom:1px solid var(--line-2)}
+.qa summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:20px;padding:22px 0;font-size:19px;font-weight:700;letter-spacing:-.005em}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::after{content:"+";width:24px;height:24px;margin-right:4px;display:grid;place-items:center;font-size:26px;font-weight:400;line-height:1;color:var(--muted);transition:transform .2s;flex:none}
+.qa[open] summary::after{transform:rotate(45deg)}
+.qa div{color:var(--muted);font-size:16.5px;padding:0 40px 24px 0;max-width:760px}
+
+/* ---------- финальный CTA ---------- */
+.final{padding:0 0 80px}
+.final-box{background:var(--ink);color:#fff;border-radius:28px;padding:64px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
+.final-box::before{content:"";position:absolute;right:-80px;top:-60px;width:520px;height:420px;background:repeating-linear-gradient(-62deg,transparent 0 40px,rgba(130,235,0,.22) 40px 52px);-webkit-mask:radial-gradient(closest-side,#000,transparent);mask:radial-gradient(closest-side,#000,transparent)}
+.final-box h2{color:#fff;margin:0 0 12px;position:relative}
+.final-box p{color:#b8c7ca;font-size:18px;margin:0;position:relative;max-width:560px}
+.final-box .btn{position:relative}
+footer{border-top:1px solid var(--line);padding:28px 0;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+
+/* ---------- адаптив ---------- */
+@media (max-width:1024px){
+  .fgrid{grid-template-columns:1fr;gap:0}
+  .side{position:sticky;top:68px;z-index:20;flex-direction:row;overflow-x:auto;gap:6px;background:var(--surface);margin:0 -32px 28px;padding:10px 32px;border-bottom:1px solid var(--line);scrollbar-width:none}
+  .side::-webkit-scrollbar{display:none}
+  .side a{font-size:14px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;flex:none}
+  .side a::before,.side .num{display:none}
+  .side a.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .card.wide{grid-template-columns:1fr;gap:0}.card.wide .mock{margin-top:22px}
+  .stack-h{grid-template-columns:1fr;gap:10px}
+  .faq-grid{grid-template-columns:1fr;gap:24px}
+  .p-grid{grid-template-columns:1fr}
+  .p-sum{position:static}
+  .p-row{grid-template-columns:1fr auto;gap:6px 12px;padding:14px 12px}
+  .p-row .p-txt{grid-column:1/-1}
+  .p-subs{margin-left:22px}
+  .p-subs::before{left:-12px}
+  .p-subs .p-row::before{left:-13px;width:13px}
+  .p-q:hover .p-tip{display:none}
+  .p-q.open .p-tip{display:block}
+  .p-tip{position:fixed;left:12px;right:12px;bottom:12px;top:auto;width:auto;z-index:60}
+  .p-tip::after{display:none}
+  .p-tip li{grid-template-columns:110px 1fr}
+  .nav{display:none}.top .wrap{grid-template-columns:1fr auto}
+}
+@media (max-width:720px){
+  .wrap{padding:0 16px}
+  .side{margin:0 -16px 24px;padding:10px 16px;top:60px}
+  h1{font-size:30px}
+  .pill{font-size:13px;text-align:left}
+  .br-d{display:none}
+  .top .wrap{height:60px}
+  .top-actions .btn{padding:9px 14px;font-size:14px}
+  .top-actions .lbl{display:none}
+  .top-actions .lbl-m{display:inline}
+  .hero{padding-top:36px}
+  .lead{font-size:17px}
+  .trust{display:grid;justify-content:center;gap:10px;text-align:left}
+  .trust li{align-items:flex-start}
+  .trust svg{margin-top:1px}
+  .frame.mob{aspect-ratio:auto;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+  .frame-hint{display:block}
+  .show{margin-top:36px;padding:10px 10px 0;border-radius:18px 18px 0 0}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;border-radius:12px;width:100%;scrollbar-width:none}
+  .tab{flex:none;padding:8px 13px}
+  .chrome .url{display:none}
+  .feat,.faq{padding:64px 0}
+  .price{padding-top:64px}
+  .sec-h{margin-bottom:28px}.sec-h p{font-size:17px}
+  .cards{grid-template-columns:1fr}
+  .card>*,.card.wide>*{min-width:0}
+  .chip{white-space:normal;text-align:left}
+  .inp .fld{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mock{max-width:100%}
+  .lnk>div{min-width:0;flex:1}
+  .lnk small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lnk .cp{flex:none}
+  .fld2{grid-template-columns:1fr}
+  .seg{flex-wrap:wrap}
+  .seg span{white-space:nowrap}
+  .card .mock .row{flex-wrap:wrap;row-gap:4px}
+  .shot.wide-shot{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .shot.wide-shot img{width:720px;max-width:none}
+  .shot-hint{display:block}
+  .card{padding:20px}
+  .card h4{font-size:21px}
+  .cat-h{flex-direction:column;gap:2px}
+  .cat-h h3{font-size:28px}
+  .draw{grid-template-columns:1fr}
+  .qa summary{font-size:17px}
+  .qa div{padding-right:0}
+  .final-box{grid-template-columns:1fr;padding:36px 24px;border-radius:20px}
+  .cta-row .btn-lg{width:100%;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.tab .pr{display:none}}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.3 13 1.5 11.5c-1-.3-1.1-1 .2-1.5l18.8-7.2c.9-.3 1.6.2 1.4 1.5Z"/></symbol>
+  <symbol id="chk" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m3 8.5 3 3 7-7"/></symbol>
+  <symbol id="arr" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 8h10m-4-4 4 4-4 4"/></symbol>
+  <symbol id="link" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.8.8M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.8-.8"/></symbol>
+  <symbol id="tv" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M2 3.5h12v8H2zM5.5 14h5"/></symbol>
+  <symbol id="mob" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M4.5 1.5h7v13h-7zM7 12.5h2"/></symbol>
+  <symbol id="cam" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M1.5 4.5h9v7h-9zM10.5 7l4-2v6l-4-2"/></symbol>
+</svg>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#">PADEL<span class="b">.</span><em>SELECT</em></a>
+    <nav class="nav"><a href="#features">Возможности</a><a href="#pricing">Тарифы</a><a href="#faq">Частые вопросы</a></nav>
+    <div class="top-actions">
+      <button class="btn btn-ghost" type="button" data-auth="login">Войти</button>
+      <button class="btn btn-dark" type="button" data-auth="signup"><span class="lbl">Начать бесплатно</span><span class="lbl-m">Начать</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ======================= 1. HERO ======================= -->
+<section class="hero">
+  <div class="wrap">
+    <a class="pill" href="#pricing"><b>Акция</b>Первый турнир — бесплатно, в любой конфигурации <svg width="14" height="14"><use href="#arr"/></svg></a>
+    <h1>Платформа для проведения<br class="br-d"> <span class="hl1">турниров и лиг</span> по&nbsp;паделу</h1>
+    <p class="lead">Проводи турниры — на&nbsp;уровне профессиональных спортивных событий.</p>
+    <div class="cta-row">
+      <button class="btn btn-dark btn-lg" type="button" data-auth="signup">Провести турнир<svg><use href="#arr"/></svg></button>
+    </div>
+    <ul class="trust">
+      <li><svg><use href="#chk"/></svg>Судейство и live-счёт</li>
+      <li><svg><use href="#chk"/></svg>ТВ-табло и телевиджеты</li>
+      <li><svg><use href="#chk"/></svg>Поддержка регламента ФПР</li>
+    </ul>
+
+    <div class="show">
+      <div class="tabs" role="tablist" id="tabs">
+        <button class="tab" role="tab" aria-selected="true" data-i="0">Кабинет организатора</button>
+        <button class="tab" role="tab" aria-selected="false" data-i="1">Расписание матчей</button>
+        <button class="tab" role="tab" aria-selected="false" data-i="2">Сетка турнира</button>
+        <button class="tab" role="tab" aria-selected="false" data-i="3">Судейский пульт</button>
+        <button class="tab" role="tab" aria-selected="false" data-i="4">ТВ-табло</button>
+        <button class="tab" role="tab" aria-selected="false" data-i="5">Теле виджет</button>
+      </div>
+      <div class="screen">
+        <div class="chrome"><i></i><i></i><i></i><span class="url" id="url"></span></div>
+        <div class="frame" id="frame">
+          <div class="canvas" id="canvas">
+
+          <!-- B1. Кабинет организатора — схема: турнир проходит все стадии -->
+          <div class="scr sx on" data-s="0">
+            <div class="x-h in"><small>Кабинет организатора</small><b>Весь турнир —<br><em>в одном окне</em></b><div class="x-auto in" style="--d:300ms"><small>Сервис делает сам</small><b data-x="ben">Проверяет настройки и подсказывает, что заполнить</b></div></div>
+            <div class="x-chips in" style="--d:100ms"><div class="x-cp" data-x="k0"><b>Настройки</b><small>ожидает</small></div><div class="x-cp" data-x="k1"><b>Приём заявок</b><small>ожидает</small></div><div class="x-cp" data-x="k2"><b>Жеребьёвка Q</b><small>ожидает</small></div><div class="x-cp" data-x="k3"><b>Жеребьёвка сетки</b><small>ожидает</small></div><div class="x-cp" data-x="k4"><b>Квалификация</b><small>ожидает</small></div><div class="x-cp" data-x="k5"><b>Основной турнир</b><small>ожидает</small></div></div>
+            <div class="x-pan in" style="--d:250ms"><div class="x-pp" data-x="p0"><div class="x-pt">Настройки турнира<small data-x="ps0">идёт</small></div><div class="x-fg"><div class="x-f st" style="--i:0"><small>Категория</small><b>ФПР 500</b></div><div class="x-f st" style="--i:1"><small>Даты</small><b>17–19 октября</b></div><div class="x-f st" style="--i:2"><small>Клуб</small><b>Арена Сити</b></div><div class="x-f st" style="--i:3"><small>Корты</small><b>3</b></div><div class="x-f st" style="--i:4"><small>Дивизионы</small><b>Мужской · Женский</b></div><div class="x-f st" style="--i:5"><small>Финальный этап</small><b>Олимпийская, до 2-х поражений</b></div><div class="x-f st" style="--i:6"><small>Пар в основной сетке</small><b>16 · из них 2 через Q</b></div><div class="x-f st" style="--i:7"><small>Судьи</small><b>3 судьи на вышке</b></div></div></div><div class="x-pp" data-x="p1"><div class="x-pt">Приём заявок<small data-x="ps1">идёт</small></div><div class="x-zt"><span class="on">Все</span><span>Основная 14</span><span>Квалификация 8</span><span>Резерв 2</span><b><span data-x="cnt">0</span> / 24 пары</b></div><div class="x-al"><div class="x-ar st" style="--i:0"><i>1</i><span class="x-sk" style="width:46%"></span><em>2140</em><u class="">Основная</u></div><div class="x-ar st" style="--i:1"><i>2</i><span class="x-sk" style="width:52%"></span><em>1980</em><u class="">Основная</u></div><div class="x-ar st" style="--i:2"><i>3</i><span class="x-sk" style="width:40%"></span><em>1875</em><u class="">Основная</u></div><div class="x-ar st" style="--i:3"><i>4</i><span class="x-sk" style="width:58%"></span><em>1720</em><u class="q">Квалификация</u></div><div class="x-ar st" style="--i:4"><i>5</i><span class="x-sk" style="width:44%"></span><em>1690</em><u class="">Основная</u></div><div class="x-ar st" style="--i:5"><i>6</i><span class="x-sk" style="width:50%"></span><em>1540</em><u class="q">Квалификация</u></div><div class="x-ar st" style="--i:6"><i>7</i><span class="x-sk" style="width:38%"></span><em>1210</em><u class="r">Резерв</u></div></div></div><div class="x-pp" data-x="p2"><div class="x-pt">Жеребьёвка квалификации<small data-x="ps2">идёт</small></div><div class="x-dw" style="grid-template-columns:repeat(2,1fr)"><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:0"><i>17</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:1"><i>24</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:2"><i>20</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:3"><i>21</i><span class="x-sk"></span></span></div></div></div><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:4"><i>18</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:5"><i>23</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:6"><i>19</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:7"><i>22</i><span class="x-sk"></span></span></div></div></div></div></div><div class="x-pp" data-x="p3"><div class="x-pt">Жеребьёвка основной сетки<small data-x="ps3">идёт</small></div><div class="x-dw" style="grid-template-columns:repeat(4,1fr)"><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:0"><i>1</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:1"><i>Q</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:2"><i>8</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:3"><i>9</i><span class="x-sk"></span></span></div></div></div><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:4"><i>5</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:5"><i>12</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:6"><i>4</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:7"><i>13</i><span class="x-sk"></span></span></div></div></div><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:8"><i>3</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:9"><i>14</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:10"><i>6</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:11"><i>11</i><span class="x-sk"></span></span></div></div></div><div class="x-dc"><div class="x-dm"><div class="x-sl"><span class="st" style="--i:12"><i>7</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:13"><i>10</i><span class="x-sk"></span></span></div></div><div class="x-dm"><div class="x-sl"><span class="st" style="--i:14"><i>Q</i><span class="x-sk"></span></span></div><div class="x-sl"><span class="st" style="--i:15"><i>2</i><span class="x-sk"></span></span></div></div></div></div></div><div class="x-pp" data-x="p4"><div class="x-pt">Квалификация<small data-x="ps4">идёт</small></div><div class="x-qg"><div class="x-qm"><div class="x-qp wn" style="--i:0"><i>17</i><span class="x-sk"></span><b>6 6</b><u class="qb">Q</u></div><div class="x-qp"><i>24</i><span class="x-sk"></span><b>3 4</b></div></div><div class="x-qm"><div class="x-qp wn" style="--i:1"><i>20</i><span class="x-sk"></span><b>4 6 10</b><u class="qb">Q</u></div><div class="x-qp"><i>21</i><span class="x-sk"></span><b>6 3 7</b></div></div><div class="x-qm"><div class="x-qp wn" style="--i:2"><i>18</i><span class="x-sk"></span><b>7 6</b><u class="qb">Q</u></div><div class="x-qp"><i>23</i><span class="x-sk"></span><b>5 2</b></div></div><div class="x-qm"><div class="x-qp wn" style="--i:3"><i>19</i><span class="x-sk"></span><b>6 7</b><u class="qb">Q</u></div><div class="x-qp"><i>22</i><span class="x-sk"></span><b>2 5</b></div></div></div></div><div class="x-pp" data-x="p5"><div class="x-pt">Основной турнир<small data-x="ps5">идёт</small></div><div class="x-mc"><div class="x-mcol"><div class="x-chd">Корт 1</div><div class="x-cd ok st" style="--i:0"><div class="x-ct"><span class="x-ok">1/4 · сыгран</span></div><div class="x-pr"><span class="x-sk" style="width:60%"></span><b>6 6</b></div><div class="x-pr"><span class="x-sk" style="width:50%"></span><b>4 3</b></div></div><div class="x-cd on st" data-x="lc" style="--i:1"><div class="x-ct"><span class="live"><span class="dot"></span>LIVE · 1/2</span></div><div class="x-pr"><span class="x-sk" style="width:56%"></span><b data-x="ls">6 3</b></div><div class="x-pr"><span class="x-sk" style="width:48%"></span><b>4 2</b></div></div></div><div class="x-mcol"><div class="x-chd">Корт 2</div><div class="x-cd ok st" style="--i:2"><div class="x-ct"><span class="x-ok">1/4 · сыгран</span></div><div class="x-pr"><span class="x-sk" style="width:52%"></span><b>7 6</b></div><div class="x-pr"><span class="x-sk" style="width:62%"></span><b>5 4</b></div></div><div class="x-cd st" data-x="c2c" style="--i:3"><div class="x-ct"><span class="x-tm">12:30 · 1/2</span></div><div class="x-pr"><span class="x-sk" style="width:50%"></span></div><div class="x-pr"><span class="x-sk" style="width:58%"></span></div></div></div><div class="x-mcol"><div class="x-chd">Корт 3</div><div class="x-cd ok st" style="--i:4"><div class="x-ct"><span class="x-ok">1/4 · сыгран</span></div><div class="x-pr"><span class="x-sk" style="width:58%"></span><b>6 4 10</b></div><div class="x-pr"><span class="x-sk" style="width:46%"></span><b>2 6 7</b></div></div><div class="x-cd tbd st" data-x="fc" style="--i:5"><div class="x-ct"><span class="x-tm">16:00 · финал</span></div><div class="x-pr"><span class="x-sk" style="width:52%"></span></div><div class="x-pr"><span class="x-sk" style="width:44%"></span></div></div></div></div><div class="x-champ" data-x="champ">🏆 Чемпион определён · турнир завершён</div></div></div>
+          </div>
+          <!-- B2. Расписание матчей — схема: одно расписание сразу у всех -->
+          <div class="scr sx" data-s="1">
+            <div class="x-h in"><small>Расписание матчей</small><b>Расписание —<br><em>сразу у всех</em></b><ul class="x-ul"><li class="in" style="--d:250ms">Поставили матч на корт — его видят все</li><li class="in" style="--d:370ms">Без объявлений в микрофон и рассылок</li><li class="in" style="--d:490ms">LIVE, итоги и перенос времени — сразу</li></ul></div>
+            <div class="x-sb in" style="--d:100ms">
+              <div class="x-sbh"><span></span><b>Корт 1</b><b>Корт 2</b><b>Корт 3</b></div>
+              <div class="x-sr"><span>10:00</span><div class="x-bm done"><div class="x-bh">Сыгран · 1:16</div><div>Орлов / Ким</div><div>Белов / Сафин</div></div><div class="x-bm done"><div class="x-bh">Сыгран · 1:24</div><div>Гусев / Лебедев</div><div>Петров / Зуев</div></div><div class="x-bm done"><div class="x-bh">Сыгран · 1:31</div><div>Носов / Ли</div><div>Ершов / Пак</div></div></div>
+              <div class="x-sr"><span>12:30</span><div class="x-bm air" data-x="sm1"><div class="x-bh"><span class="live"><span class="dot"></span>LIVE</span></div><div>Орлов / Ким</div><div>Гусев / Лебедев</div></div><div class="x-slot" data-x="slot">перетащите матч</div><div class="x-bm "><div class="x-bh">12:30</div><div>Шульц / Бек</div><div>Титов / Рой</div></div></div>
+              <div class="x-sr"><span data-x="ftm">16:00</span><div class="x-bm tbd" data-x="fin"><div class="x-bh">Финал</div><div><i>победитель 1/2 №1</i></div><div><i>победитель 1/2 №2</i></div></div><div class="x-em"></div><div class="x-em"></div></div>
+              <div class="x-tray"><small>Не назначены</small><div class="x-bm drag" data-x="mv"><div class="x-bh">1/2 финала</div><div>Носов / Ли</div><div>Титов / Рой</div></div></div>
+            </div>
+            <svg class="x-svg x-dash"><path class="x-dr" pathLength="1" style="--d:400ms" d="M912 380 C960 380 960 190 1000 190"/><path class="x-dr" pathLength="1" style="--d:500ms" d="M912 380 C960 380 960 360 1000 360"/><path class="x-dr" pathLength="1" style="--d:600ms" d="M912 380 C960 380 960 530 1000 530"/></svg>
+            <div class="x-out in" style="top:130px;--d:500ms"><div class="x-oh"><svg><use href="#tv"/></svg>ТВ-табло в клубе</div>
+              <div class="x-or" data-x="o0a"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o0at">LIVE</em></div>
+              <div class="x-or" data-x="o0b"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o0bt">16:00</em></div>
+              <div class="x-or nw" data-x="o0c"><span class="x-dotc"></span><span class="x-sk"></span><em>12:30</em></div></div><div class="x-out in" style="top:300px;--d:620ms"><div class="x-oh"><svg><use href="#mob"/></svg>Страница турнира</div>
+              <div class="x-or" data-x="o1a"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o1at">LIVE</em></div>
+              <div class="x-or" data-x="o1b"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o1bt">16:00</em></div>
+              <div class="x-or nw" data-x="o1c"><span class="x-dotc"></span><span class="x-sk"></span><em>12:30</em></div></div><div class="x-out in" style="top:470px;--d:740ms"><div class="x-oh"><svg><use href="#link"/></svg>Табло у кортов</div>
+              <div class="x-or" data-x="o2a"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o2at">LIVE</em></div>
+              <div class="x-or" data-x="o2b"><span class="x-dotc"></span><span class="x-sk"></span><em data-x="o2bt">16:00</em></div>
+              <div class="x-or nw" data-x="o2c"><span class="x-dotc"></span><span class="x-sk"></span><em>12:30</em></div></div><span class="x-pulse" data-x="u0" style="offset-path:path('M912 380 C960 380 960 190 1000 190')"></span><span class="x-pulse" data-x="u1" style="offset-path:path('M912 380 C960 380 960 360 1000 360')"></span><span class="x-pulse" data-x="u2" style="offset-path:path('M912 380 C960 380 960 530 1000 530')"></span>
+            <div class="x-say" data-x="say"></div>
+          </div>
+          <!-- B3. Сетка турнира — схема -->
+          <div class="scr sx" data-s="2">
+            <div class="x-h in"><small>Сетка турнира</small><b>Результат —<br><em>сразу в сетке</em></b><ul class="x-ul"><li class="in" style="--d:250ms">Победитель сам проходит дальше</li><li class="in" style="--d:370ms">Любая система: олимпийская, с ДТ, до 2-х поражений</li><li class="in" style="--d:490ms">Сетка обновляется на сайте и на табло</li></ul></div>
+            <div class="x-rh in" style="left:480px;--d:0ms">1/4 финала</div><div class="x-rh in" style="left:680px;--d:150ms">1/2 финала</div><div class="x-rh in" style="left:880px;--d:300ms">Финал</div><div class="x-rh in" style="left:1060px;--d:450ms">Чемпион</div>
+            <svg class="x-svg x-br"><path d="M620 150 H650 V182 H680"/><path d="M620 214 H650 V182 H680"/><path d="M620 278 H650 V310 H680"/><path d="M620 342 H650 V310 H680"/><path d="M620 406 H650 V438 H680"/><path d="M620 470 H650 V438 H680"/><path d="M620 534 H650 V566 H680"/><path d="M620 598 H650 V566 H680"/><path d="M820 182 H850 V246 H880"/><path d="M820 310 H850 V246 H880"/><path d="M820 438 H850 V502 H880"/><path d="M820 566 H850 V502 H880"/><path d="M1020 246 H1050 V374 H1060"/><path d="M1020 502 H1050 V374 H1060"/><path class="x-wp" data-x="w00" pathLength="1" d="M620 150 H650 V182 H680"/><path class="x-wp" data-x="w01" pathLength="1" d="M620 214 H650 V182 H680"/><path class="x-wp" data-x="w02" pathLength="1" d="M620 278 H650 V310 H680"/><path class="x-wp" data-x="w03" pathLength="1" d="M620 342 H650 V310 H680"/><path class="x-wp" data-x="w04" pathLength="1" d="M620 406 H650 V438 H680"/><path class="x-wp" data-x="w05" pathLength="1" d="M620 470 H650 V438 H680"/><path class="x-wp" data-x="w06" pathLength="1" d="M620 534 H650 V566 H680"/><path class="x-wp" data-x="w07" pathLength="1" d="M620 598 H650 V566 H680"/><path class="x-wp" data-x="w10" pathLength="1" d="M820 182 H850 V246 H880"/><path class="x-wp" data-x="w11" pathLength="1" d="M820 310 H850 V246 H880"/><path class="x-wp" data-x="w12" pathLength="1" d="M820 438 H850 V502 H880"/><path class="x-wp" data-x="w13" pathLength="1" d="M820 566 H850 V502 H880"/><path class="x-wp" data-x="w20" pathLength="1" d="M1020 246 H1050 V374 H1060"/><path class="x-wp" data-x="w21" pathLength="1" d="M1020 502 H1050 V374 H1060"/></svg>
+            <div class="x-n in" data-x="n00" style="left:480px;top:132px;width:140px;--d:100ms"><i>1</i><span class="x-sk"></span></div><div class="x-n in" data-x="n01" style="left:480px;top:196px;width:140px;--d:130ms"><i>8</i><span class="x-sk"></span></div><div class="x-n in" data-x="n02" style="left:480px;top:260px;width:140px;--d:160ms"><i>4</i><span class="x-sk"></span></div><div class="x-n in" data-x="n03" style="left:480px;top:324px;width:140px;--d:190ms"><i>5</i><span class="x-sk"></span></div><div class="x-n in" data-x="n04" style="left:480px;top:388px;width:140px;--d:220ms"><i>3</i><span class="x-sk"></span></div><div class="x-n in" data-x="n05" style="left:480px;top:452px;width:140px;--d:250ms"><i>6</i><span class="x-sk"></span></div><div class="x-n in" data-x="n06" style="left:480px;top:516px;width:140px;--d:280ms"><i>2</i><span class="x-sk"></span></div><div class="x-n in" data-x="n07" style="left:480px;top:580px;width:140px;--d:310ms"><i>7</i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n10" style="left:680px;top:164px;width:140px;--d:250ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n11" style="left:680px;top:292px;width:140px;--d:280ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n12" style="left:680px;top:420px;width:140px;--d:310ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n13" style="left:680px;top:548px;width:140px;--d:340ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n20" style="left:880px;top:228px;width:140px;--d:400ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n21" style="left:880px;top:484px;width:140px;--d:430ms"><i></i><span class="x-sk"></span></div><div class="x-n tbd in" data-x="n30" style="left:1060px;top:356px;width:160px;--d:550ms"><i></i><span class="x-sk"></span></div>
+            <div class="x-lbl3">Матч за 3-е место</div>
+            <div class="x-n tbd" data-x="n3rd" style="left:1060px;top:548px;width:160px"><i></i><span class="x-sk"></span></div>
+            <div class="x-sync" data-x="sync">↻ Сетка обновлена на сайте и на табло</div>
+          </div>
+          <!-- B4. Судейский пульт — схема -->
+          <div class="scr sx" data-s="3">
+            <div class="x-h in"><small>Судейский пульт</small><b>Одно касание —<br><em>счёт везде</em></b><ul class="x-ul"><li class="in" style="--d:250ms">Очко одной кнопкой</li><li class="in" style="--d:370ms">Табло, сайт и эфир синхронно</li><li class="in" style="--d:490ms">Отмена ошибочного очка</li></ul></div>
+            <svg class="x-svg x-dash"><path class="x-dr" pathLength="1" style="--d:500ms" d="M730 360 C815 360 815 168 900 168"/><path class="x-dr" pathLength="1" style="--d:600ms" d="M730 360 C815 360 815 298 900 298"/><path class="x-dr" pathLength="1" style="--d:700ms" d="M730 360 C815 360 815 428 900 428"/><path class="x-dr" pathLength="1" style="--d:800ms" d="M730 360 C815 360 815 558 900 558"/></svg>
+            <div class="x-hub in" style="--d:200ms"><small>Корт 1 · пульт судьи</small><b data-x="hs">15 : 0</b><div class="x-btns"><span data-x="b0">+1<small>Орлов / Ким</small></span><span data-x="b1">+1<small>Гусев / Лебедев</small></span></div><span class="tap"></span></div>
+            <div class="x-ep in" data-x="ep0" style="top:120px;--d:600ms"><svg><use href="#tv"/></svg><span>ТВ-табло у корта</span><b data-x="e0">15 : 0</b></div><div class="x-ep in" data-x="ep1" style="top:250px;--d:700ms"><svg><use href="#mob"/></svg><span>Страница турнира</span><b data-x="e1">15 : 0</b></div><div class="x-ep in" data-x="ep2" style="top:380px;--d:800ms"><svg><use href="#cam"/></svg><span>Трансляция</span><b data-x="e2">15 : 0</b></div><div class="x-ep in" data-x="ep3" style="top:510px;--d:900ms"><svg><use href="#link"/></svg><span>Кабинет организатора</span><b data-x="e3">15 : 0</b></div><span class="x-pulse" data-x="u0" style="offset-path:path('M730 360 C815 360 815 168 900 168')"></span><span class="x-pulse" data-x="u1" style="offset-path:path('M730 360 C815 360 815 298 900 298')"></span><span class="x-pulse" data-x="u2" style="offset-path:path('M730 360 C815 360 815 428 900 428')"></span><span class="x-pulse" data-x="u3" style="offset-path:path('M730 360 C815 360 815 558 900 558')"></span>
+          </div>
+          <!-- B5. ТВ-табло — схема: два режима -->
+          <div class="scr sx" data-s="4">
+            <div class="x-h in"><small>ТВ-табло</small><b>Табло —<br><em>в двух режимах</em></b><ul class="x-ul"><li class="in" style="--d:250ms">Общее: все корты и расписание</li><li class="in" style="--d:370ms">У корта: лайв-счёт матча</li><li class="in" style="--d:490ms">Своё табло на каждый корт</li></ul></div>
+            <div class="x-mode in" style="--d:100ms"><span class="on" data-x="m0">Общее табло</span><span data-x="m1">Табло у корта</span></div>
+            <div class="x-tv2 in" style="--d:200ms">
+              <div class="tvx tvg on" data-x="tg">
+                <div class="tg-top"><span class="tv-cat">ФПР 500</span><b>ОСЕННИЙ КУБОК</b><span class="tg-dt">19 ОКТЯБРЯ · <span data-x="clk">12:41</span></span></div>
+                <div class="tg-cols"><div class="tg-col"><div class="tg-ch">КОРТ 1</div><div class="tg-m on" data-x="t1"><div class="tg-h"><span class="lv">● ИДЁТ · 1/2</span></div><div class="tg-p">Орлов / Ким<em>6 3</em></div><div class="tg-p">Гусев / Лебедев<em>4 2</em></div></div><div class="tg-m "><div class="tg-h">НЕ РАНЕЕ 16:00 · ФИНАЛ</div><div class="tg-p"><i>победитель 1/2 №1</i><em></em></div><div class="tg-p"><i>победитель 1/2 №2</i><em></em></div></div></div><div class="tg-col"><div class="tg-ch">КОРТ 2</div><div class="tg-m " data-x="t2"><div class="tg-h"><span data-x="t2h">НАЧАЛО В 12:30 · 1/2</span></div><div class="tg-p">Носов / Ли<em></em></div><div class="tg-p">Титов / Рой<em></em></div></div><div class="tg-m "><div class="tg-h">ЗАТЕМ · ЗА 3-Е МЕСТО</div><div class="tg-p"><i>проигравший 1/2 №1</i><em></em></div><div class="tg-p"><i>проигравший 1/2 №2</i><em></em></div></div></div><div class="tg-col"><div class="tg-ch">КОРТ 3</div><div class="tg-m "><div class="tg-h">НАЧАЛО В 13:00 · НС, ФИНАЛ</div><div class="tg-p">Шульц / Бек<em></em></div><div class="tg-p">Ершов / Пак<em></em></div></div><div class="tg-m "><div class="tg-h">ЗАТЕМ · ЗА 5-Е МЕСТО</div><div class="tg-p"><i>победитель НС №1</i><em></em></div><div class="tg-p"><i>победитель НС №2</i><em></em></div></div></div></div>
+                <div class="tg-dots"><i class="on"></i><i></i></div>
+              </div>
+              <div class="tvx tvc" data-x="tc">
+                <div class="tc-top"><span class="tv-cat">ФПР 500</span><div><b>ОСЕННИЙ КУБОК</b><small>1/2 ФИНАЛА · КОРТ 1</small></div><span class="tc-lv"><span class="dot"></span>LIVE</span></div>
+                <div class="tc-hr"><span>Пара</span><span>Сет 1</span><span>Геймы</span><span>Очки</span></div>
+                <div class="tc-r srv" data-x="r0"><span class="tc-n"><i></i>ОРЛОВ / КИМ</span><span class="tc-s">6</span><span class="tc-g" data-x="g0">3</span><span class="tc-p" data-x="p0">40</span></div>
+                <div class="tc-r" data-x="r1"><span class="tc-n"><i></i>ГУСЕВ / ЛЕБЕДЕВ</span><span class="tc-s">4</span><span class="tc-g" data-x="g1">2</span><span class="tc-p" data-x="p1">30</span></div>
+                <div class="tc-ev" data-x="ev">★ STAR POINT</div>
+                <div class="tc-ft"><span>Следующий матч: <b>Финал · не ранее 16:00</b></span><span class="tc-sp"><i></i><i></i></span></div>
+              </div>
+            </div>
+            <div class="x-stand2"></div>
+            <div class="x-cap" data-x="cap">В холле клуба: все корты — что идёт сейчас и что дальше</div>
+          </div>
+          <!-- B6. Теле виджет — схема -->
+          <div class="scr sx" data-s="5">
+            <div class="x-h in"><small>Теле виджет</small><b>Счёт поверх<br><em>трансляции</em></b><ul class="x-ul"><li class="in" style="--d:250ms">Ссылка — источник в OBS или vMix</li><li class="in" style="--d:370ms">Прозрачный фон</li><li class="in" style="--d:490ms">Счёт и партнёры в эфире</li></ul></div>
+            <div class="x-vid in" style="--d:150ms"><span class="x-chip">Видео с камеры</span><svg class="x-camic" viewBox="0 0 48 48"><rect x="4" y="12" width="28" height="24" rx="4"/><path d="M32 21l12-7v20l-12-7z"/></svg></div>
+            <div class="x-ov in" data-x="ov" style="--d:400ms">
+              <span class="x-chk"></span>
+              <span class="x-chip lime">Виджет PADEL.SELECT · прозрачный фон</span>
+              <div class="x-bug"><div><span><i></i>ОРЛОВ / КИМ</span><em>6</em><em class="c" data-x="g0">4</em><b data-x="p0">0</b></div><div><span>ГУСЕВ / ЛЕБЕДЕВ</span><em>4</em><em class="c" data-x="g1">2</em><b data-x="p1">0</b></div></div>
+              <div class="x-spn">ЛОГО ПАРТНЁРА</div>
+            </div>
+            <div class="x-link in" style="--d:900ms"><svg><use href="#link"/></svg>padel.select/widget/court-1<span>→ OBS / vMix: браузерный источник</span></div>
+          </div>
+          </div>
+        </div>
+      </div>
+    <div class="frame-hint">← листайте экран →</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 2. ФИЧИ ======================= -->
+<section class="feat" id="features">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2>Всё, что надо для проведения турнира</h2>
+    </div>
+
+    <div class="fgrid">
+      <nav class="side" id="side">
+        <a href="#create" class="on">Создать<span class="num">01</span></a>
+        <a href="#run">Провести<span class="num">02</span></a>
+        <a href="#referee">Судить<span class="num">03</span></a>
+        <a href="#show">Показать<span class="num">04</span></a>
+        <a href="#earn">Заработать<span class="num">05</span></a>
+      </nav>
+
+      <div>
+        <!-- ===== 01 СОЗДАТЬ ===== -->
+        <div class="cat" id="create">
+          <div class="cat-h"><h3>Создать</h3></div>
+          <div class="cards">
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Быстрый старт</span>
+                <h4>Турнир готов к приёму заявок за несколько минут</h4>
+                <p>Четыре коротких шага вместо таблиц и ручных расчётов. Сервис подсказывает, что заполнить, и предупреждает об ошибках.</p>
+              </div>
+              <div class="mock">
+                <div class="steps"><div class="done"><b>Шаг 1</b>Основные</div><div class="cur"><b>Шаг 2</b>Тип турнира</div><div><b>Шаг 3</b>Матчи</div><div><b>Шаг 4</b>Участники</div></div>
+                <div class="lbl">Категория</div>
+                <div class="chips"><span class="chip">ФПР 40</span><span class="chip">ФПР 100</span><span class="chip">ФПР 250</span><span class="chip on">ФПР 500</span><span class="chip">ФПР 1000</span><span class="chip">Региональный</span><span class="chip">Клубный</span></div>
+                <div class="fld2"><div class="fld"><span class="mut">Площадка</span><b>Арена Сити</b></div><div class="fld"><span class="mut">Корты</span><b>6</b></div></div>
+                <div class="fld2"><div class="fld"><span class="mut">Даты</span><b>17–19 окт</b></div><div class="fld"><span class="mut">Регламент</span><b>reglament.pdf</b></div></div>
+              </div>
+            </article>
+
+            <article class="card stack" id="formats">
+              <div class="stack-h">
+                <div>
+                  <span class="eb">Любой формат</span>
+                  <h4>Проведёте турнир именно так, как задумали</h4>
+                </div>
+                <p>Квалификация, группы и финал по любой системе собираются из готовых этапов. Регламент ФПР уже учтён, матчи и туры сервис считает сам.</p>
+              </div>
+              <div class="shot wide-shot"><img src="../assets/landing/constructor.webp" width="1414" height="684" alt="Конструктор турнира: квалификация, групповой этап и финал по олимпийской системе" loading="lazy"></div>
+              <div class="shot-hint">← листайте скрин →</div>
+            </article>
+
+            <article class="card">
+              <span class="eb">Несколько дивизионов</span>
+              <h4>Все уровни и категории игроков — в одном турнире</h4>
+              <p>Делите участников как удобно: по полу, уровню или рейтингу. У каждого дивизиона своя схема, а расписание и страница для зрителей — общие.</p>
+              <div class="mock">
+                <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><b>Мужчины · ФПР 100</b><span class="chip">Квалификация + до двух поражений</span></div>
+                <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><b>Мужчины · ФПР 40</b><span class="chip">Группы + олимпийская</span></div>
+                <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><b>Женщины</b><span class="chip">Олимпийская + утешительный</span></div>
+                <div class="row" style="justify-content:space-between;padding:6px 0"><b>Микст</b><span class="chip">Группы + олимпийская</span></div>
+                <div style="margin-top:10px"><span class="mbtn ghost">⧉ Скопировать настройки во все дивизионы</span></div>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="eb">Свой формат матчей</span>
+              <h4>Правила под ваш турнир и уровень игроков</h4>
+              <p>Короткие матчи для клубного дня или полный формат для рейтингового турнира. Правила задаются один раз — судьи и табло считают по ним.</p>
+              <div class="mock">
+                <div class="row" style="justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:12px"><b>Одинаковые для всех этапов</b><span class="tg"></span></div>
+                <div class="rules">
+                  <div><span class="lbl">Сетов для победы</span><div class="seg"><span>1</span><span class="on">2</span><span>3</span></div></div>
+                  <div><span class="lbl">Геймов в сете</span><div class="seg"><span>4</span><span class="on">6</span><span>9</span></div></div>
+                  <div><span class="lbl">Тай-брейк при 6:6</span><div class="seg"><span class="on">До 7</span><span>Нет</span></div></div>
+                  <div><span class="lbl">При равенстве сетов</span><div class="seg"><span class="on">Супер-тай-брейк до 10</span><span>3-й сет</span></div></div>
+                </div>
+                <div class="lbl">При счёте 40:40</div><div class="seg"><span class="on">Star Point 1</span><span>Star Point 2</span><span>Больше-меньше</span><span>Золотой мяч</span></div>
+              </div>
+            </article>
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Без ручного ввода</span>
+                <h4>Заявки с портала ФПР подтягиваются сами</h4>
+                <p>Не нужно переписывать пары и рейтинги в таблицу. Вставьте ссылку на турнир — состав соберётся по рейтингу и будет обновляться, пока идёт приём заявок.</p>
+              </div>
+              <div class="mock">
+                <div class="inp"><div class="fld">sb.padelrus.ru/tournaments/…</div><span class="mbtn">Загрузить</span></div>
+                <div class="log">
+                  <div><span class="ic">✓</span><span><b>28 пар загружено</b><br><span class="mut">из них 4 новых с прошлого обновления</span></span></div>
+                  <div><span class="ic sp">↻</span><span class="mut">Следующее обновление через 7 минут</span></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Лиги и чемпионаты</span>
+                <h4>Лига, которая загружает корты весь сезон</h4>
+                <p>Не только турниры: в сервисе есть отдельный формат лиг и чемпионатов. Регулярные матчи приводят игроков в клуб и в будни, а сервис распишет, кто с кем играет, и сам ведёт таблицу — без Excel.</p>
+              </div>
+              <div class="mock">
+                <div class="row" style="justify-content:space-between;margin-bottom:12px"><b style="font-size:14px">Лига Арена Сити · сезон 2026</b><span class="chip lime">Лига</span></div>
+                <div class="chips" style="margin-bottom:10px"><span class="chip on">Мужчины</span><span class="chip">Женщины</span><span class="chip">Микст</span><span class="chip" style="margin-left:auto">2 круга</span></div>
+                <table class="tbl"><tr><th>#</th><th>Пара</th><th class="n">И</th><th class="n">В</th><th class="n">П</th><th class="n">О</th></tr>
+                  <tr><td>1</td><td><b>Орлов / Ким</b></td><td class="n">8</td><td class="n">7</td><td class="n">1</td><td class="n"><b>14</b></td></tr>
+                  <tr><td>2</td><td>Белов / Сафин</td><td class="n">8</td><td class="n">6</td><td class="n">2</td><td class="n"><b>12</b></td></tr>
+                  <tr><td>3</td><td>Гусев / Лебедев</td><td class="n">7</td><td class="n">4</td><td class="n">3</td><td class="n"><b>8</b></td></tr>
+                  <tr><td>4</td><td>Петров / Зуев</td><td class="n">8</td><td class="n">3</td><td class="n">5</td><td class="n"><b>6</b></td></tr>
+                </table>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ===== 02 ПРОВЕСТИ ===== -->
+        <div class="cat" id="run">
+          <div class="cat-h"><h3>Провести</h3></div>
+          <div class="cards">
+
+            <article class="card stack">
+              <div class="stack-h">
+                <div>
+                  <span class="eb">Жеребьёвка в эфире</span>
+                  <h4>Жеребьёвка как шоу — на экране клуба и в трансляции</h4>
+                </div>
+                <p>Готовый виджет жеребьёвки для телевизора и стрима: пары появляются в сетке в тот момент, когда вы их расставляете. Зрелищный контент для зрителей и соцсетей без дизайнера и монтажа.</p>
+              </div>
+              <div class="shot tv"><div class="mo" data-mo="draw" data-w="1280" data-h="720"><div class="mo-c" style="width:1280px;height:720px">
+                <div class="dw">
+                  <div class="dw-h"><span class="dw-cat">ФПР 500</span><span class="dw-t"><b>ОСЕННИЙ КУБОК АРЕНА СИТИ</b><span>Основной турнир · Жеребьёвка</span></span><span class="dw-pop" data-x="pop"><small>Позиция —</small><b>&nbsp;</b></span><span class="dw-lv"><i></i>LIVE</span></div>
+                  <div class="dw-br"><div class="dw-col"><div class="dw-r t" data-x="r0"><em>1</em><span>ОРЛОВ А. | КИМ П.</span></div><div class="dw-r b" data-x="r1"><em>2</em><span>БЕК Д. | ШУЛЬЦ А.</span></div><div class="dw-r t" data-x="r2"><em>3</em><span>НОСОВ Г. | ЛИ И.</span></div><div class="dw-r b" data-x="r3"><em>4</em><span>ЗУЕВ Р. | ПЕТРОВ О.</span></div><div class="dw-r t" data-x="r4"><em>5</em><span>ГУСЕВ Д. | ЛЕБЕДЕВ М.</span></div><div class="dw-r b" data-x="r5"><em>6</em><span>ПАК В. | ЕРШОВ К.</span></div><div class="dw-r t" data-x="r6"><em>7</em><span>ТИТОВ О. | РОЙ Е.</span></div><div class="dw-r b" data-x="r7"><em>8</em><span>САФИН Р. | БЕЛОВ С.</span></div></div><div class="dw-col"><div class="dw-r t" data-x="r8"><em>9</em><span>ФОМИН О. | ДЁМИН С.</span></div><div class="dw-r b" data-x="r9"><em>10</em><span>ЧЕРНОВ О. | ЯКОВЛЕВ С.</span></div><div class="dw-r t" data-x="r10"><em>11</em><span>ВОЛКОВ Н. | СМИРНОВ Е.</span></div><div class="dw-r b" data-x="r11"><em>12</em><span>ОРЕХОВ Л. | ЗАЙЦЕВ И.</span></div><div class="dw-r t" data-x="r12"><em>13</em><span>КРЫЛОВ Т. | БАРАНОВ А.</span></div><div class="dw-r b" data-x="r13"><em>14</em><span>ГРОМОВ Ю. | ЛЕБЕДЕВ П.</span></div><div class="dw-r t" data-x="r14"><em>15</em><span>ЖУКОВ М. | СОКОЛОВ В.</span></div><div class="dw-r b" data-x="r15"><em>16</em><span>ТАРАСОВ Б. | КУЗНЕЦОВ Р.</span></div></div></div>
+                </div>
+              </div></div></div>
+            </article>
+
+            <article class="card stack">
+              <div class="stack-h">
+                <div>
+                  <span class="eb">Расписание на экранах</span>
+                  <h4>Все видят, кто и на каком корте играет следующим</h4>
+                </div>
+                <p>Расставьте матчи по кортам — расписание сразу появится на экранах клуба и в телефонах игроков. Турнир идёт без объявлений в микрофон и рассылок по чатам.</p>
+              </div>
+              <div class="shot tv"><div class="mo" data-mo="sched" data-w="680" data-h="382"><div class="mo-c" style="width:680px;height:382px">
+                <div class="tvx tvg on mo-tv">
+                  <div class="tg-top"><span class="tv-cat">ФПР 500</span><b>ОСЕННИЙ КУБОК</b><span class="tg-dt">19 ОКТЯБРЯ · <span data-x="clk">12:41</span></span></div>
+                  <div class="tg-cols"><div class="tg-col"><div class="tg-ch">КОРТ 1</div><div class="tg-m on" data-x="m1"><div class="tg-h"><span class="lv" data-x="h1">● ИДЁТ · 1/2</span></div><div class="tg-p">Орлов / Ким<em>6 3</em></div><div class="tg-p">Гусев / Лебедев<em>4 2</em></div></div><div class="tg-m " data-x="mf"><div class="tg-h">НЕ РАНЕЕ 16:00 · ФИНАЛ</div><div class="tg-p"><i data-x="f1">победитель 1/2 №1</i><em></em></div><div class="tg-p"><i>победитель 1/2 №2</i><em></em></div></div></div><div class="tg-col"><div class="tg-ch">КОРТ 2</div><div class="tg-m " data-x="m2"><div class="tg-h"><span data-x="h2">НАЧАЛО В 12:30 · 1/2</span></div><div class="tg-p">Носов / Ли<em></em></div><div class="tg-p">Титов / Рой<em></em></div></div><div class="tg-m "><div class="tg-h">ЗАТЕМ · ЗА 3-Е МЕСТО</div><div class="tg-p"><i>проигравший 1/2 №1</i><em></em></div><div class="tg-p"><i>проигравший 1/2 №2</i><em></em></div></div></div><div class="tg-col"><div class="tg-ch">КОРТ 3</div><div class="tg-m "><div class="tg-h">НАЧАЛО В 13:00 · НС, ФИНАЛ</div><div class="tg-p">Шульц / Бек<em></em></div><div class="tg-p">Ершов / Пак<em></em></div></div><div class="tg-m "><div class="tg-h">ЗАТЕМ · ЗА 5-Е МЕСТО</div><div class="tg-p"><i>победитель НС №1</i><em></em></div><div class="tg-p"><i>победитель НС №2</i><em></em></div></div></div></div>
+                  <div class="tg-dots"><i class="on"></i><i></i></div>
+                </div>
+              </div></div></div>
+            </article>
+
+            </div>
+        </div>
+
+        <!-- ===== 03 СУДИТЬ ===== -->
+        <div class="cat" id="referee">
+          <div class="cat-h"><h3>Судить</h3></div>
+          <div class="cards">
+            <article class="card wide">
+              <div>
+                <span class="eb">Порядок на кортах</span>
+                <h4>Каждый судья знает свой корт и свои матчи</h4>
+                <p>Закрепите за турниром аккредитованных ФПР и локальных судей и назначайте их на матчи прямо в расписании.</p>
+              </div>
+              <div class="mock">
+                <div class="ref"><span class="av">АС</span><div><b>Алексей Смирнов</b><br><span class="mut">Корт 1 · 3 матча</span></div><span class="chip lime">ФПР</span></div>
+                <div class="ref"><span class="av">МК</span><div><b>Мария Котова</b><br><span class="mut">Корт 2 · 2 матча</span></div><span class="chip lime">ФПР</span></div>
+                <div class="ref"><span class="av">ДП</span><div><b>Денис Павлов</b><br><span class="mut">Корт 3 · 3 матча</span></div><span class="chip">Локальный</span></div>
+              </div>
+            </article>
+            <article class="card wide">
+              <div>
+                <span class="eb">Без ошибок в счёте</span>
+                <h4>Счёт ведёт судья — табло и зрители видят его сразу</h4>
+                <p>Одно касание на розыгрыш, подачу и смену сторон сервис считает сам. Не нужен оператор табло и ручной перенос результатов.</p>
+              </div>
+              <div class="mock" style="background:var(--surface-2);padding:24px;display:grid;place-items:center">
+                <div class="mo mo-ref" data-mo="ref" data-w="340" data-h="660"><div class="mo-c" style="width:340px;height:660px">
+                  <div class="rf" style="left:0;top:0">
+                    <div class="rf-h"><div><b>1/2 финала · Матч 1</b><small>Корт 1 · Осенний кубок</small></div><div class="rf-tm"><b data-x="tm">54:24</b><small>МАТЧ</small></div></div>
+                    <div class="rf-nm"><span class="sv">Орлов / Ким</span><span>Гусев / Лебедев</span></div>
+                    <div class="rf-r done"><b>6</b><span>Сет 1</span><b>4</b></div>
+                    <div class="rf-r"><b data-x="g0">3</b><span>Гейм</span><b data-x="g1">2</b></div>
+                    <div class="rf-r big"><b data-x="p0">15</b><span>Очки</span><b data-x="p1">15</b></div>
+                    <div class="rf-sv">подаёт <b data-x="sv">Орлов</b> · правая сторона</div>
+                    <div class="rf-bt"><div class="rf-b" data-x="b0">+ ОЧКО<small>Орлов / Ким</small></div><div class="rf-b" data-x="b1">+ ОЧКО<small>Гусев / Лебедев</small></div></div>
+                    <span class="tap"></span>
+                  </div>
+                </div></div>
+              </div>
+            </article>
+            </div>
+        </div>
+
+        <!-- ===== 04 ПОКАЗАТЬ ===== -->
+        <div class="cat" id="show">
+          <div class="cat-h"><h3>Показать</h3></div>
+          <div class="cards">
+            <article class="card wide">
+              <div>
+                <span class="eb">Зрители и игроки</span>
+                <h4>Вся информация о турнире — по одной ссылке</h4>
+                <p>Расписание, сетка и живой счёт в телефоне без регистрации. Больше не нужно рассылать фото таблиц по чатам.</p>
+              </div>
+              <div class="mock" style="background:var(--surface-2);padding:22px 22px 0;overflow:hidden">
+                <div class="mo mo-ph" data-mo="pub" data-w="300" data-h="620" data-ch="490"><div class="mo-c" style="width:300px;height:620px">
+                  <div class="ph-dev" style="left:0;top:0"><div class="pa">
+                    <div class="pa-top"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span><span class="pa-sh"></span></div>
+                    <div class="pa-hero"><span class="pa-live"><span class="dot"></span>LIVE</span><b>Осенний кубок Арена Сити</b><small>19 октября · ФПР 500 · Арена Сити</small></div>
+                    <div class="pa-tabs"><span class="on">Расписание</span><span>Сетка</span><span>Игроки</span></div>
+                    <div class="pa-m air" data-x="m1"><div class="pa-mt"><b>12:30</b><small>Корт 1</small></div><div><div class="pa-mh">1/2 финала<span class="pa-lv"><span class="dot"></span>LIVE</span></div><div class="pa-p w">Орлов / Ким<span data-x="pg">6 3</span></div><div class="pa-p">Гусев / Лебедев<span>4 2</span></div></div></div>
+                    <div class="pa-m" data-x="m2"><div class="pa-mt"><b>12:30</b><small>Корт 2</small></div><div><div class="pa-mh">1/2 финала<span class="pa-lv"><span class="dot"></span>LIVE</span></div><div class="pa-p">Носов / Ли<span data-x="qg"></span></div><div class="pa-p">Титов / Рой<span data-x="qh"></span></div></div></div>
+                    <div class="pa-m tbd"><div class="pa-mt"><b>16:00</b><small>не ранее<br>Корт 1</small></div><div><div class="pa-mh">Финал</div><div class="pa-p">Победитель 1/2 · 1</div><div class="pa-p">Победитель 1/2 · 2</div></div></div>
+                    <div class="pa-push" data-x="push"><i>P</i><div><b>Корт 2 · матч начался</b>Носов / Ли — Титов / Рой</div></div>
+                  </div></div>
+                </div></div>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="eb">Атмосфера в клубе</span>
+              <h4>Турнир на экранах клуба, как на большом соревновании</h4>
+              <p>Счёт у корта, общее табло и расписание на любом телевизоре — достаточно открыть ссылку в браузере.</p>
+              <div class="mock" style="padding:12px;background:var(--surface-2)">
+                <div class="tvm">
+                  <div class="th"><b>КОРТ 1</b><span class="live"><span class="dot"></span>LIVE</span></div>
+                  <div class="rows">
+                    <div class="tr"><span class="nm"><i></i>Орлов / Ким</span><span class="g">6</span><span class="g">3</span><span class="pt">AD</span></div>
+                    <div class="tr"><span class="nm" style="color:#cfd9da">Белов / Сафин</span><span class="g">4</span><span class="g">2</span><span class="pt d">40</span></div>
+                  </div>
+                  <div class="tf"><span class="flag">STAR POINT</span><span class="spons"><i></i><i></i><i></i></span></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="eb">Трансляции</span>
+              <h4>Графика в эфире без отдельного оператора</h4>
+              <p>Добавьте ссылку в OBS или vMix — счёт от судьи появится в кадре автоматически.</p>
+              <div class="mock" style="padding:12px;background:var(--surface-2)">
+                <div class="cam">
+                  <div class="bug">
+                    <div class="br2"><b>Орлов / Ким</b><span>6</span><span>3</span><em>AD</em></div>
+                    <div class="br2"><b>Белов / Сафин</b><span>4</span><span>2</span><em style="background:#22363a;color:#fff">40</em></div>
+                    <div class="bf">PADEL.SELECT · 1/4 ФИНАЛА</div>
+                  </div>
+                  <span class="rec"><span class="dot"></span>REC</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Всё под рукой</span>
+                <h4>Все экраны турнира запускаются за минуту</h4>
+                <p>Ссылки на страницу турнира, табло и виджеты собраны в кабинете — скопировать или открыть в один клик.</p>
+              </div>
+              <div class="mock" id="links">
+                <div class="lnk"><span class="ico"><svg><use href="#mob"/></svg></span><div><b>Страница турнира</b><small>padel.select/t/osennij-kubok</small></div><button class="cp">Копировать</button></div>
+                <div class="lnk"><span class="ico"><svg><use href="#tv"/></svg></span><div><b>ТВ-табло · Общее</b><small>padel.select/tv/…/all</small></div><button class="cp">Копировать</button></div>
+                <div class="lnk"><span class="ico"><svg><use href="#tv"/></svg></span><div><b>Табло жеребьёвки</b><small>padel.select/tv/…/draw</small></div><button class="cp">Копировать</button></div>
+                <div class="lnk"><span class="ico"><svg><use href="#tv"/></svg></span><div><b>Табло · Корт 1</b><small>padel.select/tv/…/court-1</small></div><button class="cp">Копировать</button></div>
+                <div class="lnk"><span class="ico"><svg><use href="#cam"/></svg></span><div><b>Виджет трансляции · Корт 1</b><small>padel.select/widget/…/court-1</small></div><button class="cp">Копировать</button></div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ===== 05 ЗАРАБОТАТЬ ===== -->
+        <div class="cat" id="earn">
+          <div class="cat-h"><h3>Заработать</h3></div>
+          <div class="cards">
+            <article class="card wide">
+              <div>
+                <span class="eb">Узнаваемость</span>
+                <h4>Турнир в фирменных цветах клуба или спонсора</h4>
+                <p>Страница, табло и трансляция в едином стиле — турнир выглядит как ваше событие. Попробуйте переключить.</p>
+              </div>
+              <div class="mock">
+                <div class="sw" id="sw">
+                  <button aria-pressed="true" data-c="#82eb00" data-ci="#0b1b06" data-b="#0c1719" data-b2="#132326"><i style="background:#82eb00"></i>Зелёная</button>
+                  <button aria-pressed="false" data-c="#38bdf8" data-ci="#04202e" data-b="#0b1626" data-b2="#132238"><i style="background:#38bdf8"></i>Голубая</button>
+                  <button aria-pressed="false" data-c="#ef3b3b" data-ci="#fff" data-b="#1a0b0d" data-b2="#2a1215"><i style="background:#ef3b3b"></i>Красная</button>
+                  <button aria-pressed="false" data-c="#ffffff" data-ci="#111" data-b="#0b0b0b" data-b2="#1c1c1c"><i style="background:#111;border:2px solid #fff;box-shadow:0 0 0 1px #c9d5d8"></i>Тёмная</button>
+                </div>
+                <div class="tvm brand-tv" id="btv">
+                  <div class="th"><b>ОСЕННИЙ КУБОК</b><span>Корт 1 · Финал</span></div>
+                  <div class="rows">
+                    <div class="tr"><span class="nm"><i></i>Орлов / Ким</span><span class="g">6</span><span class="g">5</span><span class="pt">30</span></div>
+                    <div class="tr"><span class="nm" style="color:#cfd9da">Гусев / Лебедев</span><span class="g">3</span><span class="g">4</span><span class="pt d">15</span></div>
+                  </div>
+                  <div class="tf"><span>Следующий: Белов / Сафин — Петров / Зуев</span><span class="spons"><i></i><i></i></span></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Ценность для спонсоров</span>
+                <h4>Спонсорам есть что предложить</h4>
+                <p>Логотипы на табло, в перерывах и в эфире. Четыре формата размещения — пакеты для партнёров под любой бюджет.</p>
+              </div>
+              <div class="mock">
+                <div class="sw" id="pl">
+                  <button aria-pressed="true" data-p="footer">Подвал</button>
+                  <button aria-pressed="false" data-p="corner">Угловая плашка</button>
+                  <button aria-pressed="false" data-p="water">Водяной знак</button>
+                  <button aria-pressed="false" data-p="splash">Заставка в перерыве</button>
+                </div>
+                <div class="place">
+                  <div class="tvm">
+                    <div class="th"><b>КОРТ 2</b><span class="live"><span class="dot"></span>LIVE</span></div>
+                    <div class="rows">
+                      <div class="tr"><span class="nm"><i></i>Носов / Ли</span><span class="g">4</span><span class="g">1</span><span class="pt">40</span></div>
+                      <div class="tr"><span class="nm" style="color:#cfd9da">Ершов / Пак</span><span class="g">6</span><span class="g">1</span><span class="pt d">30</span></div>
+                    </div>
+                    <div class="tf" style="visibility:hidden"><span>.</span></div>
+                  </div>
+                  <div class="lg footer on" data-p="footer"><span>СПОНСОР</span><span>ПАРТНЁР</span><span>ПАРТНЁР</span></div>
+                  <div class="lg corner" data-p="corner">СПОНСОР</div>
+                  <div class="lg water" data-p="water">СПОНСОР</div>
+                  <div class="lg splash" data-p="splash"><small>ПЕРЕРЫВ · ПРИ ПОДДЕРЖКЕ</small>СПОНСОР</div>
+                </div>
+              </div>
+            </article>
+
+            <article class="card wide">
+              <div>
+                <span class="eb">Новый доход</span>
+                <h4>Экраны клуба начинают приносить деньги</h4>
+                <p>Табло и трансляция становятся рекламными местами: продавайте их спонсорам турнира и партнёрам клуба.</p>
+              </div>
+              <div class="mock">
+                <div class="slots">
+                  <div class="slt"><span class="ico"></span><b>Общее табло · подвал</b><span class="chip lime">Спонсор турнира</span></div>
+                  <div class="slt"><span class="ico"></span><b>Табло кортов 1–6 · угол</b><span class="chip lime">Партнёр клуба</span></div>
+                  <div class="slt"><span class="ico"></span><b>Заставка в перерыве</b><span class="chip">Свободно</span></div>
+                  <div class="slt"><span class="ico"></span><b>Виджет трансляции</b><span class="chip">Свободно</span></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ТАРИФЫ ======================= -->
+<section class="price" id="pricing">
+  <div class="wrap">
+    <div class="sec-h">
+      <h2>Платите только за проведённый турнир</h2>
+    </div>
+    <div class="trial"><span class="trial-b">Триал</span><b>Первый турнир — бесплатно</b><span class="trial-t">в любой конфигурации</span></div>
+    <div class="p-grid">
+      <div class="p-box" id="pList">
+        <div class="p-base">
+          <div class="p-head">Состав турнира</div>
+          <div class="p-subs">
+            <div class="p-row base" aria-disabled="true">
+              <div class="p-txt"><h4>Проведение <span class="nw">турнира <span class="p-q" tabindex="0" role="button" aria-label="Что входит">?<span class="p-tip" role="tooltip"><b class="p-tip-h">Проведение турнира</b><ul><li><b>Создание</b><span>конструктор формата, дивизионы, правила матча</span></li><li><b>Приём заявок</b><span>заявки с портала ФПР, wild card и резерв</span></li><li><b>Жеребьёвка</b><span>квалификация и основная сетка</span></li><li><b>Расписание</b><span>по кортам и дням, назначение судей</span></li><li><b>Результаты</b><span>ввод счёта, сетка и страница турнира обновляются сами</span></li></ul></span></span></span></h4></div>
+              <div class="p-cost" data-m="base"></div>
+              <span class="p-sw lock" title="Входит всегда"></span>
+            </div>
+            <div class="p-row on" data-m="tv" role="switch" aria-checked="true" tabindex="0">
+              <div class="p-txt"><h4>ТВ <span class="nw">режим <span class="p-q" tabindex="0" role="button" aria-label="Что входит">?<span class="p-tip" role="tooltip"><b class="p-tip-h">ТВ режим</b><ul><li><b>Табло корта</b><span>счёт идущего матча у каждого корта</span></li><li><b>Общее табло</b><span>все корты турнира на одном экране</span></li><li><b>Жеребьёвка</b><span>сетка заполняется в прямом эфире</span></li><li><b>Расписание</b><span>ближайшие матчи по кортам</span></li><li><b>Где работает</b><span>в браузере на любом телевизоре</span></li></ul></span></span></span></h4></div>
+              <div class="p-cost" data-m="tv"></div>
+              <span class="p-sw"></span>
+            </div>
+            <div class="p-row" data-m="brand" role="switch" aria-checked="false" tabindex="0">
+              <div class="p-txt"><h4>Спонсоры + уникальное <span class="nw">брендирование <span class="p-q" tabindex="0" role="button" aria-label="Что входит">?<span class="p-tip" role="tooltip"><b class="p-tip-h">Спонсоры + уникальное брендирование</b><ul><li><b>Цвета турнира</b><span>страница, табло и трансляция в одном стиле</span></li><li><b>Логотипы</b><span>подвал, угловая плашка, водяной знак, заставка в перерыве</span></li><li><b>Главный спонсор</b><span>отдельная подложка и приоритетное место</span></li><li><b>Реклама</b><span>продажа мест на экранах партнёрам</span></li></ul></span></span></span></h4></div>
+              <div class="p-cost" data-m="brand"></div>
+              <span class="p-sw"></span>
+            </div>
+            <div class="p-row on" data-m="ref" role="switch" aria-checked="true" tabindex="0">
+              <div class="p-txt"><h4>Судейство + live счёт + модули для <span class="nw">телетрансляций <span class="p-q" tabindex="0" role="button" aria-label="Что входит">?<span class="p-tip" role="tooltip"><b class="p-tip-h">Судейство + live счёт</b><ul><li><b>Пульт судьи</b><span>телефон или планшет, счёт одним касанием</span></li><li><b>Автоматика</b><span>подача, смена сторон, Star Point, AD1/AD2</span></li><li><b>Протокол</b><span>паузы, медпомощь, карточки, видеопросмотр</span></li><li><b>Live-счёт</b><span>сразу на странице турнира и табло</span></li><li><b>Трансляция</b><span>виджет счёта для OBS и vMix</span></li></ul></span></span></span></h4></div>
+              <div class="p-cost" data-m="ref"></div>
+              <span class="p-sw"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="p-sum">
+        <span class="lbl">Турниров и лиг</span>
+        <div class="p-qty">
+          <button type="button" id="pMinus" aria-label="Меньше">−</button>
+          <input id="pQty" type="number" min="1" max="999" value="1" inputmode="numeric" aria-label="Количество">
+          <button type="button" id="pPlus" aria-label="Больше">+</button>
+        </div>
+        <div class="p-hint" id="pHint"></div>
+        <span class="lbl">Итого</span>
+        <div class="p-total" id="pTotal"></div>
+        <div class="p-per" id="pPer"></div>
+        <button class="btn btn-lime btn-lg" type="button" data-auth="signup">Начать бесплатно<svg><use href="#arr"/></svg></button>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 3. FAQ ======================= -->
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-side">
+      <h2>Частые вопросы</h2>
+      <p>Не нашли ответ? Напишите нам в Telegram, ответим и покажем сервис на примере вашего турнира.</p>
+      <a class="btn btn-dark" href="https://t.me/alpha1am" target="_blank" rel="noopener"><svg><use href="#tg"/></svg>Задать вопрос</a>
+    </div>
+    <div>
+      <details class="qa" open><summary>Какие форматы турниров поддерживаются?</summary><div>Практически любые. Турнир собирается из этапов: квалификация, групповой этап и финал в нужном сочетании. Для финала есть олимпийская система, олимпийская с утешительным турниром, до двух поражений с верхней и нижней сеткой, круговая и финальная группа. Все системы проведения из регламента ФПР уже настроены. Для сезонных лиг есть отдельный раздел с круговой системой.</div></details>
+            <details class="qa"><summary>Как подключиться и сколько это стоит?</summary><div>Нажмите «Начать бесплатно» и зарегистрируйтесь — кабинет организатора откроется сразу после подтверждения номера телефона. Первый турнир в любой конфигурации бесплатно по акции «Триал». Дальше оплата за каждый проведённый турнир или лигу: проведение турнира плюс нужные модули, стоимость можно посчитать в разделе «Тарифы».</div></details>
+      <details class="qa"><summary>Нужно ли вручную переносить заявки с портала ФПР?</summary><div>Нет. Достаточно вставить ссылку на турнир на портале ФПР (sb.padelrus.ru). Сервис загрузит пары и расставит их по рейтингу. Пока идёт приём заявок, состав обновляется каждые 10 минут. Пары не с портала можно добавить вручную.</div></details>
+      <details class="qa"><summary>Подойдёт ли сервис для клубного турнира или лиги?</summary><div>Да. Можно проводить турниры любого формата и любой категории — от ФПР 40 до ФПР 1000, а также региональные и клубные. Для сезонных лиг есть отдельный раздел «Чемпионаты / Лиги» с дивизионами и таблицей.</div></details>
+      <details class="qa"><summary>Что увидят зрители и нужно ли им регистрироваться?</summary><div>Регистрироваться не нужно. По ссылке открывается страница турнира: расписание, сетка, таблицы групп и игроки. Идущие матчи отмечены значком LIVE, счёт обновляется сам. Страница сделана в первую очередь для телефона.</div></details>
+      <details class="qa"><summary>Как вывести турнир на экран в клубе или в трансляцию?</summary><div>Скопируйте нужную ссылку из кабинета и откройте её в браузере на телевизоре: общее табло, табло корта, расписание или жеребьёвка. Для трансляции есть виджет счёта, который добавляется в OBS или vMix как источник «Браузер».</div></details>
+      <details class="qa"><summary>Как работает судейство на вышке?</summary><div>Судья открывает матч на телефоне или планшете и одним касанием отмечает, кто выиграл розыгрыш. Подачу, смену сторон и решающий сет сервис считает сам. Паузы, медпомощь, карточки и видеопросмотр фиксируются в протоколе. Счёт сразу появляется на витрине, табло и в виджете трансляции.</div></details>
+      <details class="qa"><summary>Где хранятся данные?</summary><div>На серверах в России. Обработка персональных данных соответствует 152-ФЗ.</div></details>
+      <details class="qa"><summary>Можно ли доработать сервис под наш турнир?</summary><div>Да. Мы быстро отвечаем в поддержке и дорабатываем функции под задачи организаторов. Расскажите, чего не хватает, и мы обсудим сроки.</div></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="final-box">
+      <div>
+        <h2>Готовы провести турнир?</h2>
+        <p>Зарегистрируйтесь — первый турнир в любой конфигурации бесплатно.</p>
+      </div>
+      <button class="btn btn-lime btn-lg" type="button" data-auth="signup">Начать бесплатно<svg><use href="#arr"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<dialog class="login" id="auth" aria-label="Вход и регистрация">
+  <button class="x" type="button" data-close aria-label="Закрыть">×</button>
+
+  <!-- регистрация, шаг 1: телефон -->
+  <form class="aview" data-view="signup" novalidate>
+    <h3>Регистрация</h3>
+    <p class="txt">Укажите номер телефона — пришлём код подтверждения.</p>
+    <label>Телефон<input type="tel" name="phone" inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" required data-phone></label>
+    <label class="cb"><input type="checkbox" name="agree" required checked><span>Согласен на обработку персональных данных по 152-ФЗ и с <a href="#">условиями сервиса</a></span></label>
+    <p class="err" hidden></p>
+    <button class="btn btn-dark btn-lg" type="submit">Получить код</button>
+    <p class="login-note">Уже есть аккаунт? <a href="#" data-go="login">Войти</a></p>
+  </form>
+
+  <!-- вход: телефон -->
+  <form class="aview" data-view="login" novalidate>
+    <h3>Вход</h3>
+    <p class="txt">Введите номер, с которым регистрировались, — пришлём код.</p>
+    <label>Телефон<input type="tel" name="phone" inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" required data-phone></label>
+    <p class="err" hidden></p>
+    <button class="btn btn-dark btn-lg" type="submit">Получить код</button>
+    <p class="login-note">Нет аккаунта? <a href="#" data-go="signup">Зарегистрироваться</a></p>
+    <p class="login-help">Нужна помощь? <a href="https://t.me/alpha1am" target="_blank" rel="noopener">Напишите в Telegram</a></p>
+  </form>
+
+  <!-- код из СМС: общий для регистрации и входа -->
+  <form class="aview" data-view="code" novalidate>
+    <h3>Введите код</h3>
+    <p class="txt">Отправили СМС с кодом на <b data-phone-out>+7 900 000-00-00</b></p>
+    <div class="otp" role="group" aria-label="Код из СМС">
+      <input inputmode="numeric" maxlength="1" aria-label="Цифра 1" autocomplete="one-time-code"><input inputmode="numeric" maxlength="1" aria-label="Цифра 2"><input inputmode="numeric" maxlength="1" aria-label="Цифра 3"><input inputmode="numeric" maxlength="1" aria-label="Цифра 4">
+    </div>
+    <p class="err" hidden></p>
+    <button class="btn btn-dark btn-lg" type="submit">Подтвердить</button>
+    <button class="link-btn" type="button" data-resend>Отправить код ещё раз</button>
+    <p class="login-note"><a href="#" data-back>← Изменить номер</a></p>
+    <p class="login-help">Демо: подойдёт любой код из 4 цифр</p>
+  </form>
+
+  <!-- регистрация, шаг 2: профиль -->
+  <form class="aview" data-view="profile" novalidate>
+    <h3>Расскажите о себе</h3>
+    <label>Имя и фамилия<input name="name" autocomplete="name" placeholder="Анна Ветрова" required></label>
+    <label><span class="lrow">Клуб или организация<em>необязательно</em></span><input name="org" autocomplete="organization" placeholder="Арена Сити"></label>
+    <div class="fld-c">
+      <span class="lbl-c">Контакт для связи</span>
+      <div class="seg-c" role="radiogroup" aria-label="Мессенджер">
+        <button type="button" role="radio" aria-checked="true" data-msg="tg">Telegram</button><button type="button" role="radio" aria-checked="false" data-msg="max">MAX</button>
+      </div>
+      <input name="contact" placeholder="@username" required aria-label="Контакт для связи">
+    </div>
+    <p class="err" hidden></p>
+    <button class="btn btn-dark btn-lg" type="submit">Создать аккаунт</button>
+  </form>
+</dialog>
+
+<footer><div class="wrap"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span></div></footer>
+
+<script>
+/* вход и регистрация по телефону: телефон → код из СМС → (для новых) профиль; в прототипе финал ведёт в кабинет организатора */
+(function(){
+  const d=document.getElementById("auth");
+  const views=[...d.querySelectorAll(".aview")];
+  let mode="signup",phone="";
+  function go(v){
+    views.forEach(x=>x.classList.toggle("on",x.dataset.view===v));
+    d.querySelectorAll(".err").forEach(e=>e.hidden=true);
+    d.querySelector("[data-phone-out]").textContent=phone||"+7 900 000-00-00";
+    if(v==="code"){d.querySelectorAll(".otp input").forEach(i=>i.value="");resend()}
+    const f=d.querySelector(".aview.on input:not([type=checkbox])");if(f)setTimeout(()=>f.focus(),30);
+  }
+  function open(v){if(!d.open)d.showModal();mode=v==="login"?"login":"signup";go(v)}
+  document.querySelectorAll("[data-auth]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();open(b.dataset.auth)}));
+  d.addEventListener("click",e=>{
+    if(e.target===d||e.target.closest("[data-close]"))return d.close();
+    const g=e.target.closest("[data-go]");if(g){e.preventDefault();mode=g.dataset.go;go(g.dataset.go)}
+    if(e.target.closest("[data-back]")){e.preventDefault();go(mode)}
+    const m=e.target.closest("[data-msg]");if(m){
+      m.parentElement.querySelectorAll("button").forEach(b=>b.setAttribute("aria-checked",b===m));
+      const c=d.querySelector("[name=contact]");c.placeholder=m.dataset.msg==="tg"?"@username":"Номер или ссылка на профиль";c.focus();
+    }
+  });
+  // маска телефона +7 XXX XXX-XX-XX
+  const digits=v=>{let x=v.replace(/\D/g,"");if(x[0]==="8")x="7"+x.slice(1);if(x&&x[0]!=="7")x="7"+x;return x.slice(0,11)};
+  const fmt=x=>{if(!x)return"";const p=x.slice(1);let r="+7";if(p.length)r+=" "+p.slice(0,3);if(p.length>3)r+=" "+p.slice(3,6);if(p.length>6)r+="-"+p.slice(6,8);if(p.length>8)r+="-"+p.slice(8,10);return r};
+  d.querySelectorAll("[data-phone]").forEach(i=>i.addEventListener("input",()=>{i.value=fmt(digits(i.value))}));
+  // код: автопереход между клетками и вставка целиком
+  const otp=[...d.querySelectorAll(".otp input")];
+  otp.forEach((i,k)=>{
+    i.addEventListener("input",()=>{i.value=i.value.replace(/\D/g,"").slice(-1);if(i.value&&otp[k+1])otp[k+1].focus();if(otp.every(x=>x.value))d.querySelector("[data-view=code]").requestSubmit()});
+    i.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!i.value&&otp[k-1])otp[k-1].focus()});
+    i.addEventListener("paste",e=>{const t=(e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,4);if(!t)return;e.preventDefault();t.split("").forEach((c,n)=>otp[n]&&(otp[n].value=c));(otp[t.length]||otp[3]).focus();if(t.length===4)d.querySelector("[data-view=code]").requestSubmit()});
+  });
+  function fail(f,msg,el){const e=f.querySelector(".err");e.textContent=msg;e.hidden=false;if(el)el.classList.add("bad");return false}
+  function check(f){
+    f.querySelectorAll("input").forEach(i=>i.classList.remove("bad"));f.querySelector(".err").hidden=true;
+    const v=f.dataset.view;
+    if(f.phone&&digits(f.phone.value).length!==11)return fail(f,"Введите номер полностью: +7 и 10 цифр",f.phone);
+    if(v==="signup"&&!f.agree.checked)return fail(f,"Нужно согласие на обработку персональных данных");
+    if(v==="code"&&otp.some(i=>!i.value))return fail(f,"Введите все 4 цифры кода",otp.find(i=>!i.value));
+    if(v==="profile"){
+      if(f.name.value.trim().split(/\s+/).length<2)return fail(f,"Укажите имя и фамилию",f.name);
+      if(!f.contact.value.trim())return fail(f,"Укажите контакт в Telegram или MAX",f.contact);
+    }
+    return true;
+  }
+  d.querySelectorAll("form.aview").forEach(f=>f.addEventListener("submit",e=>{
+    e.preventDefault();if(!check(f))return;
+    const v=f.dataset.view;
+    if(v==="signup"||v==="login"){phone=fmt(digits(f.phone.value));go("code")}
+    else if(v==="code"){if(mode==="signup")go("profile");else location.href="organizer-flow.html"}
+    else if(v==="profile")location.href="organizer-flow.html";
+  }));
+  const rb=d.querySelector("[data-resend]");let t;
+  function resend(){let n=60;rb.disabled=true;clearInterval(t);const tick=()=>{rb.textContent="Отправить код ещё раз через "+n+" с";if(n--<=0){clearInterval(t);rb.disabled=false;rb.textContent="Отправить код ещё раз"}};tick();t=setInterval(tick,1000)}
+  rb.addEventListener("click",resend);
+  const q=new URLSearchParams(location.search).get("auth");if(q){open(q==="code"||q==="profile"?"signup":q);if(q!=="signup"&&q!=="login")go(q)}   // ?auth=signup|login|code|profile
+})();
+
+/* тарифы: цены за один турнир или одну лигу, ₽ */
+(function(){
+  const PRICE={base:2990,tv:390,ref:990,brand:590};
+  const DISC={from:5,pct:10};   // скидка от 5 турниров/лиг
+  const fmt=n=>n.toLocaleString("ru-RU").replace(/,/g," ")+" ₽";
+  const qty=document.getElementById("pQty");
+  const rows=[...document.querySelectorAll("#pList .p-row[data-m]")];
+  const n=()=>Math.min(999,Math.max(1,parseInt(qty.value,10)||1));
+  function render(){
+    const q=n();
+    document.querySelectorAll(".p-cost").forEach(c=>{c.textContent=(c.dataset.m==="base"?"":"+ ")+fmt(PRICE[c.dataset.m])});
+    const one=PRICE.base+rows.filter(r=>r.classList.contains("on")).reduce((a,r)=>a+PRICE[r.dataset.m],0);
+    const full=one*q,disc=q>=DISC.from?Math.round(full*DISC.pct/100):0;
+    document.getElementById("pTotal").textContent=fmt(full-disc);
+    document.getElementById("pPer").innerHTML=disc?'<s>'+fmt(full)+'</s> · скидка '+DISC.pct+'%':fmt(one)+" за турнир или лигу";
+    const h=document.getElementById("pHint");
+    h.classList.toggle("on",!!disc);
+    h.textContent=disc?"Скидка "+DISC.pct+"% применена":"От "+DISC.from+" — скидка "+DISC.pct+"%";
+  }
+  function setQ(v){qty.value=Math.min(999,Math.max(1,v));render()}
+  document.getElementById("pMinus").addEventListener("click",()=>setQ(n()-1));
+  document.getElementById("pPlus").addEventListener("click",()=>setQ(n()+1));
+  qty.addEventListener("input",render);
+  qty.addEventListener("blur",()=>setQ(n()));
+  function toggle(r){r.classList.toggle("on");r.setAttribute("aria-checked",r.classList.contains("on"));render()}
+  // подсказки «?»: наведение на десктопе, нажатие на телефоне
+  document.addEventListener("click",e=>{const q=e.target.closest(".p-q");document.querySelectorAll(".p-q.open").forEach(x=>{if(x!==q)x.classList.remove("open")});if(q&&!e.target.closest(".p-tip"))q.classList.toggle("open")});
+  rows.forEach(r=>{r.addEventListener("click",e=>{if(e.target.closest(".p-q"))return;toggle(r)});r.addEventListener("keydown",e=>{if(e.target!==r)return;if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle(r)}})});
+  render();
+})();
+
+/* шапка */
+addEventListener("scroll",()=>document.getElementById("top").classList.toggle("scrolled",scrollY>8),{passive:true});
+
+/* витрина продукта: шесть схем на холсте 1280×720, масштаб под ширину.
+   Каждая схема проигрывает свой сценарий (счёт идёт, матчи стартуют, сетка двигается), вкладки листаются сами */
+(function(){
+  const T=[
+    {d:15500,url:"padel.select/tournaments/osennij-kubok"},
+    {d:11000,url:"padel.select/t/osennij-kubok"},
+    {d:10000,url:"padel.select/t/osennij-kubok/setka"},
+    {d:10000,url:"padel.select/referee/court-1"},
+    {d:11500,url:"padel.select/tv/court-1"},
+    {d:10000,url:"padel.select/widget/court-1"}
+  ];
+  const frame=document.getElementById("frame"),canvas=document.getElementById("canvas"),url=document.getElementById("url");
+  const all=[...canvas.querySelectorAll(".scr")],orig=new Map(all.map(s=>[s,s.innerHTML]));
+  const tabs=[...document.querySelectorAll(".tab")];
+  tabs.forEach(b=>b.insertAdjacentHTML("beforeend",'<span class="pr"><i></i></span>'));
+  const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sizer=document.createElement("div");sizer.className="sizer";frame.appendChild(sizer);
+  function fit(){
+    const mob=frame.parentElement.clientWidth<600, k=mob?0.5:frame.clientWidth/1280;   // на телефоне — 50% и прокрутка пальцем
+    frame.classList.toggle("mob",mob);
+    frame.style.height=mob?(720*k)+"px":"";
+    sizer.style.width=mob?(1280*k)+"px":"0";sizer.style.height=mob?(720*k)+"px":"0";
+    canvas.style.transform="scale("+k+")";
+  }
+
+  const x=(s,k)=>s.querySelector('[data-x="'+k+'"]');
+  const re=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+  const bump=(el,t)=>{el.textContent=t;re(el,"fx")};     // цифра «въезжает» сверху
+  const LIVE='<span class="live"><span class="dot"></span>';
+  function pos(el){   // координаты центра элемента в системе холста 1280×720
+    const c=canvas.getBoundingClientRect(),r=el.getBoundingClientRect(),k=c.width/1280;
+    return {x:(r.left-c.left+r.width/2)/k,y:(r.top-c.top+r.height/2)/k};
+  }
+  const PT=["0","15","30","40"];
+
+  const SB=[
+    function(s,at){   // турнир проходит все стадии: настройки → заявки → жеребьёвки → квалификация → основной турнир
+      const ST=2000,BEN=["Проверяет настройки и подсказывает, что заполнить","Подтягивает заявки с портала ФПР и сортирует по рейтингу","Показывает жеребьёвку на экране клуба и в трансляции","Оставляет в сетке места для победителей квалификации","Сам ставит победителей квалификации в основную сетку","Обновляет сетку и расписание после каждого матча"];
+      for(let k=0;k<6;k++)at(300+k*ST,()=>{
+        if(k){const pk=x(s,"k"+(k-1));pk.classList.remove("cur");pk.classList.add("done");pk.querySelector("small").textContent=k-1===1?"завершён":"завершена";x(s,"p"+(k-1)).classList.remove("on")}
+        const c=x(s,"k"+k);c.classList.add("cur");c.querySelector("small").textContent="идёт";x(s,"p"+k).classList.add("on");
+        if(k)bump(x(s,"ben"),BEN[k]);
+      });
+      for(let n=1;n<=24;n++)at(2500+n*55,()=>{x(s,"cnt").textContent=n});
+      at(2300+ST-500,()=>{x(s,"ps1").textContent="завершён"});
+      const T5=300+5*ST,done=(c,h,a,b)=>{c.classList.remove("on","tbd");c.classList.add("ok");c.querySelector(".x-ct").innerHTML='<span class="x-ok">'+h+'</span>';
+        c.querySelectorAll(".x-pr").forEach((r,k)=>{let e=r.querySelector("b");if(!e){e=document.createElement("b");r.appendChild(e)}bump(e,k?b:a)})};
+      at(T5+700,()=>{bump(x(s,"ls"),"6 4");re(x(s,"lc"),"hit")});
+      at(T5+1300,()=>done(x(s,"lc"),"1/2 · сыгран","6 6","4 2"));
+      at(T5+1700,()=>done(x(s,"c2c"),"1/2 · сыгран","6 6","3 4"));
+      at(T5+2200,()=>{const c=x(s,"fc");c.classList.remove("tbd");c.classList.add("on");c.querySelector(".x-ct").innerHTML=LIVE+"LIVE · финал</span>";re(c,"hit")});
+      at(T5+3000,()=>{const c=x(s,"fc");done(c,"Финал · сыгран","6 7","4 5");c.classList.remove("ok");c.classList.add("fin")});
+      at(T5+3400,()=>{x(s,"champ").classList.add("on");bump(x(s,"ben"),"Публикует итоги и призёров на странице турнира");const c=x(s,"k5");c.classList.remove("cur");c.classList.add("done");c.querySelector("small").textContent="завершён";x(s,"ps5").textContent="завершён"});
+    },
+    function(s,at){   // организатор ставит матч на корт → расписание обновляется на всех экранах
+      const say=x(s,"say"),send=(t,fn,msg)=>{at(t,()=>{[0,1,2].forEach(k=>re(x(s,"u"+k),"on"));if(msg){say.textContent=msg;re(say,"on")}});at(t+650,()=>[0,1,2].forEach(k=>fn(k)))};
+      at(900,()=>{const m=x(s,"mv"),sl=x(s,"slot");m.classList.add("go");m.style.left=sl.offsetLeft-m.offsetLeft+"px";m.style.top=sl.offsetTop-m.offsetTop+"px"});
+      at(1800,()=>{const m=x(s,"mv"),sl=x(s,"slot");sl.replaceWith(m);m.classList.remove("drag","go");m.style.left=m.style.top="";m.querySelector(".x-bh").textContent="12:30";s.querySelector(".x-tray").classList.add("empty");re(m,"hit")});
+      send(2000,k=>{const r=x(s,"o"+k+"c");r.classList.add("vis");re(r,"hit")},"Матч на корте 2 — у всех экранов");
+      at(4200,()=>{const m=x(s,"sm1");m.classList.remove("air");m.classList.add("done");m.querySelector(".x-bh").textContent="Сыгран · 1:02";re(m,"hit")});
+      send(4300,k=>{bump(x(s,"o"+k+"at"),"1:02");x(s,"o"+k+"a").classList.add("dn");re(x(s,"o"+k+"a"),"hit")},"Итог матча — сразу на табло и сайте");
+      at(6600,()=>{bump(x(s,"ftm"),"15:30");const f=x(s,"fin");f.querySelector(".x-bh").textContent="Финал · 15:30";re(f,"hit")});
+      send(6700,k=>{bump(x(s,"o"+k+"bt"),"15:30");re(x(s,"o"+k+"b"),"hit")},"Перенесли финал — все узнали без рассылок");
+      at(9600,()=>say.classList.remove("on"));
+    },
+    function(s,at){   // победители проходят по сетке до чемпиона
+      const W=[[1,4,3,2],[1,2],[1]],R=[[0,2,4,6],[0,3],[0]],T0=[1300,3100,4700];
+      R.forEach((ks,r)=>ks.forEach((k,j)=>{
+        const t=T0[r]+j*180;
+        at(t,()=>{x(s,"n"+r+k).classList.add("win");x(s,"w"+r+k).classList.add("on")});
+        at(t+450,()=>{const n=x(s,"n"+(r+1)+(k>>1));n.classList.remove("tbd");n.querySelector("i").textContent=W[r][j];re(n,"hit")});
+      }));
+      T0.forEach(t=>at(t+700,()=>re(x(s,"sync"),"on")));
+      at(T0[1]+900,()=>{const n=x(s,"n3rd");n.classList.remove("tbd");n.querySelector("i").textContent="4 – 3";re(n,"hit")});
+      at(6200,()=>{const n=x(s,"n30");n.classList.add("win","champ")});
+    },
+    function(s,at){   // касание на пульте → импульсы → счёт обновился везде
+      const st=[0,0],P=["0","15","30","40"],tap=s.querySelector(".tap");
+      [[1400,0],[3200,1],[5000,0],[6800,0]].forEach(([t,w])=>{
+        st[w]++;const v=P[st[0]]+" : "+P[st[1]];
+        at(t,()=>{const b=x(s,"b"+w);tap.style.left=b.offsetLeft+b.offsetWidth/2+"px";tap.style.top=b.offsetTop+b.offsetHeight/2+"px";re(tap,"on");
+          b.classList.add("press");setTimeout(()=>b.classList.remove("press"),180);bump(x(s,"hs"),v)});
+        at(t+120,()=>[0,1,2,3].forEach(k=>re(x(s,"u"+k),"on")));
+        at(t+700,()=>[0,1,2,3].forEach(k=>{bump(x(s,"e"+k),v);re(x(s,"ep"+k),"hit")}));
+      });
+    },
+    function(s,at){   // общее табло (все корты) → табло у корта (лайв-счёт)
+      at(1500,()=>{const e=x(s,"t1").querySelectorAll(".tg-p em");bump(e[0],"6 4");re(x(s,"t1"),"hit")});
+      at(2600,()=>{x(s,"t2h").outerHTML='<span class="lv">● ИДЁТ · 1/2</span>';x(s,"t2").classList.add("on");x(s,"t2").querySelectorAll(".tg-p em").forEach(e=>bump(e,"0"))});
+      at(3400,()=>bump(x(s,"clk"),"12:42"));
+      at(4600,()=>{x(s,"m0").classList.remove("on");x(s,"m1").classList.add("on");x(s,"tg").classList.remove("on");x(s,"tc").classList.add("on");bump(x(s,"cap"),"У корта: лайв-счёт матча, подача и Star Point")});
+      at(6000,()=>{bump(x(s,"p1"),"40");re(x(s,"r1"),"hit")});
+      at(7000,()=>x(s,"ev").classList.add("on"));
+      at(8600,()=>{x(s,"ev").classList.remove("on");bump(x(s,"g0"),"4");bump(x(s,"p0"),"0");bump(x(s,"p1"),"0");x(s,"r0").classList.remove("srv");x(s,"r1").classList.add("srv");re(x(s,"r0"),"hit")});
+      at(10200,()=>bump(x(s,"p1"),"15"));
+    },
+    function(s,at){   // слой виджета ложится на видео, дальше идёт счёт
+      const ov=x(s,"ov"),sp=s.querySelector(".x-spn");
+      at(2000,()=>ov.classList.add("on"));
+      at(3600,()=>bump(x(s,"p1"),"15"));
+      at(4800,()=>bump(x(s,"p0"),"15"));
+      at(5600,()=>bump(sp,"ПАРТНЁР КОРТА 1"));
+      at(6200,()=>bump(x(s,"p1"),"30"));
+      at(7600,()=>bump(x(s,"p1"),"40"));
+      at(8400,()=>bump(sp,"ОФИЦИАЛЬНЫЙ МЯЧ"));
+    }
+  ];
+
+  let cur=0,el=0,steps=[],last=0,vis=true;
+  function show(i){
+    cur=i;el=0;steps=[];
+    tabs.forEach(b=>{b.setAttribute("aria-selected",b.dataset.i==i);b.querySelector(".pr i").style.width="0"});
+    const s=all[i];
+    all.forEach(e=>{e.classList.toggle("on",e===s);e.classList.remove("play")});
+    s.innerHTML=orig.get(s);   // каждый показ — сценарий с начала
+    frame.scrollLeft=0;
+    const bar=tabs[i].parentElement;   // на телефоне лента вкладок прокручивается к активной
+    if(bar.scrollWidth>bar.clientWidth)bar.scrollTo({left:tabs[i].offsetLeft-bar.offsetLeft-16,behavior:"smooth"});
+    url.textContent=T[i].url;
+    if(RM)return;
+    void s.offsetWidth;s.classList.add("play");
+    SB[i](s,(t,fn)=>steps.push({t,fn}));
+    steps.sort((a,b)=>a.t-b.t);
+  }
+  function loop(ts){
+    const dt=Math.min(ts-last,100);last=ts;   // после фоновой вкладки не прыгаем вперёд
+    if(vis&&!document.hidden){
+      el+=dt;
+      while(steps.length&&steps[0].t<=el)steps.shift().fn();
+      const D=T[cur].d;
+      tabs[cur].querySelector(".pr i").style.width=Math.min(100,el/D*100)+"%";
+      if(el>=D)show((cur+1)%T.length);
+    }
+    requestAnimationFrame(loop);
+  }
+  document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)show(+b.dataset.i)});
+  new ResizeObserver(fit).observe(frame);fit();show(0);
+  if(!RM){
+    new IntersectionObserver(es=>{vis=es[0].isIntersecting}).observe(frame);   // за кадром сценарий стоит на паузе
+    requestAnimationFrame(t=>{last=t;requestAnimationFrame(loop)});
+  }
+})();
+
+/* анимированные макеты в блоках «Провести», «Судить», «Показать»: у каждого свой сценарий,
+   крутится по кругу, пока макет виден на экране */
+(function(){
+  const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const x=(s,k)=>s.querySelector('[data-x="'+k+'"]');
+  const re=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c)};
+  const bump=(el,t)=>{el.textContent=t;re(el,"fx")};
+  const PT=["0","15","30","40"];
+  const SC={
+    draw:[9800,(s,at)=>{   // пары встают в сетку по одной, сверху — кто и на какую позицию
+      const order=[0,15,7,8,3,12,4,11,2,13,5,10,6,9,1,14],pop=x(s,"pop");
+      order.forEach((n,k)=>at(500+k*400,()=>{const r=x(s,"r"+n);r.classList.add("f");re(r,"new");
+        pop.querySelector("small").textContent="Позиция "+(n+1);pop.querySelector("b").textContent=r.querySelector("span").textContent;pop.classList.add("on");re(pop,"hit")}));
+      at(500+16*400+600,()=>pop.classList.remove("on"));
+    }],
+    sched:[9000,(s,at)=>{   // идёт счёт, на втором корте стартует матч, полуфинал доигран — победитель в финале
+      at(1400,()=>{bump(x(s,"m1").querySelectorAll("em")[0],"6 4");re(x(s,"m1"),"hit")});
+      at(2800,()=>{x(s,"h2").outerHTML='<span class="lv">● ИДЁТ · 1/2</span>';x(s,"m2").classList.add("on");x(s,"m2").querySelectorAll("em").forEach(e=>bump(e,"0"));re(x(s,"m2"),"hit")});
+      at(3600,()=>bump(x(s,"clk"),"12:42"));
+      at(5200,()=>{bump(x(s,"m1").querySelectorAll("em")[0],"6 6");x(s,"h1").outerHTML='<span>ЗАВЕРШЁН · 1/2</span>';x(s,"m1").classList.remove("on")});
+      at(6200,()=>{const f=x(s,"f1");f.outerHTML="Орлов / Ким";re(x(s,"mf"),"hit")});
+    }],
+    ref:[8800,(s,at)=>{   // судья ставит очки, после гейма подача переходит
+      const st={p:[1,1],g:[3,2]},tap=x(s,"b0").parentElement.parentElement.querySelector(".tap");
+      let tm=54*60+24;
+      for(let t=1000;t<8800;t+=1000)at(t,()=>{tm++;x(s,"tm").textContent=Math.floor(tm/60)+":"+String(tm%60).padStart(2,"0")});
+      [[1300,0],[2900,1],[4500,0],[6100,0]].forEach(([t,w])=>{
+        let game=false;if(st.p[w]===3){st.g[w]++;st.p=[0,0];game=true}else st.p[w]++;
+        const p=[...st.p],g=[...st.g];
+        at(t,()=>{const b=x(s,"b"+w);tap.style.left=b.offsetLeft+b.offsetWidth/2+"px";tap.style.top=b.offsetTop+b.offsetHeight/2+"px";re(tap,"on");
+          b.classList.add("press");setTimeout(()=>b.classList.remove("press"),180);
+          [0,1].forEach(k=>{const e=x(s,"p"+k);if(e.textContent!==PT[p[k]])bump(e,PT[p[k]])});
+          if(game){bump(x(s,"g"+w),String(g[w]));bump(x(s,"sv"),"Гусев");s.querySelectorAll(".rf-nm span").forEach(e=>e.classList.toggle("sv"))}});
+      });
+    }],
+    pub:[8000,(s,at)=>{   // счёт меняется у зрителя, приходит пуш, на корте 2 начинается матч
+      at(1500,()=>{bump(x(s,"pg"),"6 4");re(x(s,"m1"),"hit")});
+      at(3000,()=>x(s,"push").classList.add("on"));
+      at(3500,()=>{const m=x(s,"m2");m.classList.add("air");x(s,"qg").textContent="0";x(s,"qh").textContent="0";re(m,"hit")});
+      at(6000,()=>x(s,"push").classList.remove("on"));
+      at(6600,()=>bump(x(s,"qg"),"1"));
+    }]
+  };
+  document.querySelectorAll(".mo").forEach(m=>{
+    const c=m.firstElementChild,w=+m.dataset.w,ch=+m.dataset.ch||+m.dataset.h,orig=c.innerHTML,[D,fn]=SC[m.dataset.mo];
+    new ResizeObserver(()=>{const k=m.clientWidth/w;m.style.height=ch*k+"px";c.style.transform="scale("+k+")"}).observe(m);
+    if(RM)return;
+    let steps=[],el=0,vis=false,last=0;
+    function start(){c.innerHTML=orig;steps=[];el=0;fn(c,(t,f)=>steps.push({t,f}));steps.sort((a,b)=>a.t-b.t)}
+    function loop(ts){
+      const dt=Math.min(ts-last,100);last=ts;
+      if(vis&&!document.hidden){el+=dt;while(steps.length&&steps[0].t<=el)steps.shift().f();if(el>=D)start()}
+      requestAnimationFrame(loop);
+    }
+    new IntersectionObserver(es=>{vis=es[0].isIntersecting}).observe(m);
+    start();requestAnimationFrame(t=>{last=t;requestAnimationFrame(loop)});
+  });
+})();
+
+/* липкое меню категорий: подсветка при прокрутке */
+(function(){
+  const links=[...document.querySelectorAll("#side a")];
+  const secs=links.map(a=>document.querySelector(a.getAttribute("href")));
+  function upd(){
+    const y=innerHeight*.35;let k=0;
+    secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<y)k=i});
+    links.forEach((a,i)=>a.classList.toggle("on",i===k));
+    const on=links[k],bar=on.parentElement;
+    if(bar.scrollWidth>bar.clientWidth)bar.scrollTo({left:on.offsetLeft-16,behavior:"smooth"});
+  }
+  let t;addEventListener("scroll",()=>{cancelAnimationFrame(t);t=requestAnimationFrame(upd)},{passive:true});upd();
+})();
+
+/* копирование ссылок (демо) */
+document.getElementById("links").addEventListener("click",e=>{
+  const b=e.target.closest(".cp");if(!b)return;
+  b.textContent="Скопировано ✓";b.classList.add("done");
+  setTimeout(()=>{b.textContent="Копировать";b.classList.remove("done")},1600);
+});
+
+/* цветовые схемы */
+document.getElementById("sw").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const s=document.getElementById("btv").style;
+  s.setProperty("--c",b.dataset.c);s.setProperty("--ci",b.dataset.ci);s.setProperty("--b",b.dataset.b);s.setProperty("--b2",b.dataset.b2);
+});
+
+/* размещение спонсоров */
+document.getElementById("pl").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  document.querySelectorAll(".place .lg").forEach(l=>l.classList.toggle("on",l.dataset.p===b.dataset.p));
+});
+</script>
+</body></html>
