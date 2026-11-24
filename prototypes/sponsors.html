@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Спонсоры · система размещения · PADEL.SELECT</title>
+<link rel="icon" href="../assets/brand/favicon.ico" sizes="32x32"><link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,800;1,800;1,900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Система размещения спонсоров на всех вью: правило вписывания логотипа, размерный ряд мест М1–М9 и схемы вью.
+   Размеры мест — те же константы, что в прототипах public-tournament-mobile.html, tv-board.html, tv-live-score.html,
+   broadcast-overlay.html (объект SLOT). Спека — specs/07_sponsors.md.
+   Логотипы — вымышленные бренды разных пропорций из assets/sponsors/ (поля уже обрезаны, как после загрузки). */
+:root{--bg:#f0f5f6;--card:#fff;--ink:#142c31;--muted:#5f7478;--faint:#909ea1;--line:#dde6e8;--lime:#82eb00;--lime-ink:#0b1b06;
+ --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.logo{font-family:var(--display);font-style:italic;font-weight:900;letter-spacing:.02em;white-space:nowrap;text-decoration:none;color:var(--logo-ink,var(--ink))}
+.logo .b{display:inline-block;width:.34em;height:.34em;border-radius:50%;background:var(--logo-dot,currentColor);margin:0 .12em 0 .08em;overflow:hidden;text-indent:1em}
+.logo em{display:inline-block;position:relative;z-index:0;font-style:italic;color:var(--logo-on,var(--lime-ink));padding:.11em .3em .09em .25em;line-height:1}
+.logo em::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--logo-plate,var(--lime));transform:skewX(-12deg);border-radius:.08em}
+
+.wrap{max-width:1320px;margin:0 auto;padding:36px 24px 80px}
+.top{display:flex;align-items:center;gap:14px;font-size:17px;flex-wrap:wrap}
+.top a.chip{font-size:12.5px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;text-decoration:none}
+.top a.chip:hover{color:var(--ink)}
+h1{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(30px,4.4vw,46px);line-height:1.02;margin-top:22px}
+.lead{max-width:860px;margin-top:10px;color:var(--muted);font-size:15.5px}
+.lead b{color:var(--ink);font-weight:600}
+
+/* панель управления */
+.bar{position:sticky;top:0;z-index:10;margin:22px -24px 0;padding:10px 24px;background:rgba(240,245,246,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl>span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
+.seg button{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);padding:0 12px;min-height:30px;display:inline-flex;align-items:center;border-radius:999px;white-space:nowrap}
+.seg button.on{background:var(--ink);color:#fff}
+.seg button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+h2{font-family:var(--display);font-style:italic;font-weight:900;font-size:26px;line-height:1.1;margin:44px 0 0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 span{font-family:var(--sans);font-style:normal;font-weight:600;font-size:14px;color:var(--muted)}
+.note{max-width:860px;margin-top:8px;color:var(--muted);font-size:14px}
+.note b{color:var(--ink);font-weight:600}
+code,.mono{font-family:var(--mono);font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:14px;min-width:0}
+
+/* правило 1: сравнение */
+.cmp{display:grid;grid-template-columns:200px 1fr;gap:16px 20px;align-items:center}
+.cmp .lbl b{display:block;font-size:15px}
+.cmp .lbl span{display:block;color:var(--muted);font-size:13px}
+.cmp .lbl.bad b::before{content:"✕ ";color:#d33}
+.cmp .lbl.ok b::before{content:"✓ ";color:#3a9a00}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;min-width:0}
+.chipold{display:inline-flex;align-items:center;background:#fff;border-radius:8px;padding:6px 12px;box-shadow:inset 0 0 0 1px var(--line)}
+.chipold img{display:block;height:32px;width:auto}
+.dark-strip{background:#0c1719;border-radius:12px;padding:14px}
+#cmpNew .cell{--plate-line:var(--line)}
+.formula{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.formula div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted)}
+.formula div b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}
+
+/* ячейка спонсора — единственный вид подложки во всех местах */
+.cell{flex:none;display:grid;place-items:center;background:#fff;box-shadow:inset 0 0 0 1px var(--plate-line,transparent)}
+.cell img{display:block;max-width:none}
+
+/* таблица мест */
+.tw{overflow-x:auto;margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:980px;font-size:13px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);background:#f7fafa}
+tr:last-child td{border-bottom:0}
+td.id{font-weight:800;white-space:nowrap}
+td .mono{white-space:nowrap}
+td.code{color:var(--muted)}
+
+/* схемы вью */
+.views{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:18px;margin-top:14px}
+.view{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.view.full{grid-column:1/-1}
+.vh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vh b{font-size:15.5px}
+.tag{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--lime-ink);background:var(--lime);border-radius:999px;padding:2px 8px}
+.vh a{margin-left:auto;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;white-space:nowrap}
+.vh a:hover{color:var(--ink)}
+.vh .sz{font-size:12.5px;color:var(--faint);font-weight:600}
+.scl{position:relative;overflow:hidden;border-radius:10px}
+.scl>.cv{position:absolute;left:0;top:0;transform-origin:0 0}
+.phones{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;background:var(--bg);border-radius:10px;padding:18px}
+.phones figure{display:flex;flex-direction:column;gap:8px;align-items:center}
+.phones figcaption{font-size:12.5px;color:var(--muted);font-weight:600}
+
+/* ---------- схемы: токены темы ---------- */
+.th-dark{--w-bg:#0c1719;--w-stripe:#101f22;--w-panel:#0a0e13;--w-card:#101c1f;--w-line:#1c2a2d;--w-ink:#fff;--w-muted:#8a9ea0;--w-acc:#8ae81f;--w-acc-ink:#0b1b06;--w-strip:#0a0e13;--w-strip-ink:#fff;--w-wire:#1a2a2e;--plate-line:transparent}
+.th-light{--w-bg:#fff;--w-stripe:#f6f8f9;--w-panel:#fff;--w-card:#fff;--w-line:#e6eaec;--w-ink:#12181b;--w-muted:#68777d;--w-acc:#eeff00;--w-acc-ink:#111;--w-strip:#eeff00;--w-strip-ink:#111;--w-wire:#eef1f2;--plate-line:#dfe5e7}
+.w{background:var(--w-bg);color:var(--w-ink);font-family:var(--sans)}
+.w .logo{--logo-plate:var(--w-acc);--logo-on:var(--w-acc-ink);--logo-dot:var(--w-acc);color:var(--w-strip-ink)}
+.th-light .w .strip .logo{--logo-plate:#111;--logo-on:var(--w-acc);--logo-dot:#111}
+.wire{background:var(--w-wire);border-radius:6px}
+.mark{position:absolute;z-index:3;display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 7px;border-radius:999px;background:#ff3d7f;color:#fff;font:800 12px/1 var(--sans);letter-spacing:.02em;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.hasmark{position:relative}
+
+/* витрина: полоса сверху и блок «Спонсоры турнира» — как в public-tournament-mobile.html */
+.strip{display:flex;align-items:center;gap:8px;padding:0 16px;height:56px;background:var(--w-strip);color:var(--w-strip-ink)}
+.strip .logo{font-size:15px}
+.strip .sh{margin-left:auto;width:44px;height:44px;flex:none;border:1px solid currentColor;opacity:.4;border-radius:8px}
+.strip .tsp{display:flex;align-items:center;gap:12px;min-width:0}
+.d .strip{height:64px;padding:0 32px;gap:14px}
+.d .strip .logo{font-size:17px}
+.d .strip .sep{width:1px;height:28px;background:currentColor;opacity:.25}
+.hero-w{padding:16px;background:repeating-linear-gradient(180deg,var(--w-bg) 0 36px,var(--w-stripe) 36px 72px)}
+.hero-w .k{width:62%;height:12px}
+.hero-w .t{width:86%;height:30px;margin-top:10px}
+.d .hero-w{padding:36px 32px}
+.d .hero-w .k{width:360px}
+.d .hero-w .t{width:760px;height:52px;margin-top:16px}
+.tabs-w{display:flex;gap:16px;padding:14px 16px;border-bottom:1px solid var(--w-line)}
+.tabs-w i{width:70px;height:10px}
+.d .tabs-w{padding:16px 32px;gap:36px}
+.list-w{display:grid;gap:10px;padding:14px 16px}
+.list-w i{height:96px}
+.d .list-w{grid-template-columns:repeat(3,1fr);padding:20px 32px;gap:14px}
+.d .list-w i{height:150px}
+.cut{height:22px;background:linear-gradient(135deg,var(--bg) 25%,transparent 25%) -8px 0/16px 16px,linear-gradient(225deg,var(--bg) 25%,transparent 25%) -8px 0/16px 16px;background-color:var(--w-bg)}
+.cut.up{transform:scaleY(-1)}
+.spons{padding:24px 16px 28px;border-top:1px solid var(--w-line)}
+.spons h4{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--w-muted);margin:0 0 10px}
+.spons h4+.cells{margin-bottom:0}
+.spons .cells{display:flex;flex-wrap:wrap;gap:8px}
+.spons .tier+.tier{margin-top:20px}
+.d .spons{padding:36px 32px 44px}
+.d .spons .tier{display:flex;flex-direction:column;align-items:center}
+.d .spons .cells{justify-content:center;gap:12px}
+.d .spons .tier+.tier{margin-top:28px}
+.foot-w{padding:16px;border-top:1px solid var(--w-line);display:flex;justify-content:center}
+.foot-w i{width:120px;height:10px}
+
+/* ТВ 1920×1080 — как tv-board.html */
+.tv{width:1920px;height:1080px;display:flex;flex-direction:column;padding:40px 56px 34px;background:var(--w-bg)}
+.tv .tvh{display:flex;align-items:center;gap:26px;height:76px}
+.tv .cat{background:var(--w-acc);color:var(--w-acc-ink);border-radius:8px;padding:12px 18px;font:italic 900 30px/1 var(--display)}
+.tv .ttl{flex:1;font:italic 900 50px/1 var(--display);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.tv .live{background:var(--w-acc);color:var(--w-acc-ink);border-radius:8px;padding:12px 18px;font:800 24px/1 var(--sans);letter-spacing:.12em}
+.tv .clk{font:800 44px/1 var(--display)}
+.tv .bd{flex:1;margin:18px 0 14px;display:flex;flex-direction:column;gap:16px}
+.tv .bd .st{height:56px;border-radius:8px;background:var(--w-acc);color:var(--w-acc-ink);display:grid;place-items:center;font:800 26px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.tv .grid4{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.tv .grid4 i{border-radius:10px}
+.tv .tvf{height:62px;display:flex;align-items:flex-start;gap:30px}
+.tv .segs{flex:1;display:flex;gap:18px}
+.tv .segs i{flex:1;height:6px;border-radius:3px;background:var(--w-line)}
+.tv .segs i.on{background:var(--w-acc)}
+.tv .prt{display:flex;gap:14px}
+.tv .ps{align-self:center;font-size:30px;padding-left:28px;border-left:2px solid var(--w-line)}
+.tv .ps .logo{color:var(--w-ink)}
+.tv .spon{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.tv .spon .chip{background:var(--w-acc);color:var(--w-acc-ink);border-radius:8px;padding:12px 22px;font:800 24px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase}
+.tv .spon .lb{font:800 22px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--w-muted);margin-top:14px}
+.tv .spon .pg{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;max-width:1620px}
+
+/* табло у корта */
+.ct{width:1920px;height:1080px;display:flex;flex-direction:column;padding:62px 80px 56px;background:var(--w-bg)}
+.ct .cth{display:flex;gap:34px;align-items:flex-start}
+.ct .cth .cat{background:var(--w-acc);color:var(--w-acc-ink);border-radius:10px;padding:14px 22px;font:italic 900 34px/1 var(--display)}
+.ct .cth .t{width:900px;height:60px}
+.ct .cth .s{margin-left:auto;width:320px;height:100px}
+.ct .brd{margin-top:auto;height:560px;border-radius:12px}
+.ct .ctf{margin-top:52px;display:flex;align-items:flex-end;gap:20px}
+.ct .ctf .ps{display:flex;align-items:center;height:104px;margin-left:12px;padding-left:32px;border-left:2px solid var(--w-line);font-size:34px}
+.ct .ctf .ps .logo{color:var(--w-ink)}
+.ct .ctf .dur{margin-left:auto;width:400px;height:140px}
+
+/* виджет трансляции — как broadcast-overlay.html, масштаб 1:1 */
+.ov{width:760px;height:220px;position:relative;background:linear-gradient(160deg,#2c6fb5,#1d4f86 55%,#d86b32);overflow:hidden}
+.ov .bug{position:absolute;left:40px;top:40px;display:flex;border-radius:8px;overflow:hidden;background:rgba(8,16,18,.9);border:1px solid rgba(255,255,255,.09);box-shadow:0 12px 36px rgba(0,0,0,.45);min-width:520px}
+.ov .main{flex:1;min-width:0}
+.ov .stt{height:24px;display:flex;align-items:center;padding:0 12px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.07);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+.ov .r{height:36px;display:flex;align-items:center;gap:24px;padding:0 12px;color:#fff;font:italic 800 18px/1 var(--display);text-transform:uppercase;white-space:nowrap}
+.ov .r+.r{border-top:1px solid rgba(255,255,255,.08)}
+.ov .r span{margin-left:auto;font-style:normal;letter-spacing:.3em}
+.ov .cell{border-radius:0}
+
+@media (max-width:700px){.views{grid-template-columns:1fr}.cmp{grid-template-columns:1fr}.view{padding:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="logo" href="../index.html">PADEL<span class="b">.</span><em>SELECT</em></a>
+    <a class="chip" href="brandbook.html">Брендинг</a>
+    <a class="chip" href="skins.html">Скины</a>
+    <a class="chip" href="public-tournament.html">Публичная страница</a>
+    <a class="chip" href="tv-board.html">ТВ-режим</a>
+  </div>
+  <h1>Спонсоры: система размещения</h1>
+  <p class="lead">Одни правила для всех вью: <b>титульный спонсор</b> всегда крупнее <b>партнёров</b>, логотип вписывается по <b>равной площади</b>, а не по высоте, и всегда стоит на ячейке-подложке. Организатор загружает <b>один файл</b> — поля, фон, подложку и все размеры система делает сама. Мест девять, у каждого — фиксированный размер ячейки и бокса логотипа. Спека — <code>specs/07_sponsors.md</code>.</p>
+
+  <div class="bar" id="bar">
+    <div class="ctl"><span>Тема</span><div class="seg" data-k="theme"><button data-v="dark">Тёмная</button><button data-v="light">Светлая</button></div></div>
+    <div class="ctl"><span>Титульный</span><div class="seg" data-k="title"><button data-v="granit">Гранит 3,6:1</button><button data-v="svetlaya">Светлая сторона 3,3:1</button><button data-v="fonbet">FONBET 4,8:1</button><button data-v="none">Нет</button></div></div>
+    <div class="ctl"><span>Партнёры</span><div class="seg" data-k="n"><button data-v="0">0</button><button data-v="3">3</button><button data-v="6">6</button><button data-v="10">10</button></div></div>
+  </div>
+
+  <h2 id="rule">Логотип вписывается по площади<span>правило СП2</span></h2>
+  <p class="note">Сейчас у всех логотипов одна высота — поэтому вытянутый логотип в 6 раз шире квадратного и забирает внимание, а квадратный и вертикальный выглядят мелкими. Система даёт каждому логотипу одинаковую площадь в пределах бокса места.</p>
+  <div class="card">
+    <div class="cmp">
+      <div class="lbl bad"><b>Как сейчас</b><span>одна высота 32px, ширина любая</span></div>
+      <div class="row" id="cmpOld"></div>
+      <div class="lbl ok"><b>Система</b><span>ячейки 192×88, бокс 152×56, равная площадь</span></div>
+      <div class="row" id="cmpNew"></div>
+      <div class="lbl ok"><b>То же на тёмном скине</b><span>белая ячейка, логотип не теряется на фоне</span></div>
+      <div class="row dark-strip" id="cmpDark"></div>
+    </div>
+    <div class="formula">
+      <div><b>Площадь</b><span class="mono">A = 0,55 · W · H</span><br>W×H — бокс логотипа в месте</div>
+      <div><b>Размер</b><span class="mono">h = √(A / r), w = h · r</span><br>r — пропорции логотипа (ширина / высота) после обрезки полей</div>
+      <div><b>Ограничение</b><span class="mono">h ≤ H, w ≤ W</span><br>если упёрлись — уменьшаем с сохранением пропорций</div>
+      <div><b>Один файл</b>При загрузке система обрезает поля, убирает однотонный фон, подбирает подложку (белая, для светлых логотипов — тёмная) и сохраняет пропорции — размер считается до загрузки картинки</div>
+    </div>
+  </div>
+
+  <h2 id="places">Места и размеры<span>М1–М9 · коды мест из настроек турнира</span></h2>
+  <p class="note">Ячейка — белая подложка, бокс — максимальный прямоугольник логотипа внутри неё. В одном ряду все ячейки одного размера. Размеры витрины — в CSS-пикселях, ТВ — в пикселях холста 1920×1080.</p>
+  <div class="tw"><table id="tbl"></table></div>
+
+  <h2 id="views">Места на вью<span>метки — номера мест</span></h2>
+  <div class="views" id="vws"></div>
+</div>
+
+<script>
+/* ---------- данные: демо-спонсоры (assets/sponsors), r — пропорции версии после обрезки полей ---------- */
+const L = (f, r) => ({src: `../assets/sponsors/${f}.svg`, r});
+const TITLES = {
+  granit: {title: 'Гранит', logos: {wide: L('granit-wide', 3.6)}},
+  svetlaya: {title: 'Светлая сторона', logos: {wide: L('svetlaya-wide', 3.3)}},
+  fonbet: {title: 'FONBET', logos: {wide: L('fonbet-wide', 4.84)}},
+};
+const PARTNERS = [['northline', 'Northline', 6], ['zerno', 'Зерно', 1], ['volta', 'Volta', 3], ['sibbank', 'Сиббанк', 1.5], ['padelpro', 'Padel Pro Shop', 2.2],
+  ['aqua', 'Аква', .8], ['kvadrat', 'Квадрат', 4], ['ritm', 'Ритм', 2.6], ['polus', 'Полюс', 2.5], ['lis', 'Лис', 1.2]]
+  .map(([f, title, r]) => ({title, logos: {wide: L(f, r)}}));
+
+/* ---------- места: ячейка w×h (или плашка по ширине логотипа: hug + pad), бокс логотипа bw×bh, версия логотипа ---------- */
+const SLOT = {
+  m1:  {hug: true, h: 40, pad: 10, bw: 128, bh: 28, rad: 8, ver: 'wide'},
+  m2:  {hug: true, h: 48, pad: 16, bw: 200, bh: 32, rad: 8, ver: 'wide'},
+  m3t: {w: 328, h: 104, bw: 240, bh: 68, rad: 10, ver: 'wide'},
+  m3p: {w: 160, h: 72, bw: 128, bh: 46, rad: 10, ver: 'wide'},
+  m4t: {w: 320, h: 128, bw: 256, bh: 84, rad: 12, ver: 'wide'},
+  m4p: {w: 192, h: 88, bw: 152, bh: 56, rad: 10, ver: 'wide'},
+  m5:  {w: 360, h: 76, bw: 312, bh: 56, rad: 10, ver: 'wide'},
+  m6:  {w: 168, h: 62, bw: 136, bh: 44, rad: 8, ver: 'wide'},
+  m7t: {w: 960, h: 400, bw: 800, bh: 300, rad: 16, ver: 'full'},
+  m7tp:{w: 760, h: 300, bw: 620, bh: 220, rad: 16, ver: 'full'},
+  m7p: {w: 300, h: 132, bw: 240, bh: 92, rad: 12, ver: 'wide'},
+  m8t: {w: 300, h: 104, bw: 248, bh: 72, rad: 12, ver: 'wide'},
+  m8p: {w: 210, h: 104, bw: 168, bh: 64, rad: 12, ver: 'wide'},
+  m9:  {hug: true, h: 97, pad: 14, bw: 140, bh: 56, rad: 0, ver: 'wide'},
+};
+const K = .55;
+// СП2: равная площадь в боксе места
+function fit(r, W, H) {
+  let h = Math.sqrt(K * W * H / r);
+  h = Math.min(h, H, W / r);
+  return [Math.round(h * r), Math.round(h)];
+}
+// СП4: место берёт свою версию логотипа, если её нет — горизонтальную
+const pick = (s, ver) => s.logos[ver] || s.logos.wide;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+function cell(s, k, extra = '') {
+  const t = SLOT[k], lg = pick(s, t.ver), [w, h] = fit(lg.r, t.bw, t.bh);
+  const size = t.hug ? `height:${t.h}px;padding:0 ${t.pad}px` : `width:${t.w}px;height:${t.h}px`;
+  return `<span class="cell" style="${size};border-radius:${t.rad}px;${extra}"><img src="${lg.src}" alt="${esc(s.title)}" width="${w}" height="${h}"></span>`;
+}
+// СП6: ряды партнёров заполняются поровну (6 → 3 + 3, 7 → 4 + 3)
+const rowWidth = (n, max, w, gap) => { const per = Math.ceil(n / Math.ceil(n / max)); return per * w + (per - 1) * gap; };
+const mk = (id, css) => `<span class="mark" style="${css}">${id}</span>`;
+
+/* ---------- состояние ---------- */
+const Q = new URLSearchParams(location.search);
+const st = {theme: Q.get('theme') === 'light' ? 'light' : 'dark', title: TITLES[Q.get('title')] || Q.get('title') === 'none' ? Q.get('title') : 'granit', n: ['0', '3', '6', '10'].includes(Q.get('n')) ? Q.get('n') : '6'};
+const T = () => TITLES[st.title] || null;
+const PS = () => PARTNERS.slice(0, +st.n);
+
+/* ---------- правило: сравнение ---------- */
+function renderCmp() {
+  const all = [...(T() ? [T()] : []), ...PARTNERS];
+  document.getElementById('cmpOld').innerHTML = all.map(s => `<span class="chipold"><img src="${s.logos.wide.src}" alt="${esc(s.title)}"></span>`).join('');
+  document.getElementById('cmpNew').innerHTML = all.map(s => cell(s, 'm4p')).join('');
+  document.getElementById('cmpDark').innerHTML = all.map(s => cell(s, 'm4p')).join('');
+}
+
+/* ---------- таблица мест ---------- */
+const box = k => `${SLOT[k].bw}×${SLOT[k].bh}`;
+const cellSz = k => SLOT[k].hug ? `плашка выс. ${SLOT[k].h}, по ширине логотипа` : `${SLOT[k].w}×${SLOT[k].h}`;
+const ROWS = [
+  ['М1', 'Витрина · телефон', 'Полоса сверху, рядом с логотипом сервиса', 'Титульный', cellSz('m1'), box('m1'), 'горизонтальная', 'showcase_top'],
+  ['М2', 'Витрина · десктоп', 'Полоса сверху: логотип сервиса · разделитель · плашка, без подписи', 'Титульный', cellSz('m2'), box('m2'), 'горизонтальная', 'showcase_top'],
+  ['М3', 'Витрина · телефон', 'Блок «Спонсоры турнира» в конце каждой вкладки', 'Титульный — ячейка во всю ширину<br>Партнёры — 2 в ряд', `${cellSz('m3t')}<br>${cellSz('m3p')}`, `${box('m3t')}<br>${box('m3p')}`, 'горизонтальная', 'showcase_bottom'],
+  ['М4', 'Витрина · десктоп', 'Блок «Спонсоры турнира» в конце каждой вкладки, по центру', 'Титульный — отдельный ряд<br>Партнёры — ряд с переносом', `${cellSz('m4t')}<br>${cellSz('m4p')}`, `${box('m4t')}<br>${box('m4p')}`, 'горизонтальная', 'showcase_bottom'],
+  ['М5', 'ТВ-режим · табло жеребьёвки', 'Справа в шапке — вытянутый баннер вместо LIVE, часов и даты', 'Титульный', cellSz('m5'), box('m5'), 'знак → горизонтальная', 'tv_footer (угол) · draw'],
+  ['М6', 'ТВ-режим', 'Подвал, между подписями слайдов и PADEL.SELECT', 'Партнёры, до 3 — меньше, если подписям слайдов не хватает места; больше — группами со сменой слайда<br>Титульный — первым, если он не в углу', cellSz('m6'), box('m6'), 'горизонтальная', 'tv_footer'],
+  ['М7', 'ТВ-режим', 'Слайд «Спонсоры турнира», последним', 'Титульный крупно<br>Партнёры — до 5 в ряд, до 2 рядов', `${cellSz('m7t')} (без партнёров)<br>${cellSz('m7tp')} (с партнёрами)<br>${cellSz('m7p')}`, `${box('m7t')}<br>${box('m7tp')}<br>${box('m7p')}`, 'полная → горизонтальная', 'tv_slide'],
+  ['М8', 'Табло у корта', 'Подвал слева, до PADEL.SELECT и времени матча', 'Титульный<br>Партнёры, до 3; больше — группами каждые 20 с', `${cellSz('m8t')}<br>${cellSz('m8p')}`, `${box('m8t')}<br>${box('m8p')}`, 'горизонтальная', 'court'],
+  ['М9', 'Виджет трансляции', 'Слева от счёта, на всю высоту виджета', 'Только титульный', cellSz('m9'), box('m9'), 'знак → горизонтальная', 'overlay'],
+];
+document.getElementById('tbl').innerHTML = `<thead><tr><th>Место</th><th>Вью</th><th>Где</th><th>Кто</th><th>Ячейка</th><th>Бокс логотипа</th><th>Код места</th></tr></thead><tbody>${
+  ROWS.map(r => `<tr><td class="id">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="mono">${r[4]}</span></td><td><span class="mono">${r[5]}</span></td><td class="code"><span class="mono">${r[7]}</span></td></tr>`).join('')}</tbody>`;
+
+/* ---------- схемы вью ---------- */
+const svc = '<span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span>';
+function phoneTop() {
+  const t = T();
+  return `<div class="strip hasmark">${svc}${t ? `<span class="tsp hasmark">${cell(t, 'm1')}${mk('М1', 'right:-14px;top:-10px')}</span>` : ''}<i class="sh"></i></div>
+    <div class="hero-w"><i class="wire k" style="display:block"></i><i class="wire t" style="display:block"></i></div>
+    <div class="tabs-w"><i class="wire"></i><i class="wire"></i><i class="wire"></i></div>
+    <div class="list-w"><i class="wire"></i><i class="wire"></i></div>`;
+}
+function sponsBlock(desk) {
+  const t = T(), ps = PS();
+  if (!t && !ps.length) return '';
+  const kt = desk ? 'm4t' : 'm3t', kp = desk ? 'm4p' : 'm3p', id = desk ? 'М4' : 'М3';
+  return `<div class="spons hasmark">${mk(id, 'right:10px;top:10px')}
+    ${t ? `<div class="tier"><h4>Титульный спонсор</h4><div class="cells">${cell(t, kt)}</div></div>` : ''}
+    ${ps.length ? `<div class="tier"><h4>Партнёры турнира</h4><div class="cells"${desk ? ` style="max-width:${rowWidth(ps.length, 6, 192, 12)}px"` : ''}>${ps.map(p => cell(p, kp)).join('')}</div></div>` : ''}
+  </div>`;
+}
+function phoneBottom() {
+  return `<div class="list-w"><i class="wire"></i></div>${sponsBlock(false)}<div class="foot-w"><i class="wire"></i></div>`;
+}
+function deskPage() {
+  const t = T();
+  return `<div class="w d" style="width:1440px">
+    <div class="strip">${svc}${t ? `<i class="sep"></i><span class="tsp hasmark">${cell(t, 'm2')}${mk('М2', 'right:-16px;top:-8px')}</span>` : ''}<i class="sh"></i></div>
+    <div class="hero-w"><i class="wire k" style="display:block"></i><i class="wire t" style="display:block"></i></div>
+    <div class="tabs-w"><i class="wire"></i><i class="wire"></i><i class="wire"></i><i class="wire"></i></div>
+    <div class="list-w"><i class="wire"></i><i class="wire"></i><i class="wire"></i></div>
+    ${sponsBlock(true)}
+    <div class="foot-w"><i class="wire"></i></div></div>`;
+}
+// ТВ: партнёры в подвале — до 3, остальные сменяются группами вместе со слайдом (на схеме — первая группа)
+function tvBoard() {
+  const t = T(), ps = PS(), corner = !!t;
+  const foot = ps.slice(0, 3);
+  return `<div class="w tv">
+    <div class="tvh"><span class="cat">ФПР 500</span><span class="ttl">Кубок ${t ? esc(t.title) : 'Сибири'}</span>${corner ? `<span class="hasmark">${cell(t, 'm5')}${mk('М5', 'right:-12px;top:-12px;transform:scale(2);transform-origin:100% 0')}</span>` : '<span class="live">● LIVE</span><span class="clk">20:44</span>'}</div>
+    <div class="bd"><div class="st">Квалификация</div><div class="grid4"><i class="wire"></i><i class="wire"></i><i class="wire"></i><i class="wire"></i></div></div>
+    <div class="tvf"><div class="segs"><i class="on"></i><i></i><i></i><i></i><i></i></div>${foot.length ? `<div class="prt hasmark">${foot.map(p => cell(p, 'm6')).join('')}${mk('М6', 'left:-12px;top:-12px;transform:scale(2);transform-origin:0 0')}</div>` : ''}<span class="ps">${svc}</span></div>
+  </div>`;
+}
+function tvSlide() {
+  const t = T(), ps = PS();
+  return `<div class="w tv">
+    <div class="tvh"><span class="cat">ФПР 500</span><span class="ttl">Кубок ${t ? esc(t.title) : 'Сибири'}</span>${t ? cell(t, 'm5') : '<span class="clk">20:44</span>'}</div>
+    <div class="spon hasmark">${mk('М7', 'left:0;top:0;transform:scale(2);transform-origin:0 0')}
+      ${t ? `<span class="chip">Титульный спонсор</span>${cell(t, ps.length ? 'm7tp' : 'm7t')}` : ''}
+      ${ps.length ? `<span class="lb">Партнёры турнира</span><div class="pg" style="max-width:${rowWidth(ps.length, 5, 300, 24)}px">${ps.map(p => cell(p, 'm7p')).join('')}</div>` : ''}
+    </div>
+    <div class="tvf"><div class="segs"><i></i><i></i><i></i><i></i><i class="on"></i></div><span class="ps">${svc}</span></div>
+  </div>`;
+}
+function court() {
+  const t = T(), ps = PS().slice(0, 3);
+  return `<div class="w ct">
+    <div class="cth"><span class="cat">ФПР 250</span><i class="wire t"></i><i class="wire s"></i></div>
+    <i class="wire brd"></i>
+    <div class="ctf">${t || ps.length ? `<span class="hasmark" style="display:flex;gap:20px">${t ? cell(t, 'm8t') : ''}${ps.map(p => cell(p, 'm8p')).join('')}${mk('М8', 'left:-12px;top:-12px;transform:scale(2);transform-origin:0 0')}</span>` : ''}<span class="ps">${svc}</span><i class="wire dur"></i></div>
+  </div>`;
+}
+function overlay() {
+  const t = T();
+  return `<div class="ov"><div class="bug">${t ? `<span class="hasmark" style="display:flex">${cell(t, 'm9')}${mk('М9', 'left:4px;top:4px')}</span>` : ''}<div class="main"><div class="stt">1/8 финала · Корт 1</div><div class="r">Загрядский / Семьянинов<span>6 4 5 40</span></div><div class="r">Курмаев / Татарников<span>3 6 5 40</span></div></div></div></div>`;
+}
+const link = (href, txt = 'Открыть прототип ↗') => `<a href="${href}" target="_blank" rel="noopener">${txt}</a>`;
+function spParam() { return `sp=${st.title === 'none' ? 'none' : st.title}&spn=${st.n}`; }
+function scaled(html, W, H) { return `<div class="scl" data-w="${W}" data-h="${H}"><div class="cv">${html}</div></div>`; }
+function renderViews() {
+  const th = `th-${st.theme}`, sp = spParam();
+  document.getElementById('vws').innerHTML = `
+    <div class="view full ${th}"><div class="vh"><b>Витрина · телефон</b><span class="tag">М1</span><span class="tag">М3</span><span class="sz">360px, масштаб 1:1</span>${link(`public-tournament.html?view=mobile&t=da36e9c5&${sp}`)}</div>
+      <div class="phones"><figure><div class="w" style="width:360px;border-radius:18px;overflow:hidden">${phoneTop()}<div class="cut"></div></div><figcaption>верх страницы</figcaption></figure>
+      <figure><div class="w" style="width:360px;border-radius:18px;overflow:hidden"><div class="cut up"></div>${phoneBottom()}</div><figcaption>конец любой вкладки</figcaption></figure></div></div>
+    <div class="view full ${th}"><div class="vh"><b>Витрина · десктоп</b><span class="tag">М2</span><span class="tag">М4</span><span class="sz">1440px</span>${link(`public-tournament.html?view=desktop&t=da36e9c5&${sp}`)}</div>${scaled(deskPage(), 1440, 0)}</div>
+    <div class="view ${th}"><div class="vh"><b>ТВ-режим · любой слайд</b><span class="tag">М5</span><span class="tag">М6</span><span class="sz">1920×1080</span>${link(`tv-board.html?t=da36e9c5&${sp}`)}</div>${scaled(tvBoard(), 1920, 1080)}</div>
+    <div class="view ${th}"><div class="vh"><b>ТВ-режим · слайд «Спонсоры турнира»</b><span class="tag">М7</span><span class="sz">1920×1080</span>${link(`tv-board.html?t=da36e9c5&slide=last&${sp}`)}</div>${scaled(tvSlide(), 1920, 1080)}</div>
+    <div class="view ${th}"><div class="vh"><b>Табло у корта</b><span class="tag">М8</span><span class="sz">1920×1080</span>${link(`tv-live-score.html?${sp}`)}</div>${scaled(court(), 1920, 1080)}</div>
+    <div class="view ${th}"><div class="vh"><b>Виджет трансляции</b><span class="tag">М9</span><span class="sz">масштаб 1:1</span>${link(`broadcast-overlay.html?${sp}`)}</div>${scaled(overlay(), 760, 220)}</div>`;
+  layout();
+}
+// холсты вписываются в ширину карточки, высота — по содержимому
+function layout() {
+  document.querySelectorAll('.scl').forEach(s => {
+    const cv = s.firstElementChild, W = +s.dataset.w, k = Math.min(1, s.clientWidth / W);
+    const H = +s.dataset.h || cv.firstElementChild.offsetHeight;
+    cv.style.transform = `scale(${k})`; s.style.height = H * k + 'px';
+  });
+}
+addEventListener('resize', layout);
+
+function syncBar() {
+  document.querySelectorAll('.seg').forEach(g => g.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === st[g.dataset.k])));
+  const u = new URL(location); Object.entries(st).forEach(([k, v]) => u.searchParams.set(k, v)); history.replaceState(null, '', u);
+}
+document.getElementById('bar').addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  st[b.closest('.seg').dataset.k] = b.dataset.v; syncBar(); renderCmp(); renderViews();
+});
+syncBar(); renderCmp(); renderViews();
+document.fonts.ready.then(layout);
+</script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Брендинг PADEL.SELECT</title>
+<link rel="icon" href="../assets/brand/favicon.ico" sizes="32x32"><link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@1,900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Страница брендинга: логотип «Табло», правила цвета на скинах, фавиконки, файлы и код.
+   Палитра — лендинга и кабинета. Правило логотипа — копия assets/tokens.css. */
+:root{--bg:#f0f5f6;--card:#fff;--ink:#142c31;--muted:#5f7478;--faint:#909ea1;--line:#dde6e8;--line-2:#c9d5d8;
+ --lime:#82eb00;--lime-ink:#0b1b06;--dark:#0c1719;--bad:#e5484d;
+ --display:"Inter Tight","Inter",system-ui,sans-serif;--sans:"Inter",system-ui,-apple-system,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* Логотип PADEL.SELECT «Табло» — как в assets/tokens.css; цвета наследуются от шапки, поэтому переменные здесь только запасные */
+.logo{font-family:var(--display);font-style:italic;font-weight:900;letter-spacing:.02em;white-space:nowrap;text-decoration:none;color:var(--logo-ink,var(--ink))}
+.logo .b{display:inline-block;width:.34em;height:.34em;border-radius:50%;background:var(--logo-dot,currentColor);margin:0 .12em 0 .08em;overflow:hidden;text-indent:1em}
+.logo em{display:inline-block;position:relative;z-index:0;font-style:italic;color:var(--logo-on,var(--lime-ink));padding:.11em .3em .09em .25em;line-height:1}
+.logo em::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--logo-plate,var(--lime));transform:skewX(-12deg);border-radius:.08em}
+
+/* шапка страницы */
+.top{position:sticky;top:0;z-index:20;background:rgba(240,245,246,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1200px;margin:0 auto;height:60px;padding:0 24px;display:flex;align-items:center;gap:20px}
+.top .logo{font-size:18px}
+.top nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a{padding:7px 11px;border-radius:999px;font-size:13.5px;font-weight:500;color:var(--muted);text-decoration:none;white-space:nowrap}
+.top nav a:hover{background:#fff;color:var(--ink)}
+.top nav a.on{background:var(--ink);color:#fff}
+
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px 96px}
+section{padding-top:64px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-.01em;margin-top:10px}
+h2{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(26px,3.4vw,34px);line-height:1.05;margin-top:6px}
+.lead{max-width:760px;margin-top:14px;color:var(--muted);font-size:16px}
+.lead b{color:var(--ink);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px}
+
+/* герой */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+.hero>div{min-height:260px;border-radius:20px;display:grid;place-items:center;padding:32px;font-size:clamp(30px,4.6vw,58px)}
+.hero .l{background:#fff;border:1px solid var(--line)}
+.hero .d{background:var(--dark);--logo-ink:#fff;--logo-dot:var(--lime)}
+
+/* построение */
+.anat{margin-top:24px;padding:56px 24px 40px;display:grid;place-items:center;position:relative;overflow:hidden;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:center}
+.anat .cs{display:inline-block;padding:.5em;outline:1.5px dashed #8aa3a7;outline-offset:0;font-size:clamp(34px,8.4vw,108px);position:relative;background:rgba(255,255,255,.7)}
+.anat .cs .logo{display:block}
+.mk{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--ink);color:#fff;font:700 13px/26px var(--sans);text-align:center;box-shadow:0 0 0 3px #fff}
+.mk.cs-m{background:#8aa3a7}
+.spec{width:100%;border-collapse:collapse;margin-top:16px;font-size:14.5px}
+.spec td{padding:12px 16px;border-top:1px solid var(--line);vertical-align:top}
+.spec tr:first-child td{border-top:0}
+.spec td:first-child{width:220px;font-weight:600;white-space:nowrap}
+.spec td:first-child i{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:10px;border-radius:50%;background:var(--ink);color:#fff;font:700 12px var(--sans);font-style:normal}
+.spec td:first-child i.g{background:#8aa3a7}
+.spec td:last-child{color:var(--muted)}
+.spec b{color:var(--ink);font-weight:600}
+
+/* цвета */
+.sw{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:24px}
+.sw button{all:unset;cursor:pointer;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#fff;transition:transform .15s}
+.sw button:hover{transform:translateY(-2px)}
+.sw button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.sw .c{height:96px;background:var(--c);border-bottom:1px solid var(--line)}
+.sw .t{padding:10px 12px 12px}
+.sw .t b{display:block;font-size:14px}
+.sw .t code{font:500 13px var(--mono);color:var(--ink)}
+.sw .t span{display:block;margin-top:4px;font-size:12.5px;color:var(--muted);line-height:1.35}
+
+/* скины */
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.mode{padding:16px;display:grid;gap:12px;align-content:start}
+.mode h3{font-size:15px;font-weight:700}
+.mode dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px}
+.mode dt{color:var(--muted)}
+.mode dd{margin:0;font-weight:500}
+.bar{height:60px;border-radius:10px;display:flex;align-items:center;padding:0 18px;background:var(--h-bg);font-size:18px;overflow:hidden}
+.bar.ring{box-shadow:inset 0 0 0 1px var(--line)}
+.skins{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px;margin-top:16px}
+.skin{display:grid;gap:6px}
+.skin .lb{font-size:13px;color:var(--muted)}
+.skin .lb b{color:var(--ink);font-weight:600}
+.skin .bar.tv{height:96px;font-size:30px;padding:0 26px}
+.skin .bar.ft{font-size:12px;height:44px}
+.pg{margin-top:16px;padding:18px}
+.pg-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.pg-ctl label{font-weight:600;font-size:14px;margin-right:4px}
+.dot{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--line-2) inset}
+.dot.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+.pg-ctl input[type=color]{width:46px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:2px;cursor:pointer}
+.pg-ctl code{font:500 13px var(--mono);color:var(--muted)}
+.pg-grid{display:grid;grid-template-columns:repeat(3,1fr) 260px;gap:10px;margin-top:16px;align-items:center}
+
+/* вкладки браузера */
+.tab{display:flex;align-items:flex-end;height:36px;padding:0 10px;border-radius:9px;background:var(--t-bar);overflow:hidden}
+.tab span{display:flex;align-items:center;gap:8px;height:29px;flex:0 1 230px;min-width:0;padding:0 12px;border-radius:8px 8px 0 0;background:var(--t-tab);color:var(--t-ink);font:12.5px/1 var(--sans)}
+.tab img{width:16px;height:16px;flex:none}
+.tab em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab.l{--t-bar:#dee1e6;--t-tab:#fff;--t-ink:#1f1f1f}
+.tab.d{--t-bar:#1f1f1f;--t-tab:#35363a;--t-ink:#e8eaed}
+.tabs{display:grid;gap:6px}
+
+/* фавиконки */
+.fav{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;margin-top:24px}
+.fav>.card{padding:20px}
+.fav h3{font-size:15px;font-weight:700;margin-bottom:14px}
+.sizes{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.sizes figure{display:grid;justify-items:center;gap:8px;font-size:12px;color:var(--faint)}
+.pair{display:flex;gap:6px}
+.pair span{display:grid;place-items:center;border-radius:8px}
+.pair .l{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.pair .d{background:#202124}
+.app{border-radius:22.5%;overflow:hidden;box-shadow:0 6px 18px rgba(20,44,49,.18);display:block}
+.skinfav{display:grid;gap:8px;margin-top:4px}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+
+/* файлы */
+.files{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.file{overflow:hidden;display:flex;flex-direction:column}
+.file .pv{height:150px;display:grid;place-items:center;padding:20px;background:var(--pv,#fff);border-bottom:1px solid var(--line)}
+.file .pv img{max-width:100%;max-height:100%}
+.file .pv.chk{background-color:#fff;background-image:linear-gradient(45deg,#e9eef0 25%,transparent 25%),linear-gradient(-45deg,#e9eef0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e9eef0 75%),linear-gradient(-45deg,transparent 75%,#e9eef0 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.file .tx{padding:14px 16px 16px;display:grid;gap:10px;flex:1;align-content:space-between}
+.file .tx b{font-size:14.5px}
+.file .tx span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.dl{display:flex;gap:8px;flex-wrap:wrap}
+.dl a{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;text-decoration:none}
+.dl a:hover{background:#000}
+.dl a.s{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+
+/* код */
+.code{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.code .card{overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.code .hd{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 16px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}
+.code .hd button{all:unset;cursor:pointer;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line-2)}
+.code .hd button:hover{background:var(--bg)}
+.code .hd button.ok{background:var(--lime);color:var(--lime-ink);box-shadow:none}
+.code pre{margin:0;padding:16px;overflow:auto;font:12.5px/1.6 var(--mono);color:#20383d;background:#fbfcfc;flex:1}
+.code .wide{grid-column:1/-1}
+
+/* нельзя */
+.dont{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.dont .card{overflow:hidden}
+.dont .ex{height:130px;display:grid;place-items:center;font-size:30px;overflow:hidden;background:var(--h-bg,#fff);border-bottom:1px solid var(--line);position:relative}
+.dont .ex::after{content:"";position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:var(--bad) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 8l8 8M16 8l-8 8' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center/100%}
+.dont p{padding:12px 16px 14px;font-size:13.5px;color:var(--muted)}
+.dont p b{display:block;color:var(--ink);font-size:14.5px;margin-bottom:2px}
+/* испорченные логотипы для раздела «Нельзя» */
+.x-noplate em::before{display:none}.x-noplate em{color:var(--lime);padding:0}
+.x-straight em::before{transform:none;border-radius:3px}
+.x-dot .b{width:.16em;height:.16em;margin:0 .05em}
+.x-font{font-family:var(--sans)!important;font-style:normal!important;font-weight:600!important}.x-font em{font-style:normal}.x-font em::before{transform:none}
+.x-stretch{display:inline-block;transform:scaleX(1.3) scaleY(.92)}
+
+footer{max-width:1200px;margin:0 auto;padding:28px 24px 48px;border-top:1px solid var(--line);display:flex;gap:20px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13.5px}
+footer .logo{font-size:15px}
+footer code{font:12.5px var(--mono);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:24px;translate:-50% 20px;opacity:0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;transition:.2s;pointer-events:none;z-index:30}
+.toast.on{opacity:1;translate:-50% 0}
+
+@media (max-width:1000px){
+  .sw{grid-template-columns:repeat(3,1fr)}
+  .files,.dont{grid-template-columns:repeat(2,1fr)}
+  .pg-grid{grid-template-columns:1fr}
+  .modes{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .top .in{padding:0 16px;gap:12px}
+  .top .logo{font-size:15px}
+  .wrap{padding:0 16px 72px}
+  section{padding-top:48px}
+  .hero,.fav,.code,.skins{grid-template-columns:1fr}
+  .hero>div{min-height:170px;padding:24px}
+  .sw{grid-template-columns:repeat(2,1fr)}
+  .files,.dont{grid-template-columns:1fr}
+  .spec td{padding:10px 12px}
+  .spec td:first-child{width:auto;white-space:normal}
+  .spec tr{display:grid}
+  .spec td:last-child{border-top:0;padding-top:0}
+  .anat{padding:44px 12px 28px}
+  footer{padding:24px 16px 40px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="logo" href="#logo">PADEL<span class="b">.</span><em>SELECT</em></a>
+  <nav id="nav">
+    <a href="#logo">Логотип</a><a href="#build">Построение</a><a href="#colors">Цвета</a><a href="#skins">Скины</a><a href="#favicon">Фавиконки</a><a href="#files">Файлы</a><a href="#code">Код</a><a href="#dont">Нельзя</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <section id="logo">
+    <div class="eyebrow">Брендинг</div>
+    <h1>PADEL.SELECT</h1>
+    <p class="lead">Логотип «Табло»: <b>SELECT на наклонной плашке</b>, как титр трансляции, и <b>мяч вместо точки</b>. Плашка всегда окрашена в акцентный цвет скина, поэтому логотип меняется вместе со скином спонсора.</p>
+    <div class="hero">
+      <div class="l"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span></div>
+      <div class="d"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span></div>
+    </div>
+  </section>
+
+  <section id="build">
+    <div class="eyebrow">Построение</div>
+    <h2>Три элемента и свободное поле</h2>
+    <div class="card anat" id="anat"><span class="cs"><span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span></span></div>
+    <div class="card" style="margin-top:12px;overflow:hidden">
+      <table class="spec">
+        <tr><td><i>1</i>PADEL</td><td><b>Inter Tight Italic 900</b>, прописные, трекинг +0,02 em. На светлом фоне — цвет текста, на тёмном — белый.</td></tr>
+        <tr><td><i>2</i>Мяч</td><td>Круг <b>⌀ 0,34 em</b> на базовой линии, отступы 0,08 em до PADEL и 0,12 em до плашки. Точка остаётся текстом: при копировании получается «PADEL.SELECT».</td></tr>
+        <tr><td><i>3</i>Плашка SELECT</td><td>Наклон <b>12°</b>, как у курсива; высота <b>1,2 em</b>, скругление 0,08 em, поля 0,11 / 0,30 / 0,09 / 0,25 em (сверху, справа, снизу, слева).</td></tr>
+        <tr><td><i class="g">4</i>Свободное поле</td><td>Не меньше <b>0,5 em</b> (половины кегля) со всех сторон: туда не заходят текст, логотипы партнёров и край экрана.</td></tr>
+        <tr><td><i class="g">5</i>Минимальный размер</td><td>Кегль <b>12 px</b>, ширина логотипа около 100 px. Мельче — только фавиконка «P.».</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="colors">
+    <div class="eyebrow">Цвета</div>
+    <h2>Палитра PADEL.SELECT</h2>
+    <p class="lead">Нажмите на цвет, чтобы скопировать код. В скинах спонсоров лайм заменяется акцентом спонсора.</p>
+    <div class="sw" id="sw"></div>
+  </section>
+
+  <section id="skins">
+    <div class="eyebrow">Скины</div>
+    <h2>Логотип меняется вместе со скином</h2>
+    <p class="lead">Одно правило для любого фона: <b>плашка всегда в акценте скина</b>. Если шапка сама залита акцентом, плашка становится цвета текста шапки, а слово — цвета шапки, как вырез.</p>
+    <div class="modes" id="modes"></div>
+    <p class="lead" style="margin-top:16px">Все 13 скинов страницы турнира с токенами — на странице <a href="skins.html"><b>«Скины»</b></a>.</p>
+    <div class="skins" id="skinlist"></div>
+    <div class="card pg">
+      <div class="pg-ctl" id="pgc"></div>
+      <div class="pg-grid" id="pgg"></div>
+    </div>
+  </section>
+
+  <section id="favicon">
+    <div class="eyebrow">Фавиконки</div>
+    <h2>«P.» на той же плашке</h2>
+    <p class="lead">Фавиконка повторяет плашку логотипа: наклонная, с буквой P и мячом. На странице турнира со скином спонсора она тоже окрашивается в его акцент.</p>
+    <div class="fav">
+      <div class="card">
+        <h3>Размеры</h3>
+        <div class="sizes" id="sizes"></div>
+        <div class="tabs" style="margin-top:18px" id="tabs"></div>
+      </div>
+      <div class="card">
+        <h3>В скинах спонсоров</h3>
+        <div class="skinfav" id="skinfav"></div>
+        <p class="note">Цвет буквы на плашке подбирается по контрасту с акцентом: тёмный или белый.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="files">
+    <div class="eyebrow">Файлы</div>
+    <h2>Скачать</h2>
+    <p class="lead">Логотип в кривых: шрифт не нужен. Версии с вырезом встают на фон любого цвета: слово SELECT прорезано в плашке.</p>
+    <div class="files" id="filelist"></div>
+  </section>
+
+  <section id="code">
+    <div class="eyebrow">Код</div>
+    <h2>Разметка и стили</h2>
+    <p class="lead">Источник правил — <b>assets/tokens.css</b>. Цвета логотипа задаются тремя переменными, остальное не меняется.</p>
+    <div class="code" id="codes"></div>
+  </section>
+
+  <section id="dont">
+    <div class="eyebrow">Нельзя</div>
+    <h2>Как не надо</h2>
+    <div class="dont" id="donts"></div>
+  </section>
+</div>
+
+<footer>
+  <span class="logo">PADEL<span class="b">.</span><em>SELECT</em></span>
+  <span>Правила — <code>assets/tokens.css</code>, файлы — <code>assets/brand/</code></span>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const BRAND = '../assets/brand/';
+const LOGO = 'PADEL<span class="b">.</span><em>SELECT</em>';
+const logo = (cls = '') => `<span class="logo ${cls}">${LOGO}</span>`;
+
+/* ---------- цвет: правило плашки ---------- */
+function lum(hex) { const n = parseInt(hex.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const onColor = bg => contrast(bg, '#0b0f02') >= contrast(bg, '#ffffff') ? '#0b0f02' : '#ffffff';
+// bg — фон шапки, ink — её текст, acc — акцент скина; accBar — шапка залита акцентом
+function palette(bg, ink, acc, accBar) {
+  accBar = accBar || contrast(bg, acc) < 1.05;
+  return {ink, plate: accBar ? ink : acc, on: accBar ? bg : onColor(acc), dot: !accBar && contrast(acc, bg) >= 1.8 ? acc : ink};
+}
+const vars = (p, bg) => `--h-bg:${bg};--logo-ink:${p.ink};--logo-plate:${p.plate};--logo-on:${p.on};--logo-dot:${p.dot}`;
+
+/* ---------- фавиконка: как assets/brand/favicon.svg ---------- */
+const P = 'M0 0H5.8A4.2 4.2 0 0 1 5.8 8.4H3.6V14H0Z M3.6 2.9H5.6A1.3 1.3 0 0 1 5.6 5.5H3.6Z', SK = 'translate(16 16) skewX(-12.5) translate(-16 -16)';
+const favSvg = (plate, ink) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g transform="${SK}"><rect x="4" y="2.5" width="24" height="27" rx="1.6" fill="${plate}"/><path transform="translate(7.6 7.3) scale(1.25)" fill-rule="evenodd" fill="${ink}" d="${P}"/></g><circle cx="20.43" cy="22.2" r="2.6" fill="${ink}"/></svg>`;
+const uri = s => 'data:image/svg+xml,' + encodeURIComponent(s);
+const favImg = (acc, px = 16) => `<img src="${uri(favSvg(acc, onColor(acc)))}" width="${px}" height="${px}" alt="">`;
+const tab = (cls, acc, title) => `<div class="tab ${cls}"><span>${favImg(acc)}<em>${title}</em></span></div>`;
+
+/* ---------- цвета ---------- */
+const SW = [
+  ['#82eb00', 'Лайм', 'Акцент, плашка SELECT'],
+  ['#0b1b06', 'Тёмный на лайме', 'Слово SELECT на плашке'],
+  ['#142c31', 'Текст', 'PADEL и мяч на светлом'],
+  ['#ffffff', 'Белый', 'PADEL на тёмном'],
+  ['#f0f5f6', 'Светлый фон', 'Лендинг, кабинет'],
+  ['#0c1719', 'Тёмный фон', 'Страница турнира, ТВ']
+];
+document.getElementById('sw').innerHTML = SW.map(([c, n, u]) => `<button data-copy="${c}" style="--c:${c}"><span class="c"></span><span class="t"><b>${n}</b><code>${c}</code><span>${u}</span></span></button>`).join('');
+
+/* ---------- скины ---------- */
+const MODES = [
+  {h: 'Светлый фон', bg: '#ffffff', ink: '#142c31', acc: '#82eb00', dl: [['Плашка', 'акцент'], ['Слово', 'тёмное или белое по контрасту'], ['Мяч', 'цвет текста']]},
+  {h: 'Тёмный фон', bg: '#0c1719', ink: '#ffffff', acc: '#82eb00', dl: [['Плашка', 'акцент'], ['Слово', 'тёмное или белое по контрасту'], ['Мяч', 'акцент']]},
+  {h: 'Шапка цвета акцента', bg: '#eeff00', ink: '#000000', acc: '#eeff00', accBar: true, dl: [['Плашка', 'цвет текста шапки'], ['Слово', 'цвет шапки, вырез'], ['Мяч', 'цвет текста шапки']]}
+];
+document.getElementById('modes').innerHTML = MODES.map(m => { const p = palette(m.bg, m.ink, m.acc, m.accBar);
+  return `<div class="card mode"><h3>${m.h}</h3><div class="bar ${m.bg === '#ffffff' ? 'ring' : ''}" style="${vars(p, m.bg)}">${logo()}</div><dl>${m.dl.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>`; }).join('');
+const SKINS = [
+  {n: 'Лендинг и кабинет', s: 'светлый, лайм', bg: '#f0f5f6', ink: '#142c31', acc: '#82eb00', cls: 'ring'},
+  {n: 'Страница турнира', s: 'по умолчанию, тёмная', bg: '#0c1719', ink: '#ffffff', acc: '#8ae81f'},
+  {n: '«Светлая сторона»', s: 'тёмная шапка', bg: '#0b0b0b', ink: '#ffffff', acc: '#b8dc1e'},
+  {n: '«Светлая сторона»', s: 'шапка в цвет акцента', bg: '#b8dc1e', ink: '#0b0f02', acc: '#b8dc1e', accBar: true},
+  {n: 'Varlion', s: 'жёлтая шапка', bg: '#eeff00', ink: '#000000', acc: '#eeff00', accBar: true},
+  {n: 'FONBET', s: 'красная шапка', bg: '#e11b22', ink: '#ffffff', acc: '#e11b22', accBar: true},
+  {n: 'ТВ-режим', s: 'экран у корта', bg: '#0c1719', ink: '#ffffff', acc: '#82eb00', cls: 'tv'},
+  {n: 'Подвал', s: '12 px, минимальный размер', bg: '#ffffff', ink: '#142c31', acc: '#82eb00', cls: 'ft ring'}
+];
+document.getElementById('skinlist').innerHTML = SKINS.map(s => { const p = palette(s.bg, s.ink, s.acc, s.accBar);
+  return `<div class="skin"><div class="lb"><b>${s.n}</b> · ${s.s}</div><div class="bar ${s.cls || ''}" style="${vars(p, s.bg)}">${logo()}</div></div>`; }).join('');
+
+/* ---------- свой цвет спонсора ---------- */
+const PRESETS = ['#82eb00', '#eeff00', '#e11b22', '#1e6bff', '#ff7a00', '#8b3dff', '#00c2a8', '#ffffff'];
+let acc = '#1e6bff';
+function renderPg() {
+  document.getElementById('pgc').innerHTML = '<label>Проверить цвет спонсора</label>' + PRESETS.map(c => `<button class="dot ${c === acc ? 'on' : ''}" style="--c:${c}" data-c="${c}" aria-label="${c}"></button>`).join('') + `<input type="color" id="pgi" value="${acc}" aria-label="Свой цвет"><code>${acc}</code>`;
+  document.querySelectorAll('#pgc .dot').forEach(b => b.onclick = () => { acc = b.dataset.c; renderPg(); });
+  document.getElementById('pgi').oninput = e => { acc = e.target.value; renderPg(); };
+  const rows = [{bg: '#0c1719', ink: '#ffffff'}, {bg: acc, ink: onColor(acc), accBar: true}, {bg: '#ffffff', ink: '#12181b', ring: true}];
+  document.getElementById('pgg').innerHTML = rows.map(r => `<div class="bar ${r.ring ? 'ring' : ''}" style="${vars(palette(r.bg, r.ink, acc, r.accBar), r.bg)}">${logo()}</div>`).join('') +
+    `<div class="tabs">${tab('l', acc, 'Кубок спонсора · PADEL.SELECT')}${tab('d', acc, 'Кубок спонсора · PADEL.SELECT')}</div>`;
+}
+renderPg();
+
+/* ---------- фавиконки ---------- */
+const pair = (src, s) => `<div class="pair"><span class="l" style="width:${s + 14}px;height:${s + 14}px"><img src="${src}" width="${s}" height="${s}" alt=""></span><span class="d" style="width:${s + 14}px;height:${s + 14}px"><img src="${src}" width="${s}" height="${s}" alt=""></span></div>`;
+document.getElementById('sizes').innerHTML =
+  [16, 32, 48].map(s => `<figure>${pair(BRAND + 'favicon.svg', s)}${s} px</figure>`).join('') +
+  `<figure><img class="app" src="${BRAND}apple-touch-icon.png" width="76" height="76" alt="">180 px · iPhone</figure>` +
+  `<figure><img class="app" src="${BRAND}icon-512.png" width="96" height="96" alt="">512 px · PWA, Telegram</figure>`;
+document.getElementById('tabs').innerHTML = tab('l', '#82eb00', 'Турниры · PADEL.SELECT') + tab('d', '#82eb00', 'Турниры · PADEL.SELECT');
+document.getElementById('skinfav').innerHTML = [['#82eb00', 'Кубок Арена Сити'], ['#eeff00', 'Кубок Varlion'], ['#e11b22', 'FONBET Open'], ['#b8dc1e', 'Кубок Светлой стороны']]
+  .map(([c, t], i) => tab(i % 2 ? 'd' : 'l', c, t + ' · PADEL.SELECT')).join('');
+
+/* ---------- файлы ---------- */
+const FILES = [
+  {pv: 'logo-light.svg', bg: '#fff', n: 'Логотип · светлый фон', u: 'Документы, презентации, сайты партнёров', dl: [['SVG', 'logo-light.svg'], ['PNG', 'logo-light.png']]},
+  {pv: 'logo-dark.svg', bg: '#0c1719', n: 'Логотип · тёмный фон', u: 'ТВ, трансляции, тёмные макеты', dl: [['SVG', 'logo-dark.svg'], ['PNG', 'logo-dark.png']]},
+  {pv: 'logo-black.svg', bg: '#eeff00', n: 'Чёрный с вырезом', u: 'Светлые и яркие шапки спонсоров, печать в один цвет', dl: [['SVG', 'logo-black.svg']]},
+  {pv: 'logo-white.svg', bg: '#e11b22', n: 'Белый с вырезом', u: 'Тёмные и насыщенные шапки, мерч, вышивка', dl: [['SVG', 'logo-white.svg']]},
+  {pv: 'favicon.svg', bg: 'chk', n: 'Фавиконка', u: 'Вкладка браузера; ICO — для старых браузеров и Windows', dl: [['SVG', 'favicon.svg'], ['ICO', 'favicon.ico']]},
+  {pv: 'icon-512.png', bg: '#fff', n: 'Иконка приложения', u: '180 px — экран iPhone, 512 px — PWA и аватар в Telegram', dl: [['180 px', 'apple-touch-icon.png'], ['512 px', 'icon-512.png']]}
+];
+document.getElementById('filelist').innerHTML = FILES.map(f => `<div class="card file"><div class="pv ${f.bg === 'chk' ? 'chk' : ''}" style="${f.bg === 'chk' ? '' : '--pv:' + f.bg}"><img src="${BRAND + f.pv}" alt="" style="${f.pv.startsWith('icon') || f.pv.startsWith('fav') ? 'height:84px' : 'width:86%'}${f.pv.startsWith('icon') ? ';border-radius:22.5%' : ''}"></div>
+  <div class="tx"><div><b>${f.n}</b><span>${f.u}</span></div><div class="dl">${f.dl.map(([l, file], i) => `<a class="${i ? 's' : ''}" href="${BRAND + file}" download>↓ ${l}</a>`).join('')}</div></div></div>`).join('');
+
+/* ---------- код ---------- */
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const CODE = [
+  {h: 'Разметка', c: `<a class="logo" href="/">PADEL<span class="b">.</span><em>SELECT</em></a>`},
+  {h: 'Фавиконки в <head>', c: `<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">`},
+  {h: 'Стили', wide: true, c: `/* Шрифт: Inter Tight Italic 900 */
+.logo{font-family:"Inter Tight","Inter",system-ui,sans-serif;font-style:italic;font-weight:900;
+  letter-spacing:.02em;white-space:nowrap;text-decoration:none;color:var(--ink);
+  --logo-plate:var(--accent);   /* плашка: всегда акцент скина */
+  --logo-on:var(--accent-ink);  /* слово на плашке: контрастный к акценту */
+  --logo-dot:var(--ink)}        /* мяч: на тёмном фоне — акцент */
+.logo .b{display:inline-block;width:.34em;height:.34em;border-radius:50%;
+  background:var(--logo-dot,currentColor);margin:0 .12em 0 .08em;overflow:hidden;text-indent:1em}
+.logo em{display:inline-block;position:relative;z-index:0;font-style:italic;color:var(--logo-on);
+  padding:.11em .3em .09em .25em;line-height:1}
+.logo em::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--logo-plate);
+  transform:skewX(-12deg);border-radius:.08em}
+
+/* тёмный фон */
+.dark .logo{color:#fff;--logo-dot:var(--accent)}
+/* шапка залита акцентом спонсора: плашка цвета текста, слово цвета шапки */
+.sk-fonbet .logo{color:#fff;--logo-plate:#fff;--logo-on:#e11b22;--logo-dot:#fff}`}
+];
+document.getElementById('codes').innerHTML = CODE.map((c, i) => `<div class="card ${c.wide ? 'wide' : ''}"><div class="hd">${esc(c.h)}<button data-code="${i}">Копировать</button></div><pre>${esc(c.c)}</pre></div>`).join('');
+
+/* ---------- нельзя ---------- */
+const DONT = [
+  {x: 'x-noplate', bg: '#0c1719', ink: '#ffffff', b: 'Без плашки', t: 'SELECT цветным текстом — так было раньше на тёмной странице.'},
+  {x: '', bg: '#82eb00', ink: '#0b1b06', acc: '#82eb00', raw: true, b: 'Плашка в цвет шапки', t: 'На шапке цвета акцента плашка сливается с фоном — нужна плашка цвета текста.'},
+  {x: 'x-straight', bg: '#ffffff', ink: '#142c31', b: 'Прямая плашка', t: 'Плашка наклонена вместе с курсивом на 12°, прямоугольник — старая версия.'},
+  {x: 'x-dot', bg: '#ffffff', ink: '#142c31', b: 'Точка вместо мяча', t: 'Мяч крупнее точки: 0,34 em, не уменьшать.'},
+  {x: 'x-font', bg: '#ffffff', ink: '#142c31', b: 'Другой шрифт или прямое начертание', t: 'Только Inter Tight Italic 900.'},
+  {x: 'x-stretch', bg: '#ffffff', ink: '#142c31', b: 'Растягивать и обводить', t: 'Пропорции, цвета и форму не менять, теней и обводок не добавлять.'}
+];
+document.getElementById('donts').innerHTML = DONT.map(d => {
+  const p = d.raw ? {ink: d.ink, plate: d.acc, on: d.ink, dot: d.ink} : palette(d.bg, d.ink, '#82eb00');
+  return `<div class="card"><div class="ex" style="${vars(p, d.bg)}">${logo(d.x)}</div><p><b>${d.b}</b>${d.t}</p></div>`;
+}).join('');
+
+/* ---------- построение: метки поверх логотипа ---------- */
+function marks() {
+  const box = document.getElementById('anat'), cs = box.querySelector('.cs'), L = cs.querySelector('.logo');
+  box.querySelectorAll('.mk').forEach(m => m.remove());
+  const o = box.getBoundingClientRect(), r = document.createRange(); r.selectNodeContents(L.firstChild);
+  const at = (n, rect, dy, cls = '') => { const m = document.createElement('span'); m.className = 'mk ' + cls; m.textContent = n;
+    m.style.left = (rect.left + rect.width / 2 - o.left) + 'px'; m.style.top = (rect.top - o.top + dy) + 'px'; box.appendChild(m); };
+  const top = L.querySelector('em').getBoundingClientRect().top - 22, row = rc => ({left: rc.left, width: rc.width, top});
+  at(1, row(r.getBoundingClientRect()), 0);
+  at(2, row(L.querySelector('.b').getBoundingClientRect()), 0);
+  at(3, row(L.querySelector('em').getBoundingClientRect()), 0);
+  const c = cs.getBoundingClientRect();
+  at(4, {left: c.left, width: 0, top: c.top}, 0, 'cs-m');
+}
+document.fonts.ready.then(marks); addEventListener('resize', marks);
+
+/* ---------- копирование ---------- */
+const toast = t => { const e = document.getElementById('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 1400); };
+const copy = (text, msg, btn) => navigator.clipboard.writeText(text).then(() => { toast(msg); if (btn) { btn.classList.add('ok'); btn.textContent = 'Скопировано'; setTimeout(() => { btn.classList.remove('ok'); btn.textContent = 'Копировать'; }, 1400); } }, () => toast('Не удалось скопировать'));
+document.addEventListener('click', e => {
+  const s = e.target.closest('[data-copy]'); if (s) copy(s.dataset.copy, 'Скопировано: ' + s.dataset.copy);
+  const c = e.target.closest('[data-code]'); if (c) copy(CODE[c.dataset.code].c, 'Код скопирован', c);
+});
+
+/* ---------- активный пункт меню ---------- */
+const links = [...document.querySelectorAll('#nav a')];
+const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id)); }), {rootMargin: '-40% 0px -55% 0px'});
+document.querySelectorAll('section[id]').forEach(s => io.observe(s));
+</script>
+</body>
+</html>
